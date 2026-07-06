@@ -1,0 +1,21 @@
+{
+  "name": "모닝데스크",
+  "short_name": "모닝데스크",
+  "description": "아침 뉴스, 생각 질문, 일정, 할 일을 한 화면에서 정리하는 개인 브리핑 앱",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7f4",
+  "theme_color": "#246b55",
+  "orientation": "portrait-primary",
+  "lang": "ko-KR",
+  "categories": ["productivity", "news", "utilities"],
+  "icons": [
+    {
+      "src": "./icons/morningdesk-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

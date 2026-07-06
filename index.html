@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#246b55">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="모닝데스크">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>모닝데스크</title>
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icons/morningdesk-icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./icons/morningdesk-icon.svg">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section id="threshold" class="threshold">
+        <div class="threshold__copy">
+          <p class="eyebrow">Morning Desk</p>
+          <h1>오늘을 시작하기 전에</h1>
+          <p class="lead" id="todayLabel"></p>
+        </div>
+        <form id="checkinForm" class="checkin" autocomplete="off">
+          <div class="assistant-card">
+            <div>
+              <p class="eyebrow">Assistant</p>
+              <h2>오늘은 어떻게 챙겨드릴까요?</h2>
+            </div>
+            <p id="assistantPrompt" class="assistant-dialog">몇 가지만 답하면 제가 오늘의 시작점을 정리해둘게요.</p>
+            <input id="checkinMode" type="hidden" value="conversation">
+            <input id="energyLevel" type="hidden" value="normal">
+            <input id="dayMode" type="hidden" value="normal">
+            <div class="choice-group" aria-label="체크인 방식">
+              <button class="choice-button is-selected" type="button" data-mode="conversation">대화로 정리</button>
+              <button class="choice-button" type="button" data-mode="choice">선택지만 고르기</button>
+              <button class="choice-button" type="button" data-mode="quick">짧게 시작</button>
+              <button class="choice-button" type="button" data-mode="off">오늘은 오프</button>
+            </div>
+            <div class="choice-group compact" aria-label="오늘 컨디션">
+              <button class="choice-button" type="button" data-energy="good">괜찮음</button>
+              <button class="choice-button is-selected" type="button" data-energy="normal">보통</button>
+              <button class="choice-button" type="button" data-energy="tired">피곤함</button>
+            </div>
+            <div class="choice-group compact" aria-label="오늘 강도">
+              <button class="choice-button is-selected" type="button" data-day-mode="normal">일반</button>
+              <button class="choice-button" type="button" data-day-mode="light">가볍게</button>
+              <button class="choice-button" type="button" data-day-mode="off">하루 오프</button>
+            </div>
+          </div>
+          <label>
+            오늘 가장 중요한 일
+            <input id="mainTask" name="mainTask" type="text" placeholder="예: 모닝데스크 첫 화면 확인">
+          </label>
+          <label>
+            피하고 싶은 실수
+            <input id="avoidMistake" name="avoidMistake" type="text" placeholder="예: 확인하지 않고 확신하기">
+          </label>
+          <label>
+            짧은 다짐
+            <input id="intention" name="intention" type="text" placeholder="예: 중요한 일부터 작게 시작한다">
+          </label>
+          <div class="threshold__actions">
+            <button class="primary" type="submit">브리핑 시작</button>
+            <button class="secondary" id="quickStart" type="button">짧게 시작</button>
+            <button class="secondary" id="offDay" type="button">오늘은 오프</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="dashboard" class="dashboard is-hidden" aria-live="polite">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">오늘 브리핑</p>
+            <h2 id="dashboardTitle">모닝데스크</h2>
+          </div>
+          <div class="topbar__actions">
+            <span id="storageStatus" class="storage-status">저장소 확인 중</span>
+            <button class="secondary" id="exportData" type="button">백업</button>
+            <button class="secondary" id="importData" type="button">불러오기</button>
+            <button class="secondary" id="resetCheckin" type="button">체크인 수정</button>
+            <input id="importFile" type="file" accept="application/json,.json" class="visually-hidden" aria-label="백업 파일 불러오기">
+          </div>
+        </header>
+
+        <section class="summary-grid">
+          <article class="summary-panel assistant-summary">
+            <span class="panel-label">비서 모드</span>
+            <strong id="assistantBrief"></strong>
+          </article>
+          <article class="summary-panel">
+            <span class="panel-label">핵심 업무</span>
+            <strong id="summaryMainTask"></strong>
+          </article>
+          <article class="summary-panel">
+            <span class="panel-label">주의할 점</span>
+            <strong id="summaryMistake"></strong>
+          </article>
+          <article class="summary-panel">
+            <span class="panel-label">오늘의 기준</span>
+            <strong id="summaryIntention"></strong>
+          </article>
+        </section>
+
+        <section class="voice-panel" aria-label="브리핑 읽어주기">
+          <div>
+            <p class="eyebrow">Voice</p>
+            <h3>브리핑 읽어주기</h3>
+            <p id="voiceStatus" class="voice-status">요약, 일정, 할 일, 주요 기사를 짧게 읽어드립니다.</p>
+          </div>
+          <div class="voice-controls">
+            <label class="voice-select">
+              목소리
+              <select id="voiceSelect" aria-label="읽어주기 목소리 선택">
+                <option value="">기본 음성</option>
+              </select>
+            </label>
+            <label class="voice-rate">
+              속도
+              <input id="voiceRate" type="range" min="0.8" max="1.2" step="0.1" value="1">
+            </label>
+            <button class="primary" id="readBriefing" type="button">읽기</button>
+            <button class="secondary" id="stopReading" type="button">정지</button>
+            <button class="secondary" id="toggleScript" type="button">대본</button>
+          </div>
+          <textarea id="briefingScriptPreview" class="script-preview is-hidden" rows="5" readonly aria-label="읽어줄 브리핑 대본"></textarea>
+        </section>
+
+        <section class="content-grid">
+          <div class="main-column">
+            <section class="section-header">
+              <div>
+                <p class="eyebrow">News</p>
+                <h3>선별 기사</h3>
+              </div>
+              <span id="newsCount" class="count-pill"></span>
+            </section>
+            <div id="articleList" class="article-list"></div>
+          </div>
+
+          <aside class="side-column">
+            <section class="panel">
+              <div class="section-header compact">
+                <div>
+                  <p class="eyebrow">Plan</p>
+                  <h3>일정</h3>
+                </div>
+              </div>
+              <form id="scheduleForm" class="inline-form">
+                <input id="scheduleTime" type="time" aria-label="일정 시간">
+                <input id="scheduleTitle" type="text" placeholder="일정 추가" aria-label="일정 제목">
+                <button type="submit" class="icon-button" title="일정 추가">+</button>
+              </form>
+              <ul id="scheduleList" class="list"></ul>
+            </section>
+
+            <section class="panel">
+              <div class="section-header compact">
+                <div>
+                  <p class="eyebrow">Tasks</p>
+                  <h3>할 일</h3>
+                </div>
+                <span id="taskLoad" class="count-pill"></span>
+              </div>
+              <form id="taskForm" class="inline-form">
+                <input id="taskTitle" type="text" placeholder="할 일 추가" aria-label="할 일 제목">
+                <button type="submit" class="icon-button" title="할 일 추가">+</button>
+              </form>
+              <ul id="taskList" class="list"></ul>
+            </section>
+
+            <section class="panel">
+              <div class="section-header compact">
+                <div>
+                  <p class="eyebrow">Deferred</p>
+                  <h3>미룬 일</h3>
+                </div>
+              </div>
+              <div id="deferredList" class="deferred-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="section-header compact">
+                <div>
+                  <p class="eyebrow">Settings</p>
+                  <h3>설정</h3>
+                </div>
+                <span id="weightTotal" class="count-pill"></span>
+              </div>
+              <form id="settingsForm" class="settings-form">
+                <label>
+                  하루 뉴스 개수
+                  <input id="dailyNewsCount" type="number" min="1" max="12" step="1">
+                </label>
+                <label>
+                  제외 항목
+                  <input id="excludedCategories" type="text" placeholder="스포츠, 연예, 가십">
+                </label>
+                <div id="weightEditor" class="weight-editor"></div>
+                <button class="primary full-width" type="submit">설정 저장</button>
+              </form>
+              <div id="weightList" class="weight-list"></div>
+            </section>
+
+            <section class="panel">
+              <div class="section-header compact">
+                <div>
+                  <p class="eyebrow">Review</p>
+                  <h3>한 줄 회고</h3>
+                </div>
+              </div>
+              <form id="reflectionForm" class="reflection-form">
+                <textarea id="reflectionText" rows="3" placeholder="오늘 남겨둘 한 줄을 적습니다."></textarea>
+                <button class="secondary full-width" type="submit">회고 저장</button>
+              </form>
+              <ul id="reflectionList" class="list"></ul>
+            </section>
+          </aside>
+        </section>
+      </section>
+    </main>
+    <script src="./app-config.js"></script>
+    <script src="./storage.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
