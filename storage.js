@@ -1,6 +1,29 @@
 (function () {
   const storageKey = "morningdesk.v1";
-  const config = window.MORNINGDESK_CONFIG || { storageMode: "local" };
+  const configKey = "morningdesk.config.v1";
+
+  function mergeConfig(base, override) {
+    return {
+      ...base,
+      ...override,
+      supabase: {
+        ...(base.supabase || {}),
+        ...(override.supabase || {})
+      }
+    };
+  }
+
+  function getStoredConfig() {
+    try {
+      return JSON.parse(localStorage.getItem(configKey) || "{}");
+    } catch {
+      localStorage.removeItem(configKey);
+      return {};
+    }
+  }
+
+  const config = mergeConfig(window.MORNINGDESK_CONFIG || { storageMode: "local" }, getStoredConfig());
+  window.MORNINGDESK_CONFIG = config;
 
   function currentMode() {
     if (
@@ -43,11 +66,20 @@
     return localTime > remoteTime ? localState : remoteState;
   }
 
+  function fetchWithTimeout(endpoint, options = {}) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    return fetch(endpoint, {
+      ...options,
+      signal: controller.signal
+    }).finally(() => clearTimeout(timeoutId));
+  }
+
   async function loadSupabaseState() {
     const { url, anonKey, table } = config.supabase;
     const profileId = config.profileId || "default";
     const endpoint = `${url.replace(/\/$/, "")}/rest/v1/${table}?id=eq.${encodeURIComponent(profileId)}&select=state,updated_at`;
-    const response = await fetch(endpoint, {
+    const response = await fetchWithTimeout(endpoint, {
       headers: {
         apikey: anonKey,
         Authorization: `Bearer ${anonKey}`
@@ -63,7 +95,7 @@
     const { url, anonKey, table } = config.supabase;
     const profileId = config.profileId || "default";
     const endpoint = `${url.replace(/\/$/, "")}/rest/v1/${table}`;
-    const response = await fetch(endpoint, {
+    const response = await fetchWithTimeout(endpoint, {
       method: "POST",
       headers: {
         apikey: anonKey,
@@ -159,11 +191,34 @@
     return `로컬 저장 사용 중 · 마지막 변경: ${savedAt}`;
   }
 
+  function getConfig() {
+    return JSON.parse(JSON.stringify(config));
+  }
+
+  function saveConfig(nextConfig) {
+    const merged = mergeConfig(config, nextConfig || {});
+    Object.assign(config, merged);
+    config.supabase = merged.supabase;
+    localStorage.setItem(configKey, JSON.stringify({
+      storageMode: config.storageMode || "local",
+      profileId: config.profileId || "default",
+      deviceLabel: config.deviceLabel || "",
+      supabase: {
+        url: config.supabase?.url || "",
+        anonKey: config.supabase?.anonKey || "",
+        table: config.supabase?.table || "morningdesk_state"
+      }
+    }));
+    return getConfig();
+  }
+
   window.MorningDeskStorage = {
     load,
     save,
     describe,
     describeDetail,
+    getConfig,
+    saveConfig,
     mode: currentMode
   };
 })();

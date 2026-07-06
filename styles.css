@@ -521,6 +521,10 @@ select {
   margin-bottom: 14px;
 }
 
+.two-column {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .weight-row,
 .weight-control {
   display: grid;
@@ -632,6 +636,7 @@ select {
 
   .article-grid,
   .inline-form,
+  .two-column,
   .voice-panel,
   #taskForm,
   .deferred-actions,

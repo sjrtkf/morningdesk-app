@@ -13,6 +13,7 @@ It helps you start the day with a short check-in, selected articles, schedule it
 - Local browser storage
 - JSON backup and import
 - Browser speech reading
+- Optional Supabase sync settings panel
 - PWA manifest and service worker
 
 ## Notes
@@ -20,3 +21,5 @@ It helps you start the day with a short check-in, selected articles, schedule it
 This public repository contains only the standalone app files and sanitized sample data.
 
 Private work notes, internal project documents, credentials, and voice data are not included.
+
+Supabase connection values are entered in the app and stored only in the browser local storage of each device.

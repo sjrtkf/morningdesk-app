@@ -85,6 +85,8 @@ const state = {
   settings: null
 };
 
+let storageWriteVersion = 0;
+
 const qs = (selector) => document.querySelector(selector);
 
 const assistantPrompts = {
@@ -165,7 +167,13 @@ function saveState() {
     ...normalizeMeta(state.meta),
     updatedAt: new Date().toISOString()
   };
-  window.MorningDeskStorage.save(snapshotState()).then(updateStorageStatus);
+  const writeVersion = ++storageWriteVersion;
+  return window.MorningDeskStorage.save(snapshotState()).then((result) => {
+    if (writeVersion === storageWriteVersion) {
+      updateStorageStatus(result);
+    }
+    return result;
+  });
 }
 
 function updateStorageStatus(result) {
@@ -175,6 +183,46 @@ function updateStorageStatus(result) {
   status.title = window.MorningDeskStorage.describeDetail
     ? window.MorningDeskStorage.describeDetail(result)
     : status.textContent;
+  renderSyncSettings(result);
+}
+
+function syncStatusMessage(result) {
+  const config = window.MorningDeskStorage.getConfig ? window.MorningDeskStorage.getConfig() : window.MORNINGDESK_CONFIG;
+  const profileId = config?.profileId || "default";
+  const deviceLabel = config?.deviceLabel || defaultDeviceLabel();
+
+  if (!result) {
+    return "아직 저장 상태를 확인하지 못했습니다.";
+  }
+  if (result.mode === "supabase" && result.online) {
+    return `온라인 동기화 사용 중 · 프로필 ${profileId} · 기기 ${deviceLabel}`;
+  }
+  if (result.mode === "supabase" && !result.online) {
+    return "온라인 연결에 실패했습니다. 입력한 URL, anon key, 테이블 설정을 확인하세요.";
+  }
+  return "현재는 이 브라우저에만 저장합니다.";
+}
+
+function renderSyncSettings(result) {
+  if (!window.MorningDeskStorage.getConfig) return;
+  const config = window.MorningDeskStorage.getConfig();
+  const syncMode = qs("#syncMode");
+  if (!syncMode) return;
+
+  syncMode.value = config.storageMode || "local";
+  qs("#supabaseUrl").value = config.supabase?.url || "";
+  qs("#supabaseAnonKey").value = config.supabase?.anonKey || "";
+  qs("#syncProfileId").value = config.profileId || "default";
+  qs("#syncDeviceLabel").value = config.deviceLabel || defaultDeviceLabel();
+  qs("#syncConfigStatus").textContent = syncStatusMessage(result);
+}
+
+async function reloadFromStorage() {
+  const result = await window.MorningDeskStorage.load();
+  applySavedState(result.state);
+  updateStorageStatus(result);
+  renderAll();
+  return result;
 }
 
 function applyImportedData(imported) {
@@ -725,6 +773,37 @@ function bindEvents() {
     renderWeights();
   });
 
+  qs("#syncForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const nextConfig = {
+      storageMode: qs("#syncMode").value,
+      profileId: qs("#syncProfileId").value.trim() || "default",
+      deviceLabel: qs("#syncDeviceLabel").value.trim() || defaultDeviceLabel(),
+      supabase: {
+        url: qs("#supabaseUrl").value.trim(),
+        anonKey: qs("#supabaseAnonKey").value.trim(),
+        table: "morningdesk_state"
+      }
+    };
+    window.MorningDeskStorage.saveConfig(nextConfig);
+    const writeVersion = ++storageWriteVersion;
+    qs("#storageStatus").textContent = nextConfig.storageMode === "supabase" ? "온라인 확인 중" : "로컬 저장";
+    qs("#syncConfigStatus").textContent = nextConfig.storageMode === "supabase"
+      ? "온라인 저장소에 연결을 시도합니다."
+      : "이 브라우저에만 저장하도록 바꿨습니다.";
+    const result = await window.MorningDeskStorage.save(snapshotState());
+    if (writeVersion !== storageWriteVersion) return;
+    updateStorageStatus(result);
+    qs("#syncConfigStatus").textContent = result.mode === "supabase" && result.online
+      ? "동기화 설정을 저장하고 현재 데이터를 온라인에 올렸습니다."
+      : syncStatusMessage(result);
+  });
+
+  qs("#syncNow").addEventListener("click", async () => {
+    qs("#syncConfigStatus").textContent = "동기화 중입니다.";
+    await reloadFromStorage();
+  });
+
   qs("#weightEditor").addEventListener("input", (event) => {
     const rangeIndex = event.target.dataset.weightIndex;
     const numberIndex = event.target.dataset.weightNumber;
@@ -778,6 +857,7 @@ async function init() {
   setEnergy(state.checkin.energy || "normal");
   setDayMode(state.checkin.dayMode || "normal");
   renderVoiceSettings();
+  renderSyncSettings();
   loadVoiceOptions();
   if ("speechSynthesis" in window) {
     window.speechSynthesis.addEventListener("voiceschanged", loadVoiceOptions);

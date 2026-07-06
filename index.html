@@ -157,6 +157,45 @@
             <section class="panel">
               <div class="section-header compact">
                 <div>
+                  <p class="eyebrow">Sync</p>
+                  <h3>PC·휴대폰 동기화</h3>
+                </div>
+              </div>
+              <form id="syncForm" class="settings-form">
+                <label>
+                  저장 방식
+                  <select id="syncMode">
+                    <option value="local">이 기기에만 저장</option>
+                    <option value="supabase">온라인 동기화</option>
+                  </select>
+                </label>
+                <label>
+                  Supabase URL
+                  <input id="supabaseUrl" type="url" placeholder="https://프로젝트.supabase.co">
+                </label>
+                <label>
+                  Supabase anon key
+                  <input id="supabaseAnonKey" type="password" autocomplete="off" placeholder="eyJ...">
+                </label>
+                <div class="inline-form two-column">
+                  <label>
+                    프로필
+                    <input id="syncProfileId" type="text" placeholder="default">
+                  </label>
+                  <label>
+                    기기 이름
+                    <input id="syncDeviceLabel" type="text" placeholder="phone">
+                  </label>
+                </div>
+                <button class="primary full-width" type="submit">동기화 설정 저장</button>
+                <button class="secondary full-width" id="syncNow" type="button">지금 동기화</button>
+              </form>
+              <p id="syncConfigStatus" class="empty-state">동기화 설정을 확인 중입니다.</p>
+            </section>
+
+            <section class="panel">
+              <div class="section-header compact">
+                <div>
                   <p class="eyebrow">Tasks</p>
                   <h3>할 일</h3>
                 </div>
