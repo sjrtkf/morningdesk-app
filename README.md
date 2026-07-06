@@ -23,3 +23,7 @@ This public repository contains only the standalone app files and sanitized samp
 Private work notes, internal project documents, credentials, and voice data are not included.
 
 Supabase connection values are entered in the app and stored only in the browser local storage of each device.
+
+## Design Samples
+
+- Check-in UI samples: `checkin-samples.html`

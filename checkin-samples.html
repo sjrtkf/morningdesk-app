@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>모닝데스크 체크인 시안</title>
+    <style>
+      :root {
+        --ink: #17211c;
+        --muted: #66736b;
+        --line: #d9e0da;
+        --green: #246b55;
+        --blue: #264f82;
+        --gold: #9b6a1f;
+        --rose: #8f3d52;
+        --bg: #f6f8f5;
+        --panel: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
+        line-height: 1.55;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .page {
+        width: min(1180px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 28px 0 44px;
+      }
+
+      .intro {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 22px;
+      }
+
+      .intro h1 {
+        margin: 0;
+        font-size: clamp(30px, 4vw, 54px);
+        line-height: 1.08;
+        letter-spacing: 0;
+        word-break: keep-all;
+      }
+
+      .intro p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 17px;
+      }
+
+      .samples {
+        display: grid;
+        gap: 18px;
+      }
+
+      .sample {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        overflow: hidden;
+      }
+
+      .sample-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .sample-header h2 {
+        margin: 0;
+        font-size: 22px;
+      }
+
+      .sample-header p {
+        margin: 4px 0 0;
+        color: var(--muted);
+      }
+
+      .tag {
+        align-self: start;
+        border-radius: 999px;
+        padding: 6px 10px;
+        background: #edf5f1;
+        color: var(--green);
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .mock {
+        min-height: 520px;
+        padding: 24px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      .btns,
+      .chips,
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .btn,
+      .chip {
+        min-height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 0 13px;
+        background: #fff;
+        color: var(--ink);
+        font-weight: 800;
+      }
+
+      .btn.primary,
+      .chip.active {
+        border-color: var(--green);
+        background: var(--green);
+        color: #fff;
+      }
+
+      .field {
+        display: grid;
+        gap: 7px;
+        color: var(--muted);
+        font-weight: 800;
+      }
+
+      .field input {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 12px 13px;
+        background: #fbfcfb;
+      }
+
+      .focus-layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 0.85fr) minmax(320px, 1.15fr);
+        gap: 24px;
+        align-items: center;
+      }
+
+      .focus-title h3 {
+        margin: 0;
+        max-width: 500px;
+        font-size: clamp(34px, 5vw, 62px);
+        line-height: 1.06;
+        word-break: keep-all;
+      }
+
+      .focus-card {
+        display: grid;
+        gap: 16px;
+        padding: 22px;
+        border: 1px solid #cbd8d1;
+        border-radius: 8px;
+        background: #f8fbf9;
+      }
+
+      .assistant-line {
+        margin: 0;
+        padding: 13px 14px;
+        border-left: 4px solid var(--green);
+        background: #edf5f1;
+      }
+
+      .conversation {
+        background: #fbfaf6;
+      }
+
+      .conversation-grid {
+        display: grid;
+        grid-template-columns: minmax(280px, 0.95fr) minmax(320px, 1.05fr);
+        gap: 24px;
+      }
+
+      .conversation-side {
+        display: grid;
+        align-content: center;
+        gap: 16px;
+        padding: 26px;
+        border-right: 1px solid #e2dccd;
+      }
+
+      .conversation-side h3 {
+        margin: 0;
+        font-size: clamp(32px, 4vw, 54px);
+        line-height: 1.08;
+        word-break: keep-all;
+      }
+
+      .dialogue {
+        display: grid;
+        gap: 12px;
+      }
+
+      .bubble {
+        max-width: 92%;
+        border-radius: 8px;
+        padding: 13px 14px;
+        background: #ffffff;
+        border: 1px solid #e2dccd;
+      }
+
+      .bubble.user {
+        justify-self: end;
+        background: #1f4f82;
+        color: #fff;
+        border-color: #1f4f82;
+      }
+
+      .comfort {
+        background: #f7f8fa;
+      }
+
+      .comfort-shell {
+        display: grid;
+        gap: 18px;
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .comfort-hero {
+        display: grid;
+        gap: 10px;
+        padding: 10px 0;
+      }
+
+      .comfort-hero h3 {
+        margin: 0;
+        font-size: clamp(32px, 6vw, 58px);
+        line-height: 1.05;
+        word-break: keep-all;
+      }
+
+      .option-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .option {
+        display: grid;
+        gap: 4px;
+        min-height: 88px;
+        border: 1px solid #d8dfe7;
+        border-radius: 8px;
+        padding: 14px;
+        background: #fff;
+      }
+
+      .option strong {
+        font-size: 18px;
+      }
+
+      .option span {
+        color: var(--muted);
+      }
+
+      .dense {
+        background: #f5f7f4;
+      }
+
+      .dense-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 16px;
+      }
+
+      .dense-main,
+      .dense-rail {
+        display: grid;
+        gap: 12px;
+      }
+
+      .dense-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 16px;
+        background: #fff;
+      }
+
+      .dense-card h3 {
+        margin: 0 0 8px;
+        font-size: 26px;
+        line-height: 1.18;
+      }
+
+      .mini-list {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .mini-list li {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 10px;
+        background: #fbfcfb;
+      }
+
+      @media (max-width: 760px) {
+        .sample-header,
+        .focus-layout,
+        .conversation-grid,
+        .dense-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sample-header {
+          display: grid;
+        }
+
+        .conversation-side {
+          border-right: 0;
+          border-bottom: 1px solid #e2dccd;
+        }
+
+        .option-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .mock {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="intro">
+        <p class="eyebrow">Morning Desk UI Samples</p>
+        <h1>체크인 화면 방향 4가지</h1>
+        <p>많은 글을 읽기 전에 부담 없이 지나갈 수 있는 첫 화면 후보입니다. 실제 구현 전 방향을 고르기 위한 정적 시안입니다.</p>
+      </section>
+
+      <div class="samples">
+        <article class="sample">
+          <header class="sample-header">
+            <div>
+              <h2>A. 집중형</h2>
+              <p>큰 제목과 최소 입력. 현재 구조를 가장 덜 흔들면서 가독성을 올리는 방향입니다.</p>
+            </div>
+            <span class="tag">추천</span>
+          </header>
+          <section class="mock focus-layout">
+            <div class="focus-title">
+              <p class="eyebrow">Morning Desk</p>
+              <h3>오늘은 작게 시작해도 됩니다</h3>
+              <p>2026년 7월 7일 화요일 · 1분만 정리하고 넘어갑니다.</p>
+            </div>
+            <div class="focus-card">
+              <div>
+                <p class="eyebrow">Assistant</p>
+                <h2>오늘은 어떤 강도로 챙겨드릴까요?</h2>
+              </div>
+              <p class="assistant-line">긴 대화가 싫으면 선택지만 골라도 됩니다. 제가 나머지는 기본값으로 정리해둘게요.</p>
+              <div class="chips">
+                <button class="chip active">대화로 정리</button>
+                <button class="chip">선택지만</button>
+                <button class="chip">짧게 시작</button>
+                <button class="chip">오늘은 오프</button>
+              </div>
+              <label class="field">오늘 가장 중요한 일<input value="가장 부담이 작은 핵심 1개만 고른다"></label>
+              <label class="field">피하고 싶은 실수<input value="확인하지 않은 것을 확신하지 않는다"></label>
+              <div class="actions">
+                <button class="btn primary">브리핑 시작</button>
+                <button class="btn">나중에 자세히</button>
+              </div>
+            </div>
+          </section>
+        </article>
+
+        <article class="sample">
+          <header class="sample-header">
+            <div>
+              <h2>B. 대화형 비서</h2>
+              <p>앱이 먼저 묻고 사용자는 짧게 답하는 느낌. 비서성이 가장 강합니다.</p>
+            </div>
+            <span class="tag">비서감</span>
+          </header>
+          <section class="mock conversation">
+            <div class="conversation-grid">
+              <div class="conversation-side">
+                <p class="eyebrow">Check-in</p>
+                <h3>제가 먼저 정리해볼게요</h3>
+                <p>오늘 컨디션, 하루 강도, 꼭 볼 것만 묻습니다.</p>
+              </div>
+              <div class="dialogue">
+                <div class="bubble">오늘 대화할 기분인가요, 아니면 선택지만 고를까요?</div>
+                <div class="bubble user">선택지만 고를래</div>
+                <div class="bubble">좋아요. 오늘 강도는 어느 쪽에 가까울까요?</div>
+                <div class="btns">
+                  <button class="btn">가볍게</button>
+                  <button class="btn primary">보통</button>
+                  <button class="btn">오프</button>
+                </div>
+                <div class="bubble">그럼 오늘은 핵심 하나와 주의할 점 하나만 잡고 브리핑을 줄여드릴게요.</div>
+                <button class="btn primary">브리핑 시작</button>
+              </div>
+            </div>
+          </section>
+        </article>
+
+        <article class="sample">
+          <header class="sample-header">
+            <div>
+              <h2>C. 모바일 카드형</h2>
+              <p>아침에 휴대폰으로 먼저 보는 흐름. 손가락으로 누르기 쉽고 한 화면씩 내려갑니다.</p>
+            </div>
+            <span class="tag">모바일</span>
+          </header>
+          <section class="mock comfort">
+            <div class="comfort-shell">
+              <div class="comfort-hero">
+                <p class="eyebrow">Morning Desk</p>
+                <h3>오늘의 시작 모드</h3>
+                <p>말하기 싫은 날도 괜찮습니다. 하나만 고르면 됩니다.</p>
+              </div>
+              <div class="option-grid">
+                <button class="option"><strong>짧게 시작</strong><span>핵심 1개만 잡고 바로 브리핑</span></button>
+                <button class="option"><strong>선택지만</strong><span>대화 없이 버튼으로 체크인</span></button>
+                <button class="option"><strong>대화로 정리</strong><span>비서가 순서대로 질문</span></button>
+                <button class="option"><strong>오늘은 오프</strong><span>급한 것만 확인하고 쉬기</span></button>
+              </div>
+              <label class="field">오늘의 기준<input value="작게 시작하고 일찍 줄인다"></label>
+              <button class="btn primary">계속</button>
+            </div>
+          </section>
+        </article>
+
+        <article class="sample">
+          <header class="sample-header">
+            <div>
+              <h2>D. 정보 밀도형</h2>
+              <p>체크인과 오늘의 요약을 동시에 보여줍니다. PC 첫 화면에 어울립니다.</p>
+            </div>
+            <span class="tag">PC</span>
+          </header>
+          <section class="mock dense">
+            <div class="dense-grid">
+              <div class="dense-main">
+                <div class="dense-card">
+                  <p class="eyebrow">Assistant</p>
+                  <h3>오늘은 보통 강도로 시작합니다</h3>
+                  <p>컨디션을 무시하지 않고, 가장 부담이 작은 핵심 1개부터 잡습니다.</p>
+                  <div class="chips">
+                    <button class="chip">괜찮음</button>
+                    <button class="chip active">보통</button>
+                    <button class="chip">피곤함</button>
+                  </div>
+                </div>
+                <div class="dense-card">
+                  <label class="field">오늘 가장 중요한 일<input value="브리핑 흐름 확인"></label>
+                </div>
+              </div>
+              <div class="dense-rail">
+                <div class="dense-card">
+                  <p class="eyebrow">오늘 볼 것</p>
+                  <ul class="mini-list">
+                    <li>일정 2개</li>
+                    <li>할 일 3개</li>
+                    <li>미룬 일 1개</li>
+                    <li>선별 기사 3개</li>
+                  </ul>
+                </div>
+                <button class="btn primary">브리핑 시작</button>
+              </div>
+            </div>
+          </section>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>
