@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>모닝데스크 C형 체크인 세부 시안</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17201b;
+        --muted: #63706a;
+        --line: #d8e0dc;
+        --paper: #fbfcfa;
+        --soft: #eef4f0;
+        --soft-2: #f5f2ea;
+        --green: #176a57;
+        --green-dark: #0d493c;
+        --blue: #335f92;
+        --amber: #b97921;
+        --rose: #a84b5a;
+        --shadow: 0 20px 54px rgba(23, 32, 27, 0.13);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
+        line-height: 1.55;
+        background:
+          linear-gradient(135deg, rgba(23, 106, 87, 0.10), rgba(51, 95, 146, 0.08)),
+          #f1f4f1;
+      }
+
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .page {
+        width: min(1180px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 24px 0 56px;
+      }
+
+      .hero {
+        position: relative;
+        min-height: 360px;
+        display: grid;
+        align-items: end;
+        overflow: hidden;
+        border-radius: 8px;
+        padding: clamp(24px, 5vw, 52px);
+        color: #fff;
+        background:
+          linear-gradient(90deg, rgba(13, 28, 22, 0.78), rgba(13, 28, 22, 0.38) 58%, rgba(13, 28, 22, 0.10)),
+          url("./assets/morning-assistant-bg.png") center / cover no-repeat;
+        box-shadow: var(--shadow);
+      }
+
+      .hero h1 {
+        max-width: 760px;
+        margin: 0;
+        font-size: clamp(34px, 6vw, 68px);
+        line-height: 1.04;
+        letter-spacing: 0;
+        word-break: keep-all;
+      }
+
+      .hero p {
+        max-width: 650px;
+        margin: 14px 0 0;
+        color: rgba(255, 255, 255, 0.84);
+        font-size: 18px;
+        word-break: keep-all;
+      }
+
+      .quick-nav {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 14px 0;
+        margin: 12px 0 20px;
+        background: rgba(241, 244, 241, 0.92);
+        backdrop-filter: blur(14px);
+      }
+
+      .quick-nav a {
+        flex: 0 0 auto;
+        min-height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 14px;
+        border-radius: 999px;
+        color: var(--green-dark);
+        background: #fff;
+        border: 1px solid var(--line);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .samples {
+        display: grid;
+        gap: 22px;
+      }
+
+      .sample {
+        border-radius: 8px;
+        background: var(--paper);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        border: 1px solid rgba(216, 224, 220, 0.85);
+      }
+
+      .sample-head {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        align-items: center;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .sample-title {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.2;
+        letter-spacing: 0;
+      }
+
+      .sample-desc {
+        margin: 6px 0 0;
+        color: var(--muted);
+        word-break: keep-all;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 0 10px;
+        border-radius: 999px;
+        color: var(--green-dark);
+        background: var(--soft);
+        font-size: 13px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .canvas {
+        padding: clamp(16px, 3vw, 28px);
+      }
+
+      .phone-wrap {
+        display: grid;
+        grid-template-columns: minmax(290px, 390px) 1fr;
+        gap: 24px;
+        align-items: stretch;
+      }
+
+      .phone {
+        min-height: 700px;
+        border-radius: 30px;
+        padding: 16px;
+        background: #17201b;
+        box-shadow: 0 24px 58px rgba(23, 32, 27, 0.22);
+      }
+
+      .screen {
+        min-height: 668px;
+        border-radius: 22px;
+        overflow: hidden;
+        background: #f9fbf8;
+        color: var(--ink);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .status {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 13px 16px 8px;
+        color: rgba(23, 32, 27, 0.72);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .weather-strip {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 0 18px 14px;
+      }
+
+      .weather-strip strong {
+        display: block;
+        font-size: 24px;
+        line-height: 1.15;
+      }
+
+      .weather-strip span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .weather-pill {
+        display: grid;
+        place-items: center;
+        width: 74px;
+        height: 74px;
+        border-radius: 22px;
+        background: linear-gradient(145deg, #e8f2eb, #fff7e8);
+        color: var(--green-dark);
+        font-size: 28px;
+        font-weight: 900;
+      }
+
+      .assistant-card {
+        margin: 0 14px;
+        padding: 18px;
+        border-radius: 20px;
+        background: #fff;
+        border: 1px solid var(--line);
+        box-shadow: 0 14px 28px rgba(23, 32, 27, 0.08);
+      }
+
+      .assistant-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .avatar {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        color: #fff;
+        background: var(--green);
+        font-weight: 900;
+      }
+
+      .question {
+        margin: 16px 0 0;
+        min-height: 92px;
+        font-size: 28px;
+        line-height: 1.18;
+        letter-spacing: 0;
+        font-weight: 850;
+        word-break: keep-all;
+      }
+
+      .hint {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        word-break: keep-all;
+      }
+
+      .choice-grid {
+        display: grid;
+        gap: 9px;
+        margin-top: 16px;
+      }
+
+      .choice {
+        min-height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 0 14px;
+        border-radius: 14px;
+        color: var(--ink);
+        background: var(--soft);
+        border: 1px solid rgba(216, 224, 220, 0.85);
+        font-weight: 800;
+        text-align: left;
+      }
+
+      .choice span:last-child {
+        color: var(--green);
+        font-weight: 900;
+      }
+
+      .textarea {
+        width: 100%;
+        min-height: 84px;
+        margin-top: 14px;
+        padding: 13px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        resize: none;
+        color: var(--ink);
+        background: #fbfcfa;
+      }
+
+      .bottom-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin: auto 14px 14px;
+        padding-top: 18px;
+      }
+
+      .primary,
+      .secondary,
+      .quiet {
+        min-height: 48px;
+        border-radius: 15px;
+        font-weight: 850;
+      }
+
+      .primary {
+        color: #fff;
+        background: var(--green);
+      }
+
+      .secondary {
+        color: var(--green-dark);
+        background: #eaf2ee;
+      }
+
+      .quiet {
+        color: var(--muted);
+        background: transparent;
+        border: 1px solid var(--line);
+      }
+
+      .side-notes {
+        display: grid;
+        gap: 14px;
+        align-content: start;
+      }
+
+      .note {
+        padding: 18px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.78);
+        border: 1px solid var(--line);
+      }
+
+      .note h3 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0;
+      }
+
+      .note p,
+      .note li {
+        color: var(--muted);
+        word-break: keep-all;
+      }
+
+      .note p {
+        margin: 8px 0 0;
+      }
+
+      .note ul {
+        margin: 10px 0 0;
+        padding-left: 20px;
+      }
+
+      .progress {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+        margin: 18px 14px 0;
+      }
+
+      .progress span {
+        height: 6px;
+        border-radius: 999px;
+        background: #dde6e1;
+      }
+
+      .progress .on {
+        background: var(--green);
+      }
+
+      .brief-list {
+        display: grid;
+        gap: 9px;
+        margin: 16px 14px 0;
+      }
+
+      .brief-item {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 10px;
+        align-items: start;
+        padding: 12px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.82);
+        border: 1px solid var(--line);
+      }
+
+      .brief-item b {
+        display: grid;
+        place-items: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        color: var(--green-dark);
+        background: var(--soft);
+      }
+
+      .brief-item strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .brief-item span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .sample-b .screen {
+        background:
+          linear-gradient(180deg, rgba(23, 106, 87, 0.13), rgba(255, 255, 255, 0) 42%),
+          #fbfcfa;
+      }
+
+      .sample-b .assistant-card {
+        margin-top: 10px;
+      }
+
+      .sample-b .question {
+        font-size: 26px;
+      }
+
+      .sample-c .screen {
+        background: #fbf8f2;
+      }
+
+      .sample-c .weather-pill {
+        background: linear-gradient(145deg, #fff4dc, #e9f4ef);
+      }
+
+      .mood-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin: 15px 14px 0;
+      }
+
+      .mood {
+        min-height: 76px;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--ink);
+        font-weight: 850;
+      }
+
+      .mood small {
+        display: block;
+        margin-top: 3px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .sample-d .screen {
+        background: #f7f9fb;
+      }
+
+      .sample-d .assistant-card {
+        border-color: rgba(51, 95, 146, 0.22);
+      }
+
+      .sample-d .avatar,
+      .sample-d .primary,
+      .sample-d .progress .on {
+        background: var(--blue);
+      }
+
+      .sample-d .choice span:last-child,
+      .sample-d .weather-pill {
+        color: var(--blue);
+      }
+
+      @media (max-width: 860px) {
+        .phone-wrap {
+          grid-template-columns: 1fr;
+        }
+
+        .phone {
+          width: min(100%, 390px);
+          margin: 0 auto;
+        }
+
+        .sample-head {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .page {
+          width: min(100% - 16px, 1180px);
+          padding-top: 8px;
+        }
+
+        .hero {
+          min-height: 300px;
+          border-radius: 0 0 8px 8px;
+        }
+
+        .hero p {
+          font-size: 15px;
+        }
+
+        .phone {
+          padding: 8px;
+          border-radius: 24px;
+          min-height: auto;
+        }
+
+        .screen {
+          min-height: 642px;
+          border-radius: 18px;
+        }
+
+        .question {
+          font-size: 24px;
+        }
+
+        .bottom-actions {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div>
+          <h1>C형 체크인을 더 섬세하게 고르기</h1>
+          <p>대화형 비서 방향은 유지하되, 아침에 부담 없이 쓰기 좋은 톤과 정보 밀도를 비교하는 세부 시안입니다.</p>
+        </div>
+      </section>
+
+      <nav class="quick-nav" aria-label="시안 바로가기">
+        <a href="#sample-a">A 차분한 비서</a>
+        <a href="#sample-b">B 모바일 첫눈</a>
+        <a href="#sample-c">C 컨디션 우선</a>
+        <a href="#sample-d">D 업무 압축</a>
+      </nav>
+
+      <div class="samples">
+        <section class="sample sample-a" id="sample-a">
+          <header class="sample-head">
+            <div>
+              <h2 class="sample-title">A. 차분한 비서형</h2>
+              <p class="sample-desc">가장 기본적인 C형입니다. 비서가 먼저 묻고, 사용자는 짧게 선택하거나 한 줄만 남깁니다.</p>
+            </div>
+            <span class="tag">추천 기준안</span>
+          </header>
+          <div class="canvas phone-wrap">
+            <div class="phone">
+              <div class="screen">
+                <div class="status"><span>07:18</span><span>MorningDesk</span></div>
+                <div class="weather-strip">
+                  <div>
+                    <strong>7월 7일 화요일</strong>
+                    <span>서울 24도, 흐림. 이동 전 우산 확인</span>
+                  </div>
+                  <div class="weather-pill">24</div>
+                </div>
+                <div class="progress"><span class="on"></span><span></span><span></span><span></span></div>
+                <section class="assistant-card">
+                  <div class="assistant-row"><div class="avatar">M</div><span>오늘을 정리하기 전에 하나만 물어볼게요</span></div>
+                  <div class="question">오늘 가장 먼저 챙기면 좋은 일은 무엇인가요?</div>
+                  <p class="hint">길게 쓰지 않아도 됩니다. 머릿속에 걸리는 것 하나만 잡으면 충분해요.</p>
+                  <textarea class="textarea" placeholder="예: 오전에 확인해야 할 자료 먼저 보기"></textarea>
+                  <div class="choice-grid">
+                    <button class="choice"><span>어제 미룬 일에서 고르기</span><span>›</span></button>
+                    <button class="choice"><span>오늘 일정에서 고르기</span><span>›</span></button>
+                  </div>
+                </section>
+                <div class="bottom-actions">
+                  <button class="secondary">선택지만 고르기</button>
+                  <button class="primary">다음 질문</button>
+                </div>
+              </div>
+            </div>
+            <aside class="side-notes">
+              <div class="note">
+                <h3>좋은 점</h3>
+                <p>비서 느낌이 가장 자연스럽고, 기능이 많아져도 시작 화면이 복잡해 보이지 않습니다.</p>
+              </div>
+              <div class="note">
+                <h3>조정 포인트</h3>
+                <ul>
+                  <li>질문 문장을 너무 감성적으로 쓰지 않기</li>
+                  <li>답변 입력보다 선택지를 항상 먼저 제공하기</li>
+                  <li>날씨와 날짜를 상단에 고정하기</li>
+                </ul>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="sample sample-b" id="sample-b">
+          <header class="sample-head">
+            <div>
+              <h2 class="sample-title">B. 모바일 첫눈형</h2>
+              <p class="sample-desc">휴대폰을 열자마자 날짜, 날씨, 오늘 상태, 핵심 행동이 한눈에 들어오게 만든 버전입니다.</p>
+            </div>
+            <span class="tag">아침 첫 화면 강화</span>
+          </header>
+          <div class="canvas phone-wrap">
+            <div class="phone">
+              <div class="screen">
+                <div class="status"><span>07:18</span><span>체크인 1분</span></div>
+                <div class="weather-strip">
+                  <div>
+                    <strong>오늘은 흐린 아침</strong>
+                    <span>7월 7일 화요일 · 24도 · 오후 약한 비</span>
+                  </div>
+                  <div class="weather-pill">비</div>
+                </div>
+                <div class="brief-list">
+                  <div class="brief-item"><b>1</b><div><strong>중요 일정 2개</strong><span>오전 확인 1개, 오후 준비 1개</span></div></div>
+                  <div class="brief-item"><b>2</b><div><strong>미룬 일 1개</strong><span>10분짜리로 쪼개면 오늘 처리 가능</span></div></div>
+                </div>
+                <section class="assistant-card">
+                  <div class="assistant-row"><div class="avatar">M</div><span>지금 상태에 맞춰 시작 방식을 골라볼게요</span></div>
+                  <div class="question">오늘은 어떤 방식으로 시작할까요?</div>
+                  <div class="choice-grid">
+                    <button class="choice"><span>대화로 정리</span><span>3문항</span></button>
+                    <button class="choice"><span>선택지만 고르기</span><span>30초</span></button>
+                    <button class="choice"><span>짧게 시작</span><span>1개만</span></button>
+                    <button class="choice"><span>오늘은 오프</span><span>최소 정보</span></button>
+                  </div>
+                </section>
+                <div class="bottom-actions">
+                  <button class="quiet">나중에</button>
+                  <button class="primary">시작</button>
+                </div>
+              </div>
+            </div>
+            <aside class="side-notes">
+              <div class="note">
+                <h3>좋은 점</h3>
+                <p>아침에 정신이 덜 깬 상태에서도 현재 상황을 바로 파악하기 좋습니다.</p>
+              </div>
+              <div class="note">
+                <h3>조정 포인트</h3>
+                <ul>
+                  <li>브리핑 요약이 길어지면 체크인 몰입이 약해짐</li>
+                  <li>상단 정보와 질문의 우선순위 조절 필요</li>
+                  <li>오프 모드가 죄책감 없이 보여야 함</li>
+                </ul>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="sample sample-c" id="sample-c">
+          <header class="sample-head">
+            <div>
+              <h2 class="sample-title">C. 컨디션 우선형</h2>
+              <p class="sample-desc">오늘의 에너지와 대화 의향을 먼저 확인한 뒤, 앱이 질문 강도를 낮추거나 높입니다.</p>
+            </div>
+            <span class="tag">부담 최소화</span>
+          </header>
+          <div class="canvas phone-wrap">
+            <div class="phone">
+              <div class="screen">
+                <div class="status"><span>07:18</span><span>오늘의 온도</span></div>
+                <div class="weather-strip">
+                  <div>
+                    <strong>7월 7일, 천천히 시작</strong>
+                    <span>흐림 24도 · 바람 약함 · 실내 집중 적당</span>
+                  </div>
+                  <div class="weather-pill">느림</div>
+                </div>
+                <section class="assistant-card">
+                  <div class="assistant-row"><div class="avatar">M</div><span>오늘은 먼저 컨디션부터 볼게요</span></div>
+                  <div class="question">지금 대화할 힘이 어느 정도인가요?</div>
+                  <p class="hint">낮게 골라도 괜찮아요. 그러면 질문을 줄이고 핵심만 남깁니다.</p>
+                </section>
+                <div class="mood-row">
+                  <button class="mood">낮음<small>최소 질문</small></button>
+                  <button class="mood">보통<small>기본 체크</small></button>
+                  <button class="mood">좋음<small>꼼꼼히</small></button>
+                </div>
+                <div class="brief-list">
+                  <div class="brief-item"><b>휴</b><div><strong>낮음 선택 시</strong><span>급한 일정, 핵심 1개, 오프 여부만 확인</span></div></div>
+                  <div class="brief-item"><b>업</b><div><strong>좋음 선택 시</strong><span>생각 질문과 기사 브리핑까지 확장</span></div></div>
+                </div>
+                <div class="bottom-actions">
+                  <button class="secondary">오늘은 오프</button>
+                  <button class="primary">내 상태로 시작</button>
+                </div>
+              </div>
+            </div>
+            <aside class="side-notes">
+              <div class="note">
+                <h3>좋은 점</h3>
+                <p>앱이 사용자를 몰아붙이지 않는 느낌이 강합니다. 오래 쓰는 앱으로 만들기 좋습니다.</p>
+              </div>
+              <div class="note">
+                <h3>조정 포인트</h3>
+                <ul>
+                  <li>컨디션 선택 후 실제 질문 수가 달라져야 함</li>
+                  <li>너무 느슨하면 브리핑 앱으로 약해질 수 있음</li>
+                  <li>오프 모드와 자연스럽게 연결하기 좋음</li>
+                </ul>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="sample sample-d" id="sample-d">
+          <header class="sample-head">
+            <div>
+              <h2 class="sample-title">D. 업무 압축형</h2>
+              <p class="sample-desc">대화형이지만 빠르게 업무 기준을 세우는 쪽입니다. PC와 이어지는 구조에 강합니다.</p>
+            </div>
+            <span class="tag">실행력 중심</span>
+          </header>
+          <div class="canvas phone-wrap">
+            <div class="phone">
+              <div class="screen">
+                <div class="status"><span>07:18</span><span>실행 체크</span></div>
+                <div class="weather-strip">
+                  <div>
+                    <strong>오늘의 업무 기준</strong>
+                    <span>7월 7일 화요일 · 24도 · 이동 여유 15분</span>
+                  </div>
+                  <div class="weather-pill">15</div>
+                </div>
+                <div class="progress"><span class="on"></span><span class="on"></span><span></span><span></span></div>
+                <section class="assistant-card">
+                  <div class="assistant-row"><div class="avatar">M</div><span>오늘 목록을 너무 크게 만들지 않겠습니다</span></div>
+                  <div class="question">오늘 끝났다고 말할 수 있는 기준 하나를 정할까요?</div>
+                  <textarea class="textarea" placeholder="예: 자료 확인 후 다음 행동 1개 결정"></textarea>
+                  <div class="choice-grid">
+                    <button class="choice"><span>첫 10분 행동으로 바꾸기</span><span>추천</span></button>
+                    <button class="choice"><span>오늘 꼭 할 일인지 확인</span><span>검토</span></button>
+                  </div>
+                </section>
+                <div class="brief-list">
+                  <div class="brief-item"><b>3</b><div><strong>오늘 핵심은 최대 3개</strong><span>나머지는 대기 목록으로 보냅니다</span></div></div>
+                </div>
+                <div class="bottom-actions">
+                  <button class="secondary">PC에서 이어서</button>
+                  <button class="primary">브리핑 보기</button>
+                </div>
+              </div>
+            </div>
+            <aside class="side-notes">
+              <div class="note">
+                <h3>좋은 점</h3>
+                <p>할 일 과적 방지, 미룬 일 쪼개기, PC 연동 같은 실제 기능과 가장 잘 붙습니다.</p>
+              </div>
+              <div class="note">
+                <h3>조정 포인트</h3>
+                <ul>
+                  <li>너무 업무 도구처럼 차가워지지 않게 톤 조절</li>
+                  <li>아침 첫 화면에는 부드러운 진입이 필요</li>
+                  <li>브리핑 화면과 이어지는 정보 구조가 중요</li>
+                </ul>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
