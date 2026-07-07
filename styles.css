@@ -28,6 +28,7 @@ body {
   color: var(--text);
   font-family: "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
   line-height: 1.55;
+  transition: background 520ms ease, color 320ms ease;
 }
 
 button,
@@ -126,6 +127,9 @@ button {
   padding: 24px;
   display: grid;
   gap: 18px;
+  align-self: stretch;
+  align-content: center;
+  overflow: hidden;
 }
 
 .assistant-card {
@@ -138,6 +142,7 @@ button {
     linear-gradient(180deg, rgba(23, 107, 87, 0.09), rgba(255, 255, 255, 0) 52%),
     #fbfcfa;
   box-shadow: 0 14px 30px rgba(23, 32, 27, 0.08);
+  transition: background 520ms ease, border-color 520ms ease, transform 520ms ease;
 }
 
 .assistant-head {
@@ -157,6 +162,7 @@ button {
   background: var(--accent);
   font-weight: 950;
   box-shadow: 0 12px 24px rgba(23, 107, 87, 0.20);
+  transition: background 420ms ease, box-shadow 420ms ease;
 }
 
 .assistant-card h2 {
@@ -204,6 +210,37 @@ button {
   line-height: 1.22;
   letter-spacing: 0;
   word-break: keep-all;
+  transition: background 420ms ease, border-color 420ms ease, color 320ms ease;
+}
+
+.state-switch {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.72);
+  transition: background 420ms ease, border-color 420ms ease;
+}
+
+.state-button {
+  min-height: 62px;
+  padding: 0 8px;
+  border-radius: 17px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.2;
+  transition: background 320ms ease, color 320ms ease, transform 320ms ease, box-shadow 320ms ease;
+}
+
+.state-button.is-selected {
+  color: #fff;
+  background: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(23, 107, 87, 0.18);
 }
 
 .choice-group {
@@ -248,6 +285,7 @@ label {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface-soft);
+  transition: background 420ms ease, border-color 420ms ease;
 }
 
 .checkin-step strong {
@@ -259,6 +297,42 @@ label {
   color: var(--muted);
   font-size: 14px;
   word-break: keep-all;
+}
+
+.checkin-layers {
+  display: grid;
+  gap: 12px;
+}
+
+.checkin-layer {
+  display: grid;
+  gap: 8px;
+  max-height: 0;
+  margin: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(18px);
+  transition: max-height 480ms ease, opacity 360ms ease, transform 480ms ease;
+}
+
+.checkin-layer.is-visible {
+  max-height: 120px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.checkin-layer.is-waiting {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(18px);
+}
+
+.checkin-layer span {
+  color: var(--muted);
+  font-weight: 800;
 }
 
 input {
@@ -335,6 +409,54 @@ body[data-checkin-tone="warm"] {
     linear-gradient(180deg, #fcfaf5 0%, #f4f2eb 52%, #eef4f0 100%);
 }
 
+body[data-checkin-tone="focus"] {
+  background:
+    radial-gradient(circle at top left, rgba(183, 116, 32, 0.15), transparent 34%),
+    linear-gradient(180deg, #fcfaf5 0%, #f5f1e8 50%, #eef4f0 100%);
+}
+
+body[data-checkin-tone="focus"] .threshold__copy h1 {
+  max-width: 640px;
+}
+
+body[data-checkin-tone="focus"] .assistant-card {
+  border-color: rgba(183, 116, 32, 0.24);
+  background:
+    linear-gradient(180deg, rgba(183, 116, 32, 0.14), rgba(255, 255, 255, 0) 58%),
+    #fcfaf5;
+  transform: translateY(4px);
+}
+
+body[data-checkin-tone="focus"] .assistant-avatar,
+body[data-checkin-tone="focus"] .state-button.is-selected,
+body[data-checkin-tone="focus"] .primary,
+body[data-checkin-tone="focus"] .checkin-progress .is-active {
+  background: var(--amber);
+}
+
+body[data-checkin-tone="focus"] .state-switch,
+body[data-checkin-tone="focus"] .assistant-dialog,
+body[data-checkin-tone="focus"] .checkin-step {
+  border-color: rgba(183, 116, 32, 0.22);
+  background: rgba(255, 250, 241, 0.88);
+}
+
+body[data-checkin-tone="focus"] .assistant-dialog {
+  min-height: 138px;
+  display: grid;
+  align-items: center;
+  font-size: clamp(26px, 3.4vw, 34px);
+}
+
+body[data-checkin-tone="focus"] .choice-button.is-selected,
+body[data-checkin-tone="focus"] .state-button.is-selected {
+  border-color: var(--amber);
+}
+
+body[data-checkin-tone="focus"] .checkin-step strong {
+  color: #80510f;
+}
+
 body[data-checkin-tone="warm"] .assistant-card {
   border-color: rgba(183, 116, 32, 0.24);
   background:
@@ -364,6 +486,11 @@ body[data-checkin-tone="clear"] .assistant-card {
   background:
     linear-gradient(180deg, rgba(49, 94, 147, 0.11), rgba(255, 255, 255, 0) 52%),
     #f8fafb;
+}
+
+body[data-checkin-tone="clear"] .state-button.is-selected {
+  background: var(--blue);
+  box-shadow: 0 12px 24px rgba(49, 94, 147, 0.18);
 }
 
 body[data-checkin-tone="clear"] .assistant-avatar,
@@ -833,6 +960,7 @@ select {
   .voice-panel,
   .voice-controls,
   .ambient-panel,
+  .state-switch,
   #taskForm,
   .deferred-actions,
   .weight-control,

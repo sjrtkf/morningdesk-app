@@ -96,20 +96,74 @@ const state = {
 };
 
 let storageWriteVersion = 0;
+let checkinStateChosen = false;
 
 const qs = (selector) => document.querySelector(selector);
 
 const assistantPrompts = {
-  conversation: "지금 머릿속에 가장 먼저 걸리는 일 하나만 잡아볼까요?",
-  choice: "말하기 싫은 날이면 선택지만 골라도 됩니다. 빈칸은 제가 무난하게 채워둘게요.",
-  quick: "오늘은 길게 붙잡지 않겠습니다. 핵심 하나만 잡고 바로 브리핑으로 넘어갈게요.",
-  off: "오늘은 오프 모드입니다. 급한 일정만 확인하고 쉬는 쪽으로 정리할게요."
+  conversation: "지금 대화할 힘이 어느 정도인지 먼저 알려주세요.",
+  choice: "선택만 해도 괜찮습니다. 답은 제가 무난하게 이어서 정리해둘게요.",
+  quick: "오늘은 짧게 잡겠습니다. 핵심 하나만 정하고 바로 브리핑으로 넘어갈게요.",
+  off: "오늘은 최소 모드입니다. 급한 것만 남기고 나머지는 내일로 넘길게요."
 };
 
 const assistantTones = {
-  soft: "기본은 부드럽게, 필요한 것만 차분히 챙깁니다.",
-  warm: "컨디션이 낮은 날입니다. 질문을 줄이고 꼭 필요한 것만 남깁니다.",
-  clear: "이제 오늘의 기준을 또렷하게 정리해 브리핑으로 넘깁니다."
+  soft: "상태를 고르면 얇은 레이어처럼 다음 질문을 올리겠습니다.",
+  focus: "피곤한 날입니다. 한 질문씩만, 천천히 묻겠습니다.",
+  clear: "짧고 선명하게 줄여서 브리핑으로 넘기겠습니다."
+};
+
+const checkinStateMap = {
+  charged: {
+    label: "충전됨",
+    mode: "conversation",
+    energy: "good",
+    dayMode: "normal",
+    title: "오늘은 조금 더 넓게 봐도 좋겠습니다",
+    prompt: "오늘 넓게 봐야 할 주제나 일을 하나만 잡아볼까요?",
+    stepTitle: "A형 레이어로 확장합니다.",
+    stepDetail: "상태가 괜찮으니 핵심 일, 실수, 오늘 기준을 차례로 얇게 올립니다."
+  },
+  steady: {
+    label: "보통",
+    mode: "conversation",
+    energy: "normal",
+    dayMode: "normal",
+    title: "오늘을 너무 크게 만들지 않겠습니다",
+    prompt: "지금 머릿속에 가장 먼저 걸리는 일 하나만 잡아볼까요?",
+    stepTitle: "A형 레이어로 정리합니다.",
+    stepDetail: "답을 쓰면 다음 질문이 부드럽게 올라오고, 마지막에 브리핑으로 이어집니다."
+  },
+  light: {
+    label: "가볍게",
+    mode: "quick",
+    energy: "normal",
+    dayMode: "light",
+    title: "짧게 잡고 바로 넘어가겠습니다",
+    prompt: "오늘 끝났다고 말할 기준 하나만 정할까요?",
+    stepTitle: "A형을 짧게 줄입니다.",
+    stepDetail: "질문을 줄이고, 핵심 하나를 첫 10분 행동으로 바꿉니다."
+  },
+  tired: {
+    label: "피곤함",
+    mode: "choice",
+    energy: "tired",
+    dayMode: "light",
+    title: "오늘은 한 질문씩만 묻겠습니다",
+    prompt: "지금 가능한 가장 작은 시작은 무엇일까요?",
+    stepTitle: "D형 집중 시트로 유지합니다.",
+    stepDetail: "피곤한 날에는 정보량을 숨기고, 한 질문씩 얇은 시트처럼 올립니다."
+  },
+  off: {
+    label: "오늘 오프",
+    mode: "off",
+    energy: "tired",
+    dayMode: "off",
+    title: "오늘은 최소 모드로 둡니다",
+    prompt: "급하게 확인해야 할 것만 남길까요?",
+    stepTitle: "D형 최소 모드입니다.",
+    stepDetail: "쉬는 날을 실패로 기록하지 않고, 급한 일정과 내일 이어갈 기록만 남깁니다."
+  }
 };
 
 const checkinStepMessages = {
@@ -400,6 +454,29 @@ function setDayMode(dayMode) {
   updateCheckinInterface();
 }
 
+function currentCheckinState() {
+  const mode = qs("#checkinMode").value || "conversation";
+  const energy = qs("#energyLevel").value || "normal";
+  const dayMode = qs("#dayMode").value || "normal";
+  if (mode === "off" || dayMode === "off") return "off";
+  if (energy === "tired") return "tired";
+  if (mode === "quick" || dayMode === "light") return "light";
+  if (energy === "good") return "charged";
+  return "steady";
+}
+
+function setCheckinState(stateName, chosen = true) {
+  const config = checkinStateMap[stateName] || checkinStateMap.steady;
+  checkinStateChosen = chosen;
+  qs("#checkinMode").value = config.mode;
+  qs("#energyLevel").value = config.energy;
+  qs("#dayMode").value = config.dayMode;
+  document.querySelectorAll("[data-state]").forEach((button) => {
+    button.classList.toggle("is-selected", button.dataset.state === stateName);
+  });
+  updateCheckinInterface();
+}
+
 function applyPlaceholderDefaults() {
   const defaults = assistantDefaults(qs("#checkinMode").value, qs("#energyLevel").value, qs("#dayMode").value);
   qs("#mainTask").placeholder = defaults.mainTask;
@@ -408,8 +485,8 @@ function applyPlaceholderDefaults() {
 }
 
 function checkinTone(mode, energy, dayMode) {
-  if (mode === "off" || dayMode === "off") return "warm";
-  if (energy === "tired" || dayMode === "light") return "warm";
+  if (mode === "off" || dayMode === "off") return "focus";
+  if (energy === "tired") return "focus";
   if (mode === "quick") return "clear";
   return "soft";
 }
@@ -419,17 +496,51 @@ function updateCheckinInterface() {
   const energy = qs("#energyLevel").value || "normal";
   const dayMode = qs("#dayMode").value || "normal";
   const tone = checkinTone(mode, energy, dayMode);
-  const step = checkinStepMessages[mode] || checkinStepMessages.conversation;
+  const stateName = currentCheckinState();
+  const stateConfig = checkinStateMap[stateName] || checkinStateMap.steady;
+  const hasAnyAnswer = [qs("#mainTask").value, qs("#avoidMistake").value, qs("#intention").value]
+    .some((value) => value.trim());
+  const waitingForState = !checkinStateChosen && !hasAnyAnswer;
+  const step = waitingForState ? {
+    title: "먼저 오늘 상태를 고릅니다.",
+    detail: "상태를 누르는 순간 화면 톤과 질문량이 바뀌고, 다음 질문이 얇은 레이어로 올라옵니다."
+  } : {
+    title: stateConfig.stepTitle || checkinStepMessages[mode]?.title,
+    detail: stateConfig.stepDetail || checkinStepMessages[mode]?.detail
+  };
 
   document.body.dataset.checkinTone = tone;
-  qs("#assistantPrompt").textContent = assistantPrompts[mode] || assistantPrompts.conversation;
-  qs("#assistantTone").textContent = assistantTones[tone];
+  qs(".assistant-card h2").textContent = waitingForState ? "오늘 컨디션부터 맞춰볼게요" : stateConfig.title;
+  qs("#assistantPrompt").textContent = waitingForState
+    ? "지금 상태가 어디에 가장 가까운가요?"
+    : stateConfig.prompt || assistantPrompts[mode] || assistantPrompts.conversation;
+  qs("#assistantTone").textContent = waitingForState
+    ? "상태를 고르면 화면 분위기가 먼저 부드럽게 바뀝니다."
+    : assistantTones[tone];
   qs("#checkinStep").innerHTML = `<strong>${escapeHtml(step.title)}</strong><span>${escapeHtml(step.detail)}</span>`;
+  document.querySelectorAll("[data-state]").forEach((button) => {
+    button.classList.toggle("is-selected", button.dataset.state === stateName);
+  });
   document.querySelectorAll(".checkin-progress span").forEach((item, index) => {
-    const activeCount = mode === "quick" ? 2 : mode === "off" ? 1 : dayMode === "light" ? 2 : 1;
+    const filledCount = [qs("#mainTask").value, qs("#avoidMistake").value, qs("#intention").value]
+      .filter((value) => value.trim()).length;
+    const activeCount = Math.min(4, 1 + filledCount);
     item.classList.toggle("is-active", index < activeCount);
   });
   applyPlaceholderDefaults();
+  updateCheckinLayers();
+}
+
+function updateCheckinLayers() {
+  const mainFilled = Boolean(qs("#mainTask").value.trim());
+  const mistakeFilled = Boolean(qs("#avoidMistake").value.trim());
+  const stateName = currentCheckinState();
+  const reduced = stateName === "off";
+
+  document.querySelector('[data-layer="main"]').classList.add("is-visible");
+  document.querySelector('[data-layer="main"]').classList.toggle("is-waiting", !checkinStateChosen && !mainFilled);
+  document.querySelector('[data-layer="mistake"]').classList.toggle("is-visible", mainFilled && !reduced);
+  document.querySelector('[data-layer="intention"]').classList.toggle("is-visible", mainFilled && mistakeFilled && !reduced);
 }
 
 async function loadBriefing() {
@@ -861,6 +972,10 @@ function showThreshold() {
 }
 
 function bindEvents() {
+  document.querySelectorAll("[data-state]").forEach((button) => {
+    button.addEventListener("click", () => setCheckinState(button.dataset.state));
+  });
+
   document.querySelectorAll("[data-mode]").forEach((button) => {
     button.addEventListener("click", () => setCheckinMode(button.dataset.mode));
   });
@@ -873,6 +988,10 @@ function bindEvents() {
     button.addEventListener("click", () => setDayMode(button.dataset.dayMode));
   });
 
+  ["#mainTask", "#avoidMistake", "#intention"].forEach((selector) => {
+    qs(selector).addEventListener("input", updateCheckinInterface);
+  });
+
   qs("#checkinForm").addEventListener("submit", (event) => {
     event.preventDefault();
     state.checkin = readCheckinFromForm();
@@ -881,15 +1000,14 @@ function bindEvents() {
   });
 
   qs("#quickStart").addEventListener("click", () => {
-    setCheckinMode("quick");
+    setCheckinState("light");
     state.checkin = readCheckinFromForm();
     saveState();
     showDashboard();
   });
 
   qs("#offDay").addEventListener("click", () => {
-    setCheckinMode("off");
-    setDayMode("off");
+    setCheckinState("off");
     state.checkin = readCheckinFromForm();
     saveState();
     showDashboard();
@@ -1099,6 +1217,7 @@ async function init() {
   setCheckinMode(state.checkin.mode || "conversation");
   setEnergy(state.checkin.energy || "normal");
   setDayMode(state.checkin.dayMode || "normal");
+  setCheckinState(currentCheckinState(), Boolean(state.checkin.createdAt));
   renderVoiceSettings();
   renderSyncSettings();
   loadVoiceOptions();

@@ -53,39 +53,32 @@
             <input id="checkinMode" type="hidden" value="conversation">
             <input id="energyLevel" type="hidden" value="normal">
             <input id="dayMode" type="hidden" value="normal">
-            <div class="choice-group" aria-label="체크인 방식">
-              <button class="choice-button is-selected" type="button" data-mode="conversation">대화로 정리</button>
-              <button class="choice-button" type="button" data-mode="choice">선택지만 고르기</button>
-              <button class="choice-button" type="button" data-mode="quick">짧게 시작</button>
-              <button class="choice-button" type="button" data-mode="off">오늘은 오프</button>
-            </div>
-            <div class="choice-group compact" aria-label="오늘 컨디션">
-              <button class="choice-button" type="button" data-energy="good">괜찮음</button>
-              <button class="choice-button is-selected" type="button" data-energy="normal">보통</button>
-              <button class="choice-button" type="button" data-energy="tired">피곤함</button>
-            </div>
-            <div class="choice-group compact" aria-label="오늘 강도">
-              <button class="choice-button is-selected" type="button" data-day-mode="normal">일반</button>
-              <button class="choice-button" type="button" data-day-mode="light">가볍게</button>
-              <button class="choice-button" type="button" data-day-mode="off">하루 오프</button>
+            <div class="state-switch" aria-label="오늘 상태">
+              <button class="state-button" type="button" data-state="charged">충전됨</button>
+              <button class="state-button is-selected" type="button" data-state="steady">보통</button>
+              <button class="state-button" type="button" data-state="light">가볍게</button>
+              <button class="state-button" type="button" data-state="tired">피곤함</button>
+              <button class="state-button" type="button" data-state="off">오늘 오프</button>
             </div>
           </div>
           <div id="checkinStep" class="checkin-step">
             <strong>오늘 체크인은 3단계입니다.</strong>
             <span>핵심 일 하나, 피하고 싶은 실수 하나, 오늘의 기준 하나만 정리합니다.</span>
           </div>
-          <label>
-            오늘 가장 중요한 일
-            <input id="mainTask" name="mainTask" type="text" placeholder="예: 모닝데스크 첫 화면 확인">
-          </label>
-          <label>
-            피하고 싶은 실수
-            <input id="avoidMistake" name="avoidMistake" type="text" placeholder="예: 확인하지 않고 확신하기">
-          </label>
-          <label>
-            짧은 다짐
-            <input id="intention" name="intention" type="text" placeholder="예: 중요한 일부터 작게 시작한다">
-          </label>
+          <div class="checkin-layers" aria-label="체크인 질문">
+            <label class="checkin-layer is-visible" data-layer="main">
+              <span>오늘 가장 중요한 일</span>
+              <input id="mainTask" name="mainTask" type="text" placeholder="예: 모닝데스크 첫 화면 확인">
+            </label>
+            <label class="checkin-layer" data-layer="mistake">
+              <span>피하고 싶은 실수</span>
+              <input id="avoidMistake" name="avoidMistake" type="text" placeholder="예: 확인하지 않고 확신하기">
+            </label>
+            <label class="checkin-layer" data-layer="intention">
+              <span>짧은 다짐</span>
+              <input id="intention" name="intention" type="text" placeholder="예: 중요한 일부터 작게 시작한다">
+            </label>
+          </div>
           <div class="threshold__actions">
             <button class="primary" type="submit">브리핑 시작</button>
             <button class="secondary" id="quickStart" type="button">짧게 시작</button>
