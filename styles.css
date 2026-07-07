@@ -660,6 +660,14 @@ select {
   font-size: 18px;
 }
 
+.panel-help {
+  margin: -4px 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
 .count-pill,
 .tag,
 .storage-status {
@@ -795,6 +803,17 @@ select {
 
 .list li {
   padding: 11px 12px;
+}
+
+.task-item {
+  display: grid;
+  gap: 10px;
+}
+
+.task-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
 }
 
 .list small {
@@ -961,6 +980,7 @@ select {
   .voice-controls,
   .ambient-panel,
   .state-switch,
+  .task-actions,
   #taskForm,
   .deferred-actions,
   .weight-control,

@@ -174,10 +174,11 @@
             <section class="panel">
               <div class="section-header compact">
                 <div>
-                  <p class="eyebrow">Plan</p>
-                  <h3>일정</h3>
+                  <p class="eyebrow">Flow</p>
+                  <h3>오늘 흐름</h3>
                 </div>
               </div>
+              <p class="panel-help">시간이 정해진 일만 둡니다. 오늘의 리듬을 보는 곳입니다.</p>
               <form id="scheduleForm" class="inline-form">
                 <input id="scheduleTime" type="time" aria-label="일정 시간">
                 <input id="scheduleTitle" type="text" placeholder="일정 추가" aria-label="일정 제목">
@@ -228,11 +229,12 @@
             <section class="panel">
               <div class="section-header compact">
                 <div>
-                  <p class="eyebrow">Tasks</p>
-                  <h3>할 일</h3>
+                  <p class="eyebrow">Focus</p>
+                  <h3>오늘 할 일</h3>
                 </div>
                 <span id="taskLoad" class="count-pill"></span>
               </div>
+              <p class="panel-help">오늘 실제로 움직일 행동만 둡니다. 3개를 넘으면 줄이는 게 좋습니다.</p>
               <form id="taskForm" class="inline-form">
                 <input id="taskTitle" type="text" placeholder="할 일 추가" aria-label="할 일 제목">
                 <button type="submit" class="icon-button" title="할 일 추가">+</button>
@@ -244,9 +246,10 @@
               <div class="section-header compact">
                 <div>
                   <p class="eyebrow">Deferred</p>
-                  <h3>미룬 일</h3>
+                  <h3>미룬 일 정리</h3>
                 </div>
               </div>
+              <p class="panel-help">다시 보여주기만 하지 않고, 오늘 처리·쪼개기·보류·삭제 중 하나로 정리합니다.</p>
               <div id="deferredList" class="deferred-list"></div>
             </section>
 

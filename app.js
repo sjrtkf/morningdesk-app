@@ -633,15 +633,23 @@ function renderSchedule() {
 }
 
 function renderTasks() {
-  const todayTasks = state.tasks.filter((task) => !["deferred", "hold"].includes(task.status));
+  const todayTasks = state.tasks.filter((task) => !["deferred", "hold", "done"].includes(task.status));
   const deferredTasks = state.tasks.filter((task) => task.status === "deferred");
   qs("#taskLoad").textContent = state.checkin.dayMode === "off"
     ? "오프"
     : todayTasks.length > 3 ? "과적" : `${todayTasks.length}/3`;
   qs("#taskList").innerHTML = todayTasks.map((task) => `
-    <li>
-      <strong>${escapeHtml(task.title)}</strong>
-      <small>${escapeHtml(task.priority || "보통")}</small>
+    <li class="task-item">
+      <div>
+        <strong>${escapeHtml(task.title)}</strong>
+        <small>${escapeHtml(task.priority || "보통")} · ${escapeHtml(task.firstAction || "첫 행동 미정")}</small>
+      </div>
+      <div class="task-actions">
+        <button class="small-button" type="button" data-task-action="done" data-title="${escapeHtml(task.title)}">완료</button>
+        <button class="small-button" type="button" data-task-action="defer" data-title="${escapeHtml(task.title)}">미루기</button>
+        <button class="small-button" type="button" data-task-action="split" data-title="${escapeHtml(task.title)}">10분으로</button>
+        <button class="small-button" type="button" data-task-action="delete" data-title="${escapeHtml(task.title)}">삭제</button>
+      </div>
     </li>
   `).join("");
 
@@ -649,7 +657,7 @@ function renderTasks() {
     ? deferredTasks.map((task) => `
       <div class="deferred-item">
         <strong>${escapeHtml(task.title)}</strong>
-        <small>${escapeHtml(task.daysDeferred || 1)}일 미룸</small>
+        <small>${escapeHtml(task.daysDeferred || 1)}일 미룸 · 이유: ${escapeHtml(task.deferReason || "정하지 않음")}</small>
         <div class="deferred-actions">
           <button class="small-button" type="button" data-action="today" data-title="${escapeHtml(task.title)}">오늘 처리</button>
           <button class="small-button" type="button" data-action="split" data-title="${escapeHtml(task.title)}">10분으로 쪼개기</button>
@@ -743,7 +751,7 @@ function buildBriefingScript() {
   const scheduleText = state.schedule.length
     ? state.schedule.slice(0, 3).map((item) => `${item.time || "시간 미정"} ${item.title}`).join(". ")
     : "등록된 일정은 없습니다";
-  const todayTasks = state.tasks.filter((task) => !["deferred", "hold"].includes(task.status));
+  const todayTasks = state.tasks.filter((task) => !["deferred", "hold", "done"].includes(task.status));
   const taskText = todayTasks.length
     ? todayTasks.slice(0, 3).map((task) => task.title).join(". ")
     : "등록된 할 일은 없습니다";
@@ -1114,7 +1122,7 @@ function bindEvents() {
     event.preventDefault();
     const title = qs("#taskTitle").value.trim();
     if (!title) return;
-    state.tasks.push({ title, priority: "보통", status: "today" });
+    state.tasks.push({ title, priority: "보통", status: "today", firstAction: "첫 10분 행동 정하기" });
     qs("#taskTitle").value = "";
     saveState();
     renderTasks();
@@ -1201,6 +1209,35 @@ function bindEvents() {
 
     saveState();
     renderTasks();
+  });
+
+  qs("#taskList").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-task-action]");
+    if (!button) return;
+    const { taskAction, title } = button.dataset;
+    const task = state.tasks.find((item) => item.title === title);
+    if (!task) return;
+
+    if (taskAction === "done") {
+      task.status = "done";
+      task.completedAt = new Date().toISOString();
+    }
+    if (taskAction === "defer") {
+      task.status = "deferred";
+      task.daysDeferred = Number(task.daysDeferred || 0) + 1;
+      task.deferReason = task.deferReason || "오늘 목록에서 덜어냄";
+    }
+    if (taskAction === "split") {
+      task.firstAction = "첫 10분 행동만 정하기";
+      task.priority = "쪼개기";
+    }
+    if (taskAction === "delete") {
+      state.tasks = state.tasks.filter((item) => item !== task);
+    }
+
+    saveState();
+    renderTasks();
+    updateScriptPreview();
   });
 }
 
