@@ -18,7 +18,7 @@
       <section id="threshold" class="threshold">
         <div class="threshold__copy">
           <p class="eyebrow">Morning Desk</p>
-          <h1>오늘을 시작하기 전에</h1>
+          <h1>오늘을 너무 크게 만들지 않겠습니다</h1>
           <p class="lead" id="todayLabel"></p>
           <div class="ambient-panel">
             <div>
@@ -35,10 +35,20 @@
         </div>
         <form id="checkinForm" class="checkin" autocomplete="off">
           <div class="assistant-card">
-            <div>
-              <p class="eyebrow">Assistant</p>
-              <h2>오늘은 어떻게 챙겨드릴까요?</h2>
+            <div class="assistant-head">
+              <div class="assistant-avatar" aria-hidden="true">M</div>
+              <div>
+                <p class="eyebrow">Assistant</p>
+                <h2>지금 머릿속에 걸리는 일부터 볼게요</h2>
+              </div>
             </div>
+            <div class="checkin-progress" aria-label="체크인 진행 단계">
+              <span class="is-active"></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <p id="assistantTone" class="assistant-tone">기본은 부드럽게, 컨디션이 낮으면 질문을 줄입니다.</p>
             <p id="assistantPrompt" class="assistant-dialog">몇 가지만 답하면 제가 오늘의 시작점을 정리해둘게요.</p>
             <input id="checkinMode" type="hidden" value="conversation">
             <input id="energyLevel" type="hidden" value="normal">
@@ -59,6 +69,10 @@
               <button class="choice-button" type="button" data-day-mode="light">가볍게</button>
               <button class="choice-button" type="button" data-day-mode="off">하루 오프</button>
             </div>
+          </div>
+          <div id="checkinStep" class="checkin-step">
+            <strong>오늘 체크인은 3단계입니다.</strong>
+            <span>핵심 일 하나, 피하고 싶은 실수 하나, 오늘의 기준 하나만 정리합니다.</span>
           </div>
           <label>
             오늘 가장 중요한 일

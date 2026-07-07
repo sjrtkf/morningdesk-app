@@ -100,10 +100,35 @@ let storageWriteVersion = 0;
 const qs = (selector) => document.querySelector(selector);
 
 const assistantPrompts = {
-  conversation: "몇 가지만 답하면 제가 오늘의 시작점을 정리해둘게요.",
+  conversation: "지금 머릿속에 가장 먼저 걸리는 일 하나만 잡아볼까요?",
   choice: "말하기 싫은 날이면 선택지만 골라도 됩니다. 빈칸은 제가 무난하게 채워둘게요.",
-  quick: "오늘은 길게 붙잡지 않겠습니다. 핵심 하나만 잡고 바로 넘어갈게요.",
+  quick: "오늘은 길게 붙잡지 않겠습니다. 핵심 하나만 잡고 바로 브리핑으로 넘어갈게요.",
   off: "오늘은 오프 모드입니다. 급한 일정만 확인하고 쉬는 쪽으로 정리할게요."
+};
+
+const assistantTones = {
+  soft: "기본은 부드럽게, 필요한 것만 차분히 챙깁니다.",
+  warm: "컨디션이 낮은 날입니다. 질문을 줄이고 꼭 필요한 것만 남깁니다.",
+  clear: "이제 오늘의 기준을 또렷하게 정리해 브리핑으로 넘깁니다."
+};
+
+const checkinStepMessages = {
+  conversation: {
+    title: "오늘 체크인은 3단계입니다.",
+    detail: "핵심 일 하나, 피하고 싶은 실수 하나, 오늘의 기준 하나만 정리합니다."
+  },
+  choice: {
+    title: "선택지만 골라도 충분합니다.",
+    detail: "답을 길게 쓰지 않아도 오늘의 기본값을 제가 채워둡니다."
+  },
+  quick: {
+    title: "짧게 시작합니다.",
+    detail: "오늘 가장 중요한 일 하나만 잡고 바로 브리핑으로 이동합니다."
+  },
+  off: {
+    title: "오늘은 최소 모드입니다.",
+    detail: "쉬는 날을 실패로 기록하지 않고, 급한 일정과 최소 정보만 남깁니다."
+  }
 };
 
 const modeLabels = {
@@ -354,25 +379,25 @@ function setCheckinMode(mode) {
   setChoice("[data-mode]", mode, "#checkinMode");
   if (mode === "off") setDayMode("off");
   if (mode === "quick" && qs("#dayMode").value === "normal") setDayMode("light");
-  qs("#assistantPrompt").textContent = assistantPrompts[mode] || assistantPrompts.conversation;
-  applyPlaceholderDefaults();
+  updateCheckinInterface();
 }
 
 function setEnergy(energy) {
   setChoice("[data-energy]", energy, "#energyLevel");
-  applyPlaceholderDefaults();
+  if (energy === "tired" && qs("#dayMode").value === "normal") {
+    setChoice("[data-day-mode]", "light", "#dayMode");
+  }
+  updateCheckinInterface();
 }
 
 function setDayMode(dayMode) {
   setChoice("[data-day-mode]", dayMode, "#dayMode");
   if (dayMode === "off") {
     setChoice("[data-mode]", "off", "#checkinMode");
-    qs("#assistantPrompt").textContent = assistantPrompts.off;
   } else if (qs("#checkinMode").value === "off") {
     setChoice("[data-mode]", "choice", "#checkinMode");
-    qs("#assistantPrompt").textContent = assistantPrompts.choice;
   }
-  applyPlaceholderDefaults();
+  updateCheckinInterface();
 }
 
 function applyPlaceholderDefaults() {
@@ -380,6 +405,31 @@ function applyPlaceholderDefaults() {
   qs("#mainTask").placeholder = defaults.mainTask;
   qs("#avoidMistake").placeholder = defaults.avoidMistake;
   qs("#intention").placeholder = defaults.intention;
+}
+
+function checkinTone(mode, energy, dayMode) {
+  if (mode === "off" || dayMode === "off") return "warm";
+  if (energy === "tired" || dayMode === "light") return "warm";
+  if (mode === "quick") return "clear";
+  return "soft";
+}
+
+function updateCheckinInterface() {
+  const mode = qs("#checkinMode").value || "conversation";
+  const energy = qs("#energyLevel").value || "normal";
+  const dayMode = qs("#dayMode").value || "normal";
+  const tone = checkinTone(mode, energy, dayMode);
+  const step = checkinStepMessages[mode] || checkinStepMessages.conversation;
+
+  document.body.dataset.checkinTone = tone;
+  qs("#assistantPrompt").textContent = assistantPrompts[mode] || assistantPrompts.conversation;
+  qs("#assistantTone").textContent = assistantTones[tone];
+  qs("#checkinStep").innerHTML = `<strong>${escapeHtml(step.title)}</strong><span>${escapeHtml(step.detail)}</span>`;
+  document.querySelectorAll(".checkin-progress span").forEach((item, index) => {
+    const activeCount = mode === "quick" ? 2 : mode === "off" ? 1 : dayMode === "light" ? 2 : 1;
+    item.classList.toggle("is-active", index < activeCount);
+  });
+  applyPlaceholderDefaults();
 }
 
 async function loadBriefing() {

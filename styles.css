@@ -1,18 +1,19 @@
 :root {
   color-scheme: light;
-  --bg: #f3f5f2;
+  --bg: #f2f5f2;
   --surface: #ffffff;
-  --surface-soft: #eef1ed;
-  --surface-warm: #fff7ed;
-  --text: #18221d;
-  --muted: #647067;
-  --line: #d9ded8;
+  --surface-soft: #eef4f0;
+  --surface-warm: #fcfaf5;
+  --text: #17211c;
+  --body: #34423b;
+  --muted: #6b7771;
+  --line: #dce4df;
   --accent: #176b57;
-  --accent-strong: #0f4e41;
-  --amber: #bd6b21;
-  --blue: #315f9c;
+  --accent-strong: #0f4c40;
+  --amber: #b77420;
+  --blue: #315e93;
   --red: #a43d3d;
-  --shadow: 0 18px 42px rgba(24, 34, 29, 0.09);
+  --shadow: 0 22px 58px rgba(20, 31, 26, 0.12);
 }
 
 * {
@@ -22,9 +23,11 @@
 body {
   margin: 0;
   background:
-    linear-gradient(180deg, #fbfbf7 0%, var(--bg) 46%, #eef1ed 100%);
+    radial-gradient(circle at top left, rgba(23, 107, 87, 0.12), transparent 32%),
+    linear-gradient(180deg, #fbfcfa 0%, var(--bg) 48%, #eef4f0 100%);
   color: var(--text);
-  font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
+  font-family: "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
+  line-height: 1.55;
 }
 
 button,
@@ -46,7 +49,7 @@ button {
 .threshold {
   min-height: calc(100vh - 64px);
   display: grid;
-  grid-template-columns: minmax(360px, 1fr) minmax(320px, 1.1fr);
+  grid-template-columns: minmax(340px, 0.9fr) minmax(340px, 1.1fr);
   gap: 32px;
   align-items: center;
 }
@@ -69,6 +72,7 @@ button {
   color: var(--muted);
   font-size: 18px;
   line-height: 1.6;
+  word-break: keep-all;
 }
 
 .ambient-panel {
@@ -79,9 +83,9 @@ button {
   max-width: 680px;
   margin-top: 24px;
   padding: 16px;
-  border: 1px solid rgba(23, 107, 87, 0.18);
+  border: 1px solid rgba(23, 107, 87, 0.16);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.80);
   box-shadow: var(--shadow);
   backdrop-filter: blur(14px);
 }
@@ -119,7 +123,7 @@ button {
 }
 
 .checkin {
-  padding: 26px;
+  padding: 24px;
   display: grid;
   gap: 18px;
 }
@@ -127,25 +131,79 @@ button {
 .assistant-card {
   display: grid;
   gap: 14px;
-  padding: 18px;
+  padding: 20px;
   border: 1px solid rgba(23, 107, 87, 0.18);
-  border-radius: 8px;
-  background: linear-gradient(135deg, #f7fbf8 0%, #fff7ed 100%);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(23, 107, 87, 0.09), rgba(255, 255, 255, 0) 52%),
+    #fbfcfa;
+  box-shadow: 0 14px 30px rgba(23, 32, 27, 0.08);
+}
+
+.assistant-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.assistant-avatar {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--accent);
+  font-weight: 950;
+  box-shadow: 0 12px 24px rgba(23, 107, 87, 0.20);
 }
 
 .assistant-card h2 {
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1.25;
+  letter-spacing: 0;
+  word-break: keep-all;
+}
+
+.checkin-progress {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.checkin-progress span {
+  height: 6px;
+  border-radius: 999px;
+  background: #dce5e0;
+}
+
+.checkin-progress .is-active {
+  background: var(--accent);
+}
+
+.assistant-tone {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+  word-break: keep-all;
 }
 
 .assistant-dialog {
   margin: 0;
-  padding: 13px 14px;
-  border-left: 4px solid var(--accent);
-  background: rgba(255, 255, 255, 0.72);
-  color: #26342d;
-  line-height: 1.55;
+  min-height: 78px;
+  padding: 16px;
+  border: 1px solid rgba(23, 107, 87, 0.16);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text);
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.22;
+  letter-spacing: 0;
+  word-break: keep-all;
 }
 
 .choice-group {
@@ -159,13 +217,14 @@ button {
 }
 
 .choice-button {
-  min-height: 42px;
+  min-height: 46px;
   padding: 0 10px;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 14px;
   background: var(--surface);
   color: var(--text);
   font-weight: 800;
+  line-height: 1.25;
 }
 
 .choice-button.is-selected {
@@ -182,10 +241,30 @@ label {
   font-weight: 700;
 }
 
+.checkin-step {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.checkin-step strong {
+  color: var(--accent-strong);
+  font-size: 15px;
+}
+
+.checkin-step span {
+  color: var(--muted);
+  font-size: 14px;
+  word-break: keep-all;
+}
+
 input {
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 14px;
   padding: 13px 14px;
   background: #fbfcfb;
   color: var(--text);
@@ -195,7 +274,7 @@ textarea {
   width: 100%;
   resize: vertical;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 14px;
   padding: 13px 14px;
   background: #fbfcfb;
   color: var(--text);
@@ -227,7 +306,7 @@ select:focus {
 .icon-button,
 .small-button {
   border: 0;
-  border-radius: 6px;
+  border-radius: 14px;
   min-height: 40px;
 }
 
@@ -248,6 +327,58 @@ select:focus {
   background: var(--surface-soft);
   color: var(--text);
   font-weight: 700;
+}
+
+body[data-checkin-tone="warm"] {
+  background:
+    radial-gradient(circle at top left, rgba(183, 116, 32, 0.14), transparent 32%),
+    linear-gradient(180deg, #fcfaf5 0%, #f4f2eb 52%, #eef4f0 100%);
+}
+
+body[data-checkin-tone="warm"] .assistant-card {
+  border-color: rgba(183, 116, 32, 0.24);
+  background:
+    linear-gradient(180deg, rgba(183, 116, 32, 0.13), rgba(255, 255, 255, 0) 52%),
+    #fcfaf5;
+}
+
+body[data-checkin-tone="warm"] .assistant-avatar,
+body[data-checkin-tone="warm"] .choice-button.is-selected,
+body[data-checkin-tone="warm"] .primary,
+body[data-checkin-tone="warm"] .checkin-progress .is-active {
+  background: var(--amber);
+}
+
+body[data-checkin-tone="warm"] .choice-button.is-selected {
+  border-color: var(--amber);
+}
+
+body[data-checkin-tone="warm"] .assistant-dialog,
+body[data-checkin-tone="warm"] .checkin-step {
+  border-color: rgba(183, 116, 32, 0.22);
+  background: #fffaf1;
+}
+
+body[data-checkin-tone="clear"] .assistant-card {
+  border-color: rgba(49, 94, 147, 0.22);
+  background:
+    linear-gradient(180deg, rgba(49, 94, 147, 0.11), rgba(255, 255, 255, 0) 52%),
+    #f8fafb;
+}
+
+body[data-checkin-tone="clear"] .assistant-avatar,
+body[data-checkin-tone="clear"] .choice-button.is-selected,
+body[data-checkin-tone="clear"] .primary,
+body[data-checkin-tone="clear"] .checkin-progress .is-active {
+  background: var(--blue);
+}
+
+body[data-checkin-tone="clear"] .choice-button.is-selected {
+  border-color: var(--blue);
+}
+
+body[data-checkin-tone="clear"] .checkin-step strong {
+  color: var(--blue);
 }
 
 .small-link {
