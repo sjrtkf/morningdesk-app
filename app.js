@@ -97,6 +97,8 @@ const state = {
 
 let storageWriteVersion = 0;
 let checkinStateChosen = false;
+let checkinStage = "intro";
+let speechRecognizer = null;
 
 const qs = (selector) => document.querySelector(selector);
 
@@ -491,6 +493,116 @@ function checkinTone(mode, energy, dayMode) {
   return "soft";
 }
 
+function setVoiceAdvanceStatus(message) {
+  const status = qs("#voiceAdvanceStatus");
+  if (status) status.textContent = message;
+}
+
+function setCheckinStage(stage) {
+  checkinStage = stage;
+  document.body.dataset.checkinStage = stage;
+
+  if (stage === "state") {
+    checkinStateChosen = false;
+    updateCheckinInterface();
+  }
+
+  if (stage === "questions") {
+    checkinStateChosen = true;
+    updateCheckinInterface();
+    window.setTimeout(() => qs("#mainTask")?.focus(), 260);
+  }
+
+  if (stage === "intro") {
+    setVoiceAdvanceStatus('"다음", "넘어가", "확인"이라고 말하면 다음 카드로 넘어갑니다.');
+  } else if (stage === "state") {
+    setVoiceAdvanceStatus("컨디션을 고른 뒤 확인하거나, 다시 말로 넘길 수 있습니다.");
+  } else {
+    setVoiceAdvanceStatus("답을 적고 다음이라고 말하면 필요한 질문으로 넘어갑니다.");
+  }
+}
+
+function visibleLayerNeedsInput(selector) {
+  const layer = document.querySelector(selector);
+  return layer?.classList.contains("is-visible") && !layer.classList.contains("is-waiting");
+}
+
+function advanceQuestionCard() {
+  const mainTask = qs("#mainTask");
+  const avoidMistake = qs("#avoidMistake");
+  const intention = qs("#intention");
+
+  if (!mainTask.value.trim()) {
+    mainTask.focus();
+    return;
+  }
+  if (visibleLayerNeedsInput('[data-layer="mistake"]') && !avoidMistake.value.trim()) {
+    avoidMistake.focus();
+    return;
+  }
+  if (visibleLayerNeedsInput('[data-layer="intention"]') && !intention.value.trim()) {
+    intention.focus();
+    return;
+  }
+
+  qs("#checkinForm").requestSubmit();
+}
+
+function advanceCheckin() {
+  if (checkinStage === "intro") {
+    setCheckinStage("state");
+    return;
+  }
+
+  if (checkinStage === "state") {
+    setCheckinState(currentCheckinState(), true);
+    setCheckinStage("questions");
+    return;
+  }
+
+  advanceQuestionCard();
+}
+
+function startVoiceAdvance() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    setVoiceAdvanceStatus("이 브라우저에서는 음성 넘김을 지원하지 않습니다. 버튼으로 넘겨주세요.");
+    return;
+  }
+
+  if (speechRecognizer) {
+    speechRecognizer.stop();
+    speechRecognizer = null;
+  }
+
+  const recognizer = new SpeechRecognition();
+  speechRecognizer = recognizer;
+  recognizer.lang = "ko-KR";
+  recognizer.interimResults = false;
+  recognizer.maxAlternatives = 1;
+  recognizer.addEventListener("start", () => {
+    setVoiceAdvanceStatus('"다음", "넘어가", "확인" 중 하나를 말해주세요.');
+  });
+  recognizer.addEventListener("result", (event) => {
+    const transcript = String(event.results?.[0]?.[0]?.transcript || "").trim();
+    const command = transcript.replace(/\s+/g, "");
+    const canAdvance = ["다음", "넘어", "넘겨", "확인", "시작", "계속"].some((word) => command.includes(word));
+    if (canAdvance) {
+      setVoiceAdvanceStatus(`${transcript}이라고 들었어요. 다음 카드로 넘어갑니다.`);
+      advanceCheckin();
+      return;
+    }
+    setVoiceAdvanceStatus(`${transcript || "잘 들리지 않았어요"}. "다음"이라고 말하면 넘어갑니다.`);
+  });
+  recognizer.addEventListener("error", () => {
+    setVoiceAdvanceStatus("음성을 듣지 못했습니다. 마이크 권한을 확인하거나 버튼으로 넘겨주세요.");
+  });
+  recognizer.addEventListener("end", () => {
+    if (speechRecognizer === recognizer) speechRecognizer = null;
+  });
+  recognizer.start();
+}
+
 function updateCheckinInterface() {
   const mode = qs("#checkinMode").value || "conversation";
   const energy = qs("#energyLevel").value || "normal";
@@ -500,7 +612,7 @@ function updateCheckinInterface() {
   const stateConfig = checkinStateMap[stateName] || checkinStateMap.steady;
   const hasAnyAnswer = [qs("#mainTask").value, qs("#avoidMistake").value, qs("#intention").value]
     .some((value) => value.trim());
-  const waitingForState = !checkinStateChosen && !hasAnyAnswer;
+  const waitingForState = (checkinStage === "state" && !checkinStateChosen) || (!checkinStateChosen && !hasAnyAnswer);
   const step = waitingForState ? {
     title: "먼저 오늘 상태를 고릅니다.",
     detail: "상태를 누르는 순간 화면 톤과 질문량이 바뀌고, 다음 질문이 얇은 레이어로 올라옵니다."
@@ -536,11 +648,12 @@ function updateCheckinLayers() {
   const mistakeFilled = Boolean(qs("#avoidMistake").value.trim());
   const stateName = currentCheckinState();
   const reduced = stateName === "off";
+  const questionsOpen = checkinStage === "questions";
 
-  document.querySelector('[data-layer="main"]').classList.add("is-visible");
-  document.querySelector('[data-layer="main"]').classList.toggle("is-waiting", !checkinStateChosen && !mainFilled);
-  document.querySelector('[data-layer="mistake"]').classList.toggle("is-visible", mainFilled && !reduced);
-  document.querySelector('[data-layer="intention"]').classList.toggle("is-visible", mainFilled && mistakeFilled && !reduced);
+  document.querySelector('[data-layer="main"]').classList.toggle("is-visible", questionsOpen);
+  document.querySelector('[data-layer="main"]').classList.toggle("is-waiting", !questionsOpen || (!checkinStateChosen && !mainFilled));
+  document.querySelector('[data-layer="mistake"]').classList.toggle("is-visible", questionsOpen && mainFilled && !reduced);
+  document.querySelector('[data-layer="intention"]').classList.toggle("is-visible", questionsOpen && mainFilled && mistakeFilled && !reduced);
 }
 
 async function loadBriefing() {
@@ -977,6 +1090,7 @@ function showDashboard() {
 function showThreshold() {
   qs("#threshold").classList.remove("is-hidden");
   qs("#dashboard").classList.add("is-hidden");
+  setCheckinStage("intro");
 }
 
 function bindEvents() {
@@ -1006,6 +1120,11 @@ function bindEvents() {
     saveState();
     showDashboard();
   });
+
+  qs("#introNext").addEventListener("click", advanceCheckin);
+  qs("#cardNext").addEventListener("click", advanceCheckin);
+  qs("#introVoiceAdvance").addEventListener("click", startVoiceAdvance);
+  qs("#checkinVoiceAdvance").addEventListener("click", startVoiceAdvance);
 
   qs("#quickStart").addEventListener("click", () => {
     setCheckinState("light");
@@ -1255,6 +1374,7 @@ async function init() {
   setEnergy(state.checkin.energy || "normal");
   setDayMode(state.checkin.dayMode || "normal");
   setCheckinState(currentCheckinState(), Boolean(state.checkin.createdAt));
+  setCheckinStage("intro");
   renderVoiceSettings();
   renderSyncSettings();
   loadVoiceOptions();

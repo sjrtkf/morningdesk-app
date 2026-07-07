@@ -28,7 +28,7 @@ body {
   color: var(--text);
   font-family: "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
   line-height: 1.55;
-  transition: background 520ms ease, color 320ms ease;
+  transition: background 560ms cubic-bezier(0.2, 0.85, 0.22, 1), color 320ms ease;
 }
 
 button,
@@ -53,6 +53,16 @@ button {
   grid-template-columns: minmax(340px, 0.9fr) minmax(340px, 1.1fr);
   gap: 32px;
   align-items: center;
+  transition: grid-template-columns 460ms cubic-bezier(0.2, 0.85, 0.22, 1), gap 460ms cubic-bezier(0.2, 0.85, 0.22, 1);
+}
+
+.threshold__copy,
+.checkin {
+  transition:
+    opacity 360ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    transform 460ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    max-height 460ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    padding 360ms cubic-bezier(0.2, 0.85, 0.22, 1);
 }
 
 .threshold__copy h1,
@@ -91,6 +101,21 @@ button {
   backdrop-filter: blur(14px);
 }
 
+.ambient-actions {
+  display: grid;
+  gap: 8px;
+  min-width: 132px;
+}
+
+.voice-command-status {
+  max-width: 680px;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  word-break: keep-all;
+}
+
 .ambient-panel strong {
   display: block;
   font-size: 19px;
@@ -124,6 +149,7 @@ button {
 }
 
 .checkin {
+  max-height: 760px;
   padding: 24px;
   display: grid;
   gap: 18px;
@@ -142,7 +168,11 @@ button {
     linear-gradient(180deg, rgba(23, 107, 87, 0.09), rgba(255, 255, 255, 0) 52%),
     #fbfcfa;
   box-shadow: 0 14px 30px rgba(23, 32, 27, 0.08);
-  transition: background 520ms ease, border-color 520ms ease, transform 520ms ease;
+  transition:
+    background 560ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    border-color 560ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    transform 460ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    box-shadow 460ms cubic-bezier(0.2, 0.85, 0.22, 1);
 }
 
 .assistant-head {
@@ -233,7 +263,11 @@ button {
   font-size: 13px;
   font-weight: 900;
   line-height: 1.2;
-  transition: background 320ms ease, color 320ms ease, transform 320ms ease, box-shadow 320ms ease;
+  transition:
+    background 420ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    color 260ms ease,
+    transform 340ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    box-shadow 340ms cubic-bezier(0.2, 0.85, 0.22, 1);
 }
 
 .state-button.is-selected {
@@ -302,6 +336,10 @@ label {
 .checkin-layers {
   display: grid;
   gap: 12px;
+  transition:
+    opacity 360ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    transform 460ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    max-height 460ms cubic-bezier(0.2, 0.85, 0.22, 1);
 }
 
 .checkin-layer {
@@ -312,22 +350,32 @@ label {
   opacity: 0;
   overflow: hidden;
   pointer-events: none;
-  transform: translateY(18px);
-  transition: max-height 480ms ease, opacity 360ms ease, transform 480ms ease;
+  transform: translateY(18px) scale(0.985);
+  transition:
+    max-height 430ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    opacity 300ms ease,
+    transform 430ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    padding 360ms cubic-bezier(0.2, 0.85, 0.22, 1),
+    background 360ms ease;
 }
 
 .checkin-layer.is-visible {
-  max-height: 120px;
+  max-height: 132px;
+  padding: 12px;
+  border: 1px solid rgba(23, 107, 87, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .checkin-layer.is-waiting {
   max-height: 0;
+  padding: 0;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(18px);
+  transform: translateY(18px) scale(0.985);
 }
 
 .checkin-layer span {
@@ -401,6 +449,87 @@ select:focus {
   background: var(--surface-soft);
   color: var(--text);
   font-weight: 700;
+}
+
+body[data-checkin-stage="intro"] .threshold {
+  grid-template-columns: minmax(0, 760px);
+  justify-content: center;
+}
+
+body[data-checkin-stage="intro"] .threshold__copy {
+  max-height: 760px;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+body[data-checkin-stage="intro"] .checkin {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(26px) scale(0.985);
+}
+
+body[data-checkin-stage="state"] .threshold,
+body[data-checkin-stage="questions"] .threshold {
+  grid-template-columns: minmax(320px, 760px);
+  justify-content: center;
+}
+
+body[data-checkin-stage="state"] .threshold__copy,
+body[data-checkin-stage="questions"] .threshold__copy {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-28px) scale(0.985);
+}
+
+body[data-checkin-stage="state"] .checkin,
+body[data-checkin-stage="questions"] .checkin {
+  max-height: 860px;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+body[data-checkin-stage="state"] .checkin-layers {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(18px) scale(0.985);
+}
+
+body[data-checkin-stage="state"] .checkin button[type="submit"],
+body[data-checkin-stage="state"] #quickStart,
+body[data-checkin-stage="state"] #offDay {
+  display: none;
+}
+
+body[data-checkin-stage="questions"] .state-switch,
+body[data-checkin-stage="questions"] #cardNext {
+  max-height: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+body[data-checkin-stage="questions"] #cardNext {
+  display: none;
+}
+
+body[data-checkin-stage="questions"] .state-switch {
+  transform: translateY(-10px);
+}
+
+body[data-checkin-stage="questions"] .checkin-layers {
+  max-height: 420px;
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 body[data-checkin-tone="warm"] {

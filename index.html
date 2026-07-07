@@ -30,8 +30,13 @@
               <strong id="weatherSummary">위치 기반 날씨 대기 중</strong>
               <small id="weatherDetail">위치 권한을 허용하면 현재 지역 날씨를 보여드립니다.</small>
             </div>
-            <button class="secondary" id="refreshWeather" type="button">날씨 확인</button>
+            <div class="ambient-actions">
+              <button class="secondary" id="refreshWeather" type="button">날씨 확인</button>
+              <button class="primary" id="introNext" type="button">확인</button>
+              <button class="secondary" id="introVoiceAdvance" type="button">말로 넘기기</button>
+            </div>
           </div>
+          <p id="voiceAdvanceStatus" class="voice-command-status">"다음", "넘어가", "확인"이라고 말하면 다음 카드로 넘어갑니다.</p>
         </div>
         <form id="checkinForm" class="checkin" autocomplete="off">
           <div class="assistant-card">
@@ -80,9 +85,11 @@
             </label>
           </div>
           <div class="threshold__actions">
+            <button class="primary" id="cardNext" type="button">다음</button>
             <button class="primary" type="submit">브리핑 시작</button>
             <button class="secondary" id="quickStart" type="button">짧게 시작</button>
             <button class="secondary" id="offDay" type="button">오늘은 오프</button>
+            <button class="secondary" id="checkinVoiceAdvance" type="button">말로 넘기기</button>
           </div>
         </form>
       </section>
