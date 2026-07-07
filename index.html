@@ -20,6 +20,18 @@
           <p class="eyebrow">Morning Desk</p>
           <h1>오늘을 시작하기 전에</h1>
           <p class="lead" id="todayLabel"></p>
+          <div class="ambient-panel">
+            <div>
+              <span class="panel-label">오늘</span>
+              <strong id="dateCard">날짜 확인 중</strong>
+            </div>
+            <div>
+              <span class="panel-label">날씨</span>
+              <strong id="weatherSummary">위치 기반 날씨 대기 중</strong>
+              <small id="weatherDetail">위치 권한을 허용하면 현재 지역 날씨를 보여드립니다.</small>
+            </div>
+            <button class="secondary" id="refreshWeather" type="button">날씨 확인</button>
+          </div>
         </div>
         <form id="checkinForm" class="checkin" autocomplete="off">
           <div class="assistant-card">
@@ -110,10 +122,23 @@
           </div>
           <div class="voice-controls">
             <label class="voice-select">
+              엔진
+              <select id="voiceEngine" aria-label="읽어주기 엔진 선택">
+                <option value="browser">브라우저 기본 음성</option>
+                <option value="kokoro">Kokoro 로컬</option>
+                <option value="melo">MeloTTS 로컬</option>
+                <option value="sherpa">sherpa-onnx 로컬</option>
+              </select>
+            </label>
+            <label class="voice-select">
               목소리
               <select id="voiceSelect" aria-label="읽어주기 목소리 선택">
                 <option value="">기본 음성</option>
               </select>
+            </label>
+            <label class="voice-endpoint">
+              로컬 주소
+              <input id="voiceEndpoint" type="url" placeholder="http://127.0.0.1:7860/speak">
             </label>
             <label class="voice-rate">
               속도

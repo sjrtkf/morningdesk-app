@@ -73,9 +73,19 @@ const state = {
     dayMode: "normal"
   },
   voice: {
+    engine: "browser",
     voiceURI: "",
     rate: 1,
-    scriptVisible: false
+    scriptVisible: false,
+    endpoint: ""
+  },
+  weather: {
+    status: "idle",
+    summary: "",
+    detail: "",
+    latitude: null,
+    longitude: null,
+    updatedAt: ""
   },
   meta: {
     schemaVersion: 1,
@@ -253,10 +263,19 @@ function normalizeCheckin(checkin = {}) {
 
 function normalizeVoice(voice = {}) {
   return {
+    engine: voice.engine || "browser",
     voiceURI: voice.voiceURI || "",
     rate: Number(voice.rate || 1),
-    scriptVisible: Boolean(voice.scriptVisible)
+    scriptVisible: Boolean(voice.scriptVisible),
+    endpoint: voice.endpoint || defaultVoiceEndpoint(voice.engine || "browser")
   };
+}
+
+function defaultVoiceEndpoint(engine) {
+  if (engine === "kokoro") return "http://127.0.0.1:7860/speak";
+  if (engine === "melo") return "http://127.0.0.1:7861/speak";
+  if (engine === "sherpa") return "http://127.0.0.1:7862/speak";
+  return "";
 }
 
 function normalizeMeta(meta = {}) {
@@ -407,6 +426,7 @@ function renderArticles() {
         ${detail("업무 기회", article.opportunity)}
       </div>
       <div class="article-actions">
+        ${article.url && article.url !== "#" ? `<a class="small-link" href="${escapeHtml(article.url)}" target="_blank" rel="noopener noreferrer">원문 보기</a>` : `<span class="feedback-state">원문 링크 대기</span>`}
         <button class="small-button" type="button" data-feedback="useful" data-article-title="${escapeHtml(article.cleanTitle)}">유익함</button>
         <button class="small-button" type="button" data-feedback="later" data-article-title="${escapeHtml(article.cleanTitle)}">나중에 보기</button>
         <button class="small-button" type="button" data-feedback="low" data-article-title="${escapeHtml(article.cleanTitle)}">관심 낮음</button>
@@ -534,6 +554,8 @@ function renderVoiceSettings() {
   const voiceRate = qs("#voiceRate");
   if (!voiceSelect || !voiceRate) return;
 
+  qs("#voiceEngine").value = state.voice.engine || "browser";
+  qs("#voiceEndpoint").value = state.voice.endpoint || defaultVoiceEndpoint(state.voice.engine);
   voiceRate.value = state.voice.rate || 1;
   qs("#briefingScriptPreview").classList.toggle("is-hidden", !state.voice.scriptVisible);
   updateScriptPreview();
@@ -593,14 +615,53 @@ function stopReading() {
   updateVoiceStatus("읽기를 멈췄습니다.");
 }
 
+async function speakWithLocalEngine(script) {
+  const endpoint = (state.voice.endpoint || "").trim();
+  if (!endpoint) {
+    updateVoiceStatus("로컬 TTS 주소가 없습니다. PC에서 엔진을 켠 뒤 주소를 입력해주세요.");
+    return;
+  }
+
+  updateVoiceStatus(`${engineLabel(state.voice.engine)}에 읽기를 요청하는 중입니다.`);
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text: script,
+        lang: "ko-KR",
+        rate: Number(state.voice.rate || 1),
+        engine: state.voice.engine
+      })
+    });
+    if (!response.ok) throw new Error("local voice engine failed");
+    updateVoiceStatus(`${engineLabel(state.voice.engine)}로 브리핑을 보냈습니다.`);
+  } catch {
+    updateVoiceStatus("로컬 TTS에 연결하지 못했습니다. 엔진 실행 상태와 주소를 확인해주세요.");
+  }
+}
+
+function engineLabel(engine) {
+  if (engine === "kokoro") return "Kokoro";
+  if (engine === "melo") return "MeloTTS";
+  if (engine === "sherpa") return "sherpa-onnx";
+  return "브라우저 기본 음성";
+}
+
 function readBriefing() {
+  const script = buildBriefingScript();
+  if (state.voice.engine && state.voice.engine !== "browser") {
+    speakWithLocalEngine(script);
+    return;
+  }
+
   if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
     updateVoiceStatus("이 브라우저에서는 읽어주기를 지원하지 않습니다.");
     return;
   }
 
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(buildBriefingScript());
+  const utterance = new SpeechSynthesisUtterance(script);
   const voices = window.speechSynthesis.getVoices();
   const selectedVoice = voices.find((voice) => voice.voiceURI === state.voice.voiceURI);
   if (selectedVoice) utterance.voice = selectedVoice;
@@ -615,12 +676,127 @@ function readBriefing() {
 
 function renderAll() {
   renderSummary();
+  renderDateWeather();
   renderArticles();
   renderSchedule();
   renderTasks();
   renderWeights();
   renderReflections();
   renderVoiceSettings();
+}
+
+function weatherText(code) {
+  const weatherCodes = {
+    0: "맑음",
+    1: "대체로 맑음",
+    2: "구름 조금",
+    3: "흐림",
+    45: "안개",
+    48: "서리 안개",
+    51: "가벼운 이슬비",
+    53: "이슬비",
+    55: "강한 이슬비",
+    61: "약한 비",
+    63: "비",
+    65: "강한 비",
+    71: "약한 눈",
+    73: "눈",
+    75: "강한 눈",
+    80: "소나기",
+    81: "소나기",
+    82: "강한 소나기",
+    95: "뇌우"
+  };
+  return weatherCodes[code] || "날씨 확인";
+}
+
+function renderDateWeather() {
+  const dateCard = qs("#dateCard");
+  const weatherSummary = qs("#weatherSummary");
+  const weatherDetail = qs("#weatherDetail");
+  if (dateCard) dateCard.textContent = todayText();
+  if (!weatherSummary || !weatherDetail) return;
+
+  weatherSummary.textContent = state.weather.summary || "위치 기반 날씨 대기 중";
+  weatherDetail.textContent = state.weather.detail || "위치 권한을 허용하면 현재 지역 날씨를 보여드립니다.";
+}
+
+async function fetchWeatherByLocation(position) {
+  const { latitude, longitude } = position.coords;
+  state.weather = {
+    ...state.weather,
+    status: "loading",
+    latitude,
+    longitude,
+    summary: "날씨 가져오는 중",
+    detail: "현재 위치 기준으로 확인하고 있습니다."
+  };
+  renderDateWeather();
+
+  try {
+    const endpoint = new URL("https://api.open-meteo.com/v1/forecast");
+    endpoint.searchParams.set("latitude", latitude.toFixed(4));
+    endpoint.searchParams.set("longitude", longitude.toFixed(4));
+    endpoint.searchParams.set("current", "temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m");
+    endpoint.searchParams.set("timezone", "auto");
+    const response = await fetch(endpoint.toString());
+    if (!response.ok) throw new Error("weather unavailable");
+    const data = await response.json();
+    const current = data.current || {};
+    const temp = Math.round(Number(current.temperature_2m));
+    const feel = Math.round(Number(current.apparent_temperature));
+    const humidity = Math.round(Number(current.relative_humidity_2m));
+    const wind = Math.round(Number(current.wind_speed_10m));
+    state.weather = {
+      ...state.weather,
+      status: "ready",
+      summary: `${weatherText(current.weather_code)} · ${temp}°C`,
+      detail: `체감 ${feel}°C · 습도 ${humidity}% · 바람 ${wind}km/h`,
+      updatedAt: new Date().toISOString()
+    };
+  } catch {
+    state.weather = {
+      ...state.weather,
+      status: "error",
+      summary: "날씨 연결 실패",
+      detail: "인터넷 연결이나 위치 권한을 확인해주세요."
+    };
+  }
+  renderDateWeather();
+}
+
+function requestWeather() {
+  if (!("geolocation" in navigator)) {
+    state.weather = {
+      ...state.weather,
+      status: "unsupported",
+      summary: "위치 확인 불가",
+      detail: "이 브라우저에서는 위치 기반 날씨를 지원하지 않습니다."
+    };
+    renderDateWeather();
+    return;
+  }
+
+  state.weather = {
+    ...state.weather,
+    status: "permission",
+    summary: "위치 권한 확인 중",
+    detail: "브라우저가 위치 사용 허용을 요청할 수 있습니다."
+  };
+  renderDateWeather();
+  navigator.geolocation.getCurrentPosition(fetchWeatherByLocation, () => {
+    state.weather = {
+      ...state.weather,
+      status: "blocked",
+      summary: "날씨 권한 필요",
+      detail: "위치 권한을 허용하면 현재 지역 날씨를 표시합니다."
+    };
+    renderDateWeather();
+  }, {
+    enableHighAccuracy: false,
+    timeout: 10000,
+    maximumAge: 1000 * 60 * 30
+  });
 }
 
 function showDashboard() {
@@ -672,6 +848,22 @@ function bindEvents() {
   qs("#resetCheckin").addEventListener("click", showThreshold);
   qs("#readBriefing").addEventListener("click", readBriefing);
   qs("#stopReading").addEventListener("click", stopReading);
+  qs("#refreshWeather").addEventListener("click", requestWeather);
+  qs("#voiceEngine").addEventListener("change", () => {
+    state.voice.engine = qs("#voiceEngine").value;
+    state.voice.endpoint = state.voice.endpoint || defaultVoiceEndpoint(state.voice.engine);
+    if (state.voice.engine !== "browser" && !qs("#voiceEndpoint").value) {
+      state.voice.endpoint = defaultVoiceEndpoint(state.voice.engine);
+    }
+    renderVoiceSettings();
+    saveState();
+    updateVoiceStatus(`${engineLabel(state.voice.engine)} 모드로 바꿨습니다.`);
+  });
+  qs("#voiceEndpoint").addEventListener("change", () => {
+    state.voice.endpoint = qs("#voiceEndpoint").value.trim();
+    saveState();
+    updateVoiceStatus("로컬 TTS 주소를 저장했습니다.");
+  });
   qs("#voiceSelect").addEventListener("change", () => {
     state.voice.voiceURI = qs("#voiceSelect").value;
     saveState();
@@ -846,6 +1038,7 @@ function bindEvents() {
 
 async function init() {
   qs("#todayLabel").textContent = `${todayText()} · 짧게 정리하고 바로 시작합니다.`;
+  renderDateWeather();
   await loadSavedState();
   await loadBriefing();
   bindEvents();

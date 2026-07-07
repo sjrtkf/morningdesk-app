@@ -1,17 +1,18 @@
 :root {
   color-scheme: light;
-  --bg: #f5f7f4;
+  --bg: #f3f5f2;
   --surface: #ffffff;
-  --surface-soft: #eef3ef;
-  --text: #1b2520;
-  --muted: #66736b;
-  --line: #d9e0da;
-  --accent: #246b55;
-  --accent-strong: #164f3d;
-  --amber: #b7791f;
-  --blue: #2f5f98;
+  --surface-soft: #eef1ed;
+  --surface-warm: #fff7ed;
+  --text: #18221d;
+  --muted: #647067;
+  --line: #d9ded8;
+  --accent: #176b57;
+  --accent-strong: #0f4e41;
+  --amber: #bd6b21;
+  --blue: #315f9c;
   --red: #a43d3d;
-  --shadow: 0 18px 50px rgba(33, 50, 41, 0.12);
+  --shadow: 0 18px 42px rgba(24, 34, 29, 0.09);
 }
 
 * {
@@ -20,7 +21,8 @@
 
 body {
   margin: 0;
-  background: var(--bg);
+  background:
+    linear-gradient(180deg, #fbfbf7 0%, var(--bg) 46%, #eef1ed 100%);
   color: var(--text);
   font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
 }
@@ -69,6 +71,34 @@ button {
   line-height: 1.6;
 }
 
+.ambient-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr) auto;
+  gap: 12px;
+  align-items: center;
+  max-width: 680px;
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid rgba(23, 107, 87, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+.ambient-panel strong {
+  display: block;
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.ambient-panel small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .eyebrow {
   margin: 0 0 8px;
   color: var(--accent);
@@ -89,7 +119,7 @@ button {
 }
 
 .checkin {
-  padding: 28px;
+  padding: 26px;
   display: grid;
   gap: 18px;
 }
@@ -98,9 +128,9 @@ button {
   display: grid;
   gap: 14px;
   padding: 18px;
-  border: 1px solid #cbd8d1;
+  border: 1px solid rgba(23, 107, 87, 0.18);
   border-radius: 8px;
-  background: #f8fbf9;
+  background: linear-gradient(135deg, #f7fbf8 0%, #fff7ed 100%);
 }
 
 .assistant-card h2 {
@@ -113,7 +143,7 @@ button {
   margin: 0;
   padding: 13px 14px;
   border-left: 4px solid var(--accent);
-  background: #edf5f1;
+  background: rgba(255, 255, 255, 0.72);
   color: #26342d;
   line-height: 1.55;
 }
@@ -142,6 +172,7 @@ button {
   border-color: var(--accent);
   background: var(--accent);
   color: #fff;
+  box-shadow: 0 10px 24px rgba(23, 107, 87, 0.2);
 }
 
 label {
@@ -219,6 +250,29 @@ select:focus {
   font-weight: 700;
 }
 
+.small-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 6px;
+  background: #eaf3f0;
+  color: var(--accent-strong);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.small-link:hover {
+  background: #dcebe6;
+}
+
+.secondary:hover,
+.small-button:hover,
+.choice-button:hover {
+  border-color: rgba(23, 107, 87, 0.32);
+  background: #e6ece8;
+}
+
 .dashboard.is-hidden,
 .threshold.is-hidden {
   display: none;
@@ -228,6 +282,8 @@ select:focus {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 22px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
 }
 
 .topbar__actions {
@@ -245,12 +301,12 @@ select:focus {
 }
 
 .assistant-summary {
-  background: #f8fbf9;
+  background: linear-gradient(135deg, #f5fbf8 0%, #fff7ed 100%);
 }
 
 .voice-panel {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 0.8fr) minmax(340px, 1.2fr);
   gap: 16px;
   margin-bottom: 22px;
   padding: 16px 18px;
@@ -271,18 +327,18 @@ select:focus {
 }
 
 .voice-controls {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
   align-items: end;
   gap: 10px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
 }
 
 .voice-rate {
   min-width: 160px;
 }
 
-.voice-select {
+.voice-select,
+.voice-endpoint {
   min-width: 220px;
 }
 
@@ -438,6 +494,12 @@ select {
   box-shadow: none;
 }
 
+.panel:hover,
+.article-card:hover,
+.summary-panel:hover {
+  border-color: rgba(23, 107, 87, 0.24);
+}
+
 .inline-form {
   display: grid;
   grid-template-columns: 96px 1fr 40px;
@@ -563,7 +625,7 @@ select {
 .bar span {
   display: block;
   height: 100%;
-  background: var(--blue);
+  background: linear-gradient(90deg, var(--blue), var(--accent));
 }
 
 .empty-state {
@@ -638,6 +700,8 @@ select {
   .inline-form,
   .two-column,
   .voice-panel,
+  .voice-controls,
+  .ambient-panel,
   #taskForm,
   .deferred-actions,
   .weight-control,
