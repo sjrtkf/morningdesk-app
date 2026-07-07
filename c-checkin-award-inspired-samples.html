@@ -1,0 +1,1059 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>모닝데스크 어워드 감각 체크인 시안</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #111a16;
+        --body: #314039;
+        --muted: #68756f;
+        --line: rgba(209, 220, 214, 0.88);
+        --surface: rgba(255, 255, 255, 0.82);
+        --paper: #fbfcfa;
+        --green: #176a57;
+        --green-dark: #0e4b3e;
+        --blue: #315e93;
+        --amber: #b77420;
+        --rose: #b45a54;
+        --shadow: 0 28px 70px rgba(17, 26, 22, 0.15);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", Arial, sans-serif;
+        line-height: 1.55;
+        background:
+          linear-gradient(135deg, rgba(23, 106, 87, 0.12), rgba(49, 94, 147, 0.09)),
+          #f2f5f2;
+      }
+
+      button,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .page {
+        width: min(1240px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 24px 0 64px;
+      }
+
+      .hero {
+        min-height: 390px;
+        display: grid;
+        align-items: end;
+        overflow: hidden;
+        border-radius: 8px;
+        padding: clamp(24px, 5vw, 54px);
+        color: #fff;
+        background:
+          linear-gradient(90deg, rgba(12, 28, 23, 0.78), rgba(12, 28, 23, 0.38) 58%, rgba(12, 28, 23, 0.08)),
+          url("./assets/morning-assistant-bg.png") center / cover no-repeat;
+        box-shadow: var(--shadow);
+      }
+
+      .hero h1 {
+        max-width: 820px;
+        margin: 0;
+        font-size: clamp(34px, 6vw, 70px);
+        line-height: 1.05;
+        letter-spacing: 0;
+        word-break: keep-all;
+      }
+
+      .hero p {
+        max-width: 720px;
+        margin: 14px 0 0;
+        color: rgba(255, 255, 255, 0.84);
+        font-size: 18px;
+        word-break: keep-all;
+      }
+
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 14px 0;
+        margin: 12px 0 18px;
+        background: rgba(242, 245, 242, 0.9);
+        backdrop-filter: blur(16px);
+      }
+
+      .nav a {
+        flex: 0 0 auto;
+        min-height: 38px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--green-dark);
+        background: rgba(255, 255, 255, 0.84);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 850;
+      }
+
+      .note {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 22px;
+      }
+
+      .note article,
+      .sample {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.84);
+        box-shadow: var(--shadow);
+      }
+
+      .note article {
+        padding: 18px;
+      }
+
+      .note h2,
+      .note h3 {
+        margin: 0;
+        letter-spacing: 0;
+      }
+
+      .note p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        word-break: keep-all;
+      }
+
+      .sample {
+        overflow: hidden;
+        margin-top: 22px;
+      }
+
+      .sample-head {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+        align-items: center;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .sample-title {
+        margin: 0;
+        font-size: 25px;
+        line-height: 1.2;
+        letter-spacing: 0;
+        word-break: keep-all;
+      }
+
+      .sample-sub {
+        margin: 7px 0 0;
+        color: var(--muted);
+        word-break: keep-all;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+        padding: 0 12px;
+        border-radius: 999px;
+        color: var(--green-dark);
+        background: rgba(238, 244, 240, 0.95);
+        font-size: 13px;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .sample-body {
+        display: grid;
+        grid-template-columns: minmax(300px, 390px) 1fr;
+        gap: 24px;
+        padding: clamp(16px, 3vw, 28px);
+      }
+
+      .phone {
+        padding: 15px;
+        border-radius: 32px;
+        background: #111a16;
+        box-shadow: 0 28px 72px rgba(17, 26, 22, 0.26);
+      }
+
+      .screen {
+        min-height: 700px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 24px;
+        color: var(--ink);
+        background: #fbfcfa;
+      }
+
+      .status {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 13px 16px 7px;
+        color: rgba(17, 26, 22, 0.62);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .topline {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 4px 18px 14px;
+      }
+
+      .topline strong {
+        display: block;
+        font-size: 23px;
+        line-height: 1.15;
+        word-break: keep-all;
+      }
+
+      .topline span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .weather-token {
+        width: 72px;
+        height: 72px;
+        display: grid;
+        place-items: center;
+        border-radius: 24px;
+        color: var(--green-dark);
+        background: linear-gradient(145deg, rgba(231, 242, 237, 0.95), rgba(255, 246, 225, 0.9));
+        font-size: 22px;
+        font-weight: 950;
+      }
+
+      .assistant {
+        margin: 0 14px;
+        padding: 18px;
+        border: 1px solid rgba(209, 220, 214, 0.9);
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.86);
+        box-shadow: 0 14px 30px rgba(17, 26, 22, 0.08);
+      }
+
+      .assistant-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .avatar {
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        color: #fff;
+        background: var(--green);
+        font-weight: 950;
+      }
+
+      .question {
+        min-height: 92px;
+        margin: 16px 0 0;
+        font-size: 27px;
+        line-height: 1.18;
+        letter-spacing: 0;
+        font-weight: 930;
+        word-break: keep-all;
+      }
+
+      .assistant p {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 14px;
+        word-break: keep-all;
+      }
+
+      .choices,
+      .mini-list {
+        display: grid;
+        gap: 9px;
+        margin-top: 16px;
+      }
+
+      .choice {
+        min-height: 49px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 0 14px;
+        border-radius: 17px;
+        color: var(--ink);
+        background: rgba(238, 244, 240, 0.92);
+        border: 1px solid rgba(209, 220, 214, 0.9);
+        font-weight: 880;
+        text-align: left;
+      }
+
+      .choice small {
+        color: var(--muted);
+        font-weight: 850;
+      }
+
+      .bottom {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin: auto 14px 14px;
+        padding-top: 18px;
+      }
+
+      .primary,
+      .secondary {
+        min-height: 50px;
+        border-radius: 17px;
+        font-weight: 920;
+      }
+
+      .primary {
+        color: #fff;
+        background: var(--green);
+      }
+
+      .secondary {
+        color: var(--green-dark);
+        background: rgba(238, 244, 240, 0.96);
+        border: 1px solid var(--line);
+      }
+
+      .specs {
+        display: grid;
+        gap: 12px;
+        align-content: start;
+      }
+
+      .spec {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .spec h3 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0;
+      }
+
+      .spec p,
+      .spec li {
+        color: var(--muted);
+        word-break: keep-all;
+      }
+
+      .spec p {
+        margin: 8px 0 0;
+      }
+
+      .spec ul {
+        margin: 10px 0 0;
+        padding-left: 20px;
+      }
+
+      .glass .screen {
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.30), rgba(255, 255, 255, 0) 40%),
+          linear-gradient(155deg, #e8f2ec, #f9fbf7 50%, #eef3f7);
+      }
+
+      .glass .assistant,
+      .glass .mini-glass {
+        background: rgba(255, 255, 255, 0.54);
+        backdrop-filter: blur(18px);
+        border-color: rgba(255, 255, 255, 0.62);
+      }
+
+      .glass .mini-glass {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+        margin: 14px;
+        padding: 14px;
+        border-radius: 20px;
+        box-shadow: 0 14px 32px rgba(17, 26, 22, 0.07);
+      }
+
+      .glass .mini-glass strong {
+        display: block;
+        font-size: 15px;
+      }
+
+      .glass .mini-glass span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .bento .screen {
+        background: #f7f8f4;
+      }
+
+      .bento-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin: 0 14px 14px;
+      }
+
+      .bento-tile {
+        min-height: 104px;
+        padding: 14px;
+        border-radius: 22px;
+        background: #fff;
+        border: 1px solid var(--line);
+      }
+
+      .bento-tile strong {
+        display: block;
+        font-size: 22px;
+      }
+
+      .bento-tile span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .bento .choice:nth-child(1) {
+        background: #e7f3ee;
+      }
+
+      .bento .choice:nth-child(2) {
+        background: #eef2fb;
+      }
+
+      .motion .screen {
+        background:
+          linear-gradient(180deg, #f7faf6, #fff8ee 54%, #f2f5f2);
+      }
+
+      .motion-band {
+        margin: 0 14px 14px;
+        padding: 14px;
+        border-radius: 24px;
+        color: #fff;
+        background: linear-gradient(120deg, #176a57, #315e93);
+        box-shadow: 0 18px 36px rgba(49, 94, 147, 0.16);
+      }
+
+      .motion-band strong {
+        display: block;
+        font-size: 18px;
+      }
+
+      .motion-band span {
+        display: block;
+        margin-top: 4px;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 13px;
+      }
+
+      .focus .screen {
+        background: #fbfcfa;
+      }
+
+      .focus .assistant {
+        margin-top: auto;
+        border-radius: 28px 28px 20px 20px;
+      }
+
+      .focus .question {
+        min-height: 148px;
+        font-size: 32px;
+      }
+
+      .hybrid .screen {
+        transition: background 520ms ease;
+      }
+
+      .hybrid[data-tone="steady"] .screen {
+        background:
+          linear-gradient(180deg, rgba(23, 106, 87, 0.12), rgba(255, 255, 255, 0) 38%),
+          #fbfcfa;
+      }
+
+      .hybrid[data-tone="light"] .screen {
+        background:
+          linear-gradient(180deg, rgba(49, 94, 147, 0.13), rgba(255, 255, 255, 0) 38%),
+          #f8fafb;
+      }
+
+      .hybrid[data-tone="recover"] .screen,
+      .hybrid[data-tone="off"] .screen {
+        background:
+          linear-gradient(180deg, rgba(183, 116, 32, 0.16), rgba(255, 255, 255, 0) 40%),
+          #fcfaf5;
+      }
+
+      .state-ribbon {
+        display: grid;
+        gap: 8px;
+        margin: 0 14px 14px;
+      }
+
+      .state-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 7px;
+        padding: 7px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.70);
+        border: 1px solid var(--line);
+        transition: background 420ms ease, border-color 420ms ease;
+      }
+
+      .state-button {
+        min-height: 64px;
+        border-radius: 17px;
+        color: var(--muted);
+        background: transparent;
+        font-size: 12px;
+        font-weight: 900;
+        line-height: 1.2;
+        transition: background 320ms ease, color 320ms ease, transform 320ms ease;
+      }
+
+      .state-button.is-active {
+        color: #fff;
+        background: var(--green);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(23, 106, 87, 0.18);
+      }
+
+      .hybrid[data-tone="light"] .state-button.is-active {
+        background: var(--blue);
+        box-shadow: 0 12px 24px rgba(49, 94, 147, 0.18);
+      }
+
+      .hybrid[data-tone="recover"] .state-button.is-active,
+      .hybrid[data-tone="off"] .state-button.is-active {
+        background: var(--amber);
+        box-shadow: 0 12px 24px rgba(183, 116, 32, 0.18);
+      }
+
+      .state-note {
+        padding: 12px 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 850;
+        transition: color 360ms ease, background 360ms ease;
+      }
+
+      .hybrid .assistant,
+      .hybrid .avatar,
+      .hybrid .primary {
+        transition: background 420ms ease, border-color 420ms ease, transform 420ms ease;
+      }
+
+      .hybrid[data-tone="light"] .avatar,
+      .hybrid[data-tone="light"] .primary {
+        background: var(--blue);
+      }
+
+      .hybrid[data-tone="recover"] .avatar,
+      .hybrid[data-tone="recover"] .primary,
+      .hybrid[data-tone="off"] .avatar,
+      .hybrid[data-tone="off"] .primary {
+        background: var(--amber);
+      }
+
+      .hybrid[data-tone="recover"] .assistant,
+      .hybrid[data-tone="off"] .assistant {
+        background: rgba(255, 250, 241, 0.88);
+        border-color: rgba(183, 116, 32, 0.22);
+      }
+
+      .hybrid[data-tone="light"] .assistant {
+        background: rgba(248, 250, 251, 0.9);
+        border-color: rgba(49, 94, 147, 0.22);
+      }
+
+      .reference {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .reference span {
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: rgba(238, 244, 240, 0.8);
+        color: var(--body);
+        font-size: 13px;
+        font-weight: 850;
+        word-break: keep-all;
+      }
+
+      @media (max-width: 920px) {
+        .note,
+        .sample-body {
+          grid-template-columns: 1fr;
+        }
+
+        .phone {
+          width: min(100%, 390px);
+          margin: 0 auto;
+        }
+
+        .reference {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .page {
+          width: min(100% - 16px, 1240px);
+          padding-top: 8px;
+        }
+
+        .hero {
+          min-height: 310px;
+          border-radius: 0 0 8px 8px;
+        }
+
+        .hero p {
+          font-size: 15px;
+        }
+
+        .sample-head {
+          grid-template-columns: 1fr;
+        }
+
+        .phone {
+          padding: 8px;
+          border-radius: 24px;
+        }
+
+        .screen {
+          min-height: 660px;
+          border-radius: 18px;
+        }
+
+        .question {
+          font-size: 24px;
+        }
+
+        .focus .question {
+          font-size: 27px;
+        }
+
+        .bottom {
+          grid-template-columns: 1fr;
+        }
+
+        .state-row {
+          grid-template-columns: 1fr;
+        }
+
+        .state-button {
+          min-height: 44px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div>
+          <h1>딱딱함을 덜고, 살아 움직이는 체크인으로</h1>
+          <p>좋은 평가를 받은 앱들의 공통 감각을 모닝데스크식으로 번역했습니다. 따라 하는 것이 아니라, 아침 비서 앱에 맞는 상호작용으로 바꾸는 시안입니다.</p>
+        </div>
+      </section>
+
+      <nav class="nav" aria-label="시안 이동">
+        <a href="#why">방향</a>
+        <a href="#glass">A 리퀴드 레이어</a>
+        <a href="#bento">B 벤토 브리핑</a>
+        <a href="#motion">C 감정 전환</a>
+        <a href="#focus">D 집중 시트</a>
+        <a href="#hybrid">E 추천+사용자 생각</a>
+      </nav>
+
+      <section class="note" id="why">
+        <article>
+          <h2>참고한 감각</h2>
+          <p>최근 수상작과 좋은 평가를 받은 앱들은 대체로 버튼을 많이 늘리기보다, 상태 변화와 시각 반응으로 사용자가 “앱이 알아듣고 있다”고 느끼게 만듭니다.</p>
+          <div class="reference">
+            <span>레이어와 유리감</span>
+            <span>작은 전환 애니메이션</span>
+            <span>상태에 맞는 말투</span>
+          </div>
+        </article>
+        <article>
+          <h2>중복 문제 정리</h2>
+          <p>`괜찮음/보통/피곤함`과 `일반/가볍게/하루 오프`는 사용자가 보기엔 겹칩니다. 마지막 추천안에서는 둘을 합쳐 `오늘 상태` 하나로 만들었습니다.</p>
+          <div class="reference">
+            <span>충전됨</span>
+            <span>보통</span>
+            <span>가볍게</span>
+            <span>회복 필요</span>
+            <span>오늘 오프</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="sample glass" id="glass">
+        <header class="sample-head">
+          <div>
+            <h2 class="sample-title">A. 리퀴드 레이어형</h2>
+            <p class="sample-sub">유리처럼 겹치는 레이어와 부드러운 깊이감. 혁신적인 느낌은 있지만, 과하면 정보 앱에 부담이 됩니다.</p>
+          </div>
+          <span class="badge">시각 완성도 중심</span>
+        </header>
+        <div class="sample-body">
+          <div class="phone">
+            <div class="screen">
+              <div class="status"><span>07:18</span><span>MorningDesk</span></div>
+              <div class="topline">
+                <div>
+                  <strong>7월 7일, 흐린 아침</strong>
+                  <span>24도 · 오후 약한 비 · 이동 전 우산 확인</span>
+                </div>
+                <div class="weather-token">24</div>
+              </div>
+              <div class="mini-glass">
+                <div><strong>이미 챙겨둔 것</strong><span>일정 2개 · 미룬 일 1개 · 기사 3개</span></div>
+                <button class="secondary">보기</button>
+              </div>
+              <section class="assistant">
+                <div class="assistant-row"><div class="avatar">M</div><span>부드럽게 정리해볼게요</span></div>
+                <div class="question">오늘 가장 먼저 가볍게 잡을 일은 무엇인가요?</div>
+                <p>답을 쓰면 다음 질문이 얇은 레이어처럼 올라오는 구조입니다.</p>
+                <div class="choices">
+                  <button class="choice"><span>미룬 일에서 고르기</span><small>추천</small></button>
+                  <button class="choice"><span>일정에서 고르기</span><small>빠름</small></button>
+                </div>
+              </section>
+              <div class="bottom"><button class="secondary">선택만</button><button class="primary">다음</button></div>
+            </div>
+          </div>
+          <aside class="specs">
+            <div class="spec">
+              <h3>장점</h3>
+              <p>딱딱함이 크게 줄고 “고급 앱” 느낌이 납니다. 날씨, 일정, 질문이 겹겹이 준비된 것처럼 보입니다.</p>
+            </div>
+            <div class="spec">
+              <h3>주의점</h3>
+              <p>텍스트가 많아지면 유리감이 가독성을 해칠 수 있습니다. 실제 앱에는 중요한 첫 화면에만 제한적으로 쓰는 게 좋습니다.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="sample bento" id="bento">
+        <header class="sample-head">
+          <div>
+            <h2 class="sample-title">B. 벤토 브리핑형</h2>
+            <p class="sample-sub">정보를 작고 명확한 조각으로 보여줍니다. 우수한 생산성 앱들이 자주 쓰는 구조입니다.</p>
+          </div>
+          <span class="badge">정보 구조 중심</span>
+        </header>
+        <div class="sample-body">
+          <div class="phone">
+            <div class="screen">
+              <div class="status"><span>07:18</span><span>브리핑 준비됨</span></div>
+              <div class="topline">
+                <div>
+                  <strong>오늘은 3개만 보면 됩니다</strong>
+                  <span>날씨, 일정, 미룬 일만 먼저 압축</span>
+                </div>
+                <div class="weather-token">3</div>
+              </div>
+              <div class="bento-grid">
+                <div class="bento-tile"><strong>24도</strong><span>오후 비 가능</span></div>
+                <div class="bento-tile"><strong>2개</strong><span>중요 일정</span></div>
+                <div class="bento-tile"><strong>1개</strong><span>미룬 일</span></div>
+                <div class="bento-tile"><strong>3개</strong><span>선별 기사</span></div>
+              </div>
+              <section class="assistant">
+                <div class="assistant-row"><div class="avatar">M</div><span>먼저 하나만 고르면 됩니다</span></div>
+                <div class="question">오늘의 첫 행동을 어디에서 가져올까요?</div>
+                <div class="choices">
+                  <button class="choice"><span>미룬 일</span><small>10분으로</small></button>
+                  <button class="choice"><span>오늘 일정</span><small>바로</small></button>
+                </div>
+              </section>
+              <div class="bottom"><button class="secondary">오프</button><button class="primary">선택</button></div>
+            </div>
+          </div>
+          <aside class="specs">
+            <div class="spec">
+              <h3>장점</h3>
+              <p>한눈에 좋습니다. 기능이 늘어도 사용자가 어디를 봐야 할지 덜 헤맵니다.</p>
+            </div>
+            <div class="spec">
+              <h3>주의점</h3>
+              <p>비서와 대화하는 느낌은 조금 약해질 수 있습니다. 브리핑 화면에는 좋고, 체크인 첫 화면에는 약간 차가울 수 있습니다.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="sample motion" id="motion">
+        <header class="sample-head">
+          <div>
+            <h2 class="sample-title">C. 감정 전환형</h2>
+            <p class="sample-sub">상태를 고르는 순간 말투와 색이 바뀌는 구조입니다. 지금 네가 말한 “한 발 더 나아간” 방향입니다.</p>
+          </div>
+          <span class="badge">전환감 중심</span>
+        </header>
+        <div class="sample-body">
+          <div class="phone">
+            <div class="screen">
+              <div class="status"><span>07:18</span><span>상태 감지</span></div>
+              <div class="topline">
+                <div>
+                  <strong>오늘의 톤을 먼저 고릅니다</strong>
+                  <span>선택과 동시에 화면 분위기가 부드럽게 바뀜</span>
+                </div>
+                <div class="weather-token">톤</div>
+              </div>
+              <div class="motion-band"><strong>보통으로 시작 중</strong><span>질문 3개, 브리핑 기본량</span></div>
+              <section class="assistant">
+                <div class="assistant-row"><div class="avatar">M</div><span>화면이 먼저 맞춰집니다</span></div>
+                <div class="question">오늘은 어느 정도로 챙겨드릴까요?</div>
+                <div class="choices">
+                  <button class="choice"><span>보통</span><small>기본</small></button>
+                  <button class="choice"><span>가볍게</span><small>질문 줄임</small></button>
+                  <button class="choice"><span>오프</span><small>최소</small></button>
+                </div>
+              </section>
+              <div class="bottom"><button class="secondary">나중에</button><button class="primary">적용</button></div>
+            </div>
+          </div>
+          <aside class="specs">
+            <div class="spec">
+              <h3>장점</h3>
+              <p>앱이 나를 따라온다는 느낌이 강합니다. 피곤한 날 따뜻한 톤으로 바뀌면 사용자가 덜 밀려나는 효과가 있습니다.</p>
+            </div>
+            <div class="spec">
+              <h3>주의점</h3>
+              <p>전환이 너무 화려하면 아침 앱답지 않습니다. 0.4초 정도의 짧은 전환이 적당합니다.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="sample focus" id="focus">
+        <header class="sample-head">
+          <div>
+            <h2 class="sample-title">D. 집중 시트형</h2>
+            <p class="sample-sub">정보를 거의 숨기고, 한 질문만 크게 보여줍니다. 명상·집중 앱의 차분함을 빌린 방식입니다.</p>
+          </div>
+          <span class="badge">몰입 중심</span>
+        </header>
+        <div class="sample-body">
+          <div class="phone">
+            <div class="screen">
+              <div class="status"><span>07:18</span><span>1문항 모드</span></div>
+              <div class="topline">
+                <div>
+                  <strong>오늘 정보는 잠시 접어둡니다</strong>
+                  <span>먼저 마음에 걸리는 것 하나만</span>
+                </div>
+                <div class="weather-token">1</div>
+              </div>
+              <section class="assistant">
+                <div class="assistant-row"><div class="avatar">M</div><span>딱 하나만 물어볼게요</span></div>
+                <div class="question">오늘이 조금 나아지려면, 무엇 하나만 정하면 될까요?</div>
+                <p>답한 뒤에야 일정과 뉴스가 올라옵니다.</p>
+              </section>
+              <div class="bottom"><button class="secondary">오늘 오프</button><button class="primary">답하기</button></div>
+            </div>
+          </div>
+          <aside class="specs">
+            <div class="spec">
+              <h3>장점</h3>
+              <p>덜 딱딱하고, 아침 감정에 잘 맞습니다. 진입 장벽이 낮습니다.</p>
+            </div>
+            <div class="spec">
+              <h3>주의점</h3>
+              <p>모닝데스크가 브리핑 앱이라는 정체성이 약해질 수 있습니다. 첫 실행이나 피곤한 날에만 쓰는 편이 좋습니다.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="sample hybrid" id="hybrid" data-tone="steady">
+        <header class="sample-head">
+          <div>
+            <h2 class="sample-title">E. 추천 + 네 생각 반영형</h2>
+            <p class="sample-sub">내 추천안에 네 피드백을 합친 버전입니다. 중복된 두 줄 버튼을 `오늘 상태` 하나로 합치고, 누르는 순간 페이지 톤이 자연스럽게 변합니다.</p>
+          </div>
+          <span class="badge">추천 구현 후보</span>
+        </header>
+        <div class="sample-body">
+          <div class="phone">
+            <div class="screen">
+              <div class="status"><span>07:18</span><span>MorningDesk</span></div>
+              <div class="topline">
+                <div>
+                  <strong id="hybridTitle">오늘을 너무 크게 만들지 않겠습니다</strong>
+                  <span id="hybridWeather">7월 7일 · 흐림 24도 · 오후 약한 비</span>
+                </div>
+                <div class="weather-token" id="hybridToken">보통</div>
+              </div>
+              <div class="state-ribbon">
+                <div class="state-row" aria-label="오늘 상태">
+                  <button class="state-button" type="button" data-state="charged">충전됨</button>
+                  <button class="state-button is-active" type="button" data-state="steady">보통</button>
+                  <button class="state-button" type="button" data-state="light">가볍게</button>
+                  <button class="state-button" type="button" data-state="recover">회복 필요</button>
+                  <button class="state-button" type="button" data-state="off">오늘 오프</button>
+                </div>
+                <div class="state-note" id="hybridNote">기본 질문 3개로 오늘 기준을 잡습니다.</div>
+              </div>
+              <section class="assistant">
+                <div class="assistant-row"><div class="avatar">M</div><span id="hybridTone">필요한 것만 차분히 챙깁니다</span></div>
+                <div class="question" id="hybridQuestion">지금 머릿속에 가장 먼저 걸리는 일 하나만 잡아볼까요?</div>
+                <p id="hybridHint">상태를 바꾸면 질문 수, 말투, 배경 톤이 같이 바뀝니다.</p>
+                <div class="choices">
+                  <button class="choice"><span id="hybridChoiceA">미룬 일에서 고르기</span><small>추천</small></button>
+                  <button class="choice"><span id="hybridChoiceB">일정에서 고르기</span><small>빠름</small></button>
+                </div>
+              </section>
+              <div class="bottom"><button class="secondary">선택지만</button><button class="primary">브리핑 보기</button></div>
+            </div>
+          </div>
+          <aside class="specs">
+            <div class="spec">
+              <h3>왜 이게 추천인지</h3>
+              <ul>
+                <li>중복되던 2번째 줄과 3번째 줄을 하나로 합쳤습니다.</li>
+                <li>상태 선택이 단순 설정이 아니라, 화면 톤을 즉시 바꾸는 행동이 됩니다.</li>
+                <li>기본은 부드럽고, 피곤한 날은 따뜻해지고, 가볍게는 선명해집니다.</li>
+              </ul>
+            </div>
+            <div class="spec">
+              <h3>실제 앱 적용 방식</h3>
+              <p>`괜찮음/보통/피곤함`과 `일반/가볍게/하루 오프`를 제거하고, `오늘 상태` 하나만 남깁니다. 선택값에 따라 질문 수, 기사 수, 브리핑 길이, 배경 톤이 같이 바뀝니다.</p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const hybrid = document.querySelector(".hybrid");
+      const stateButtons = document.querySelectorAll(".state-button");
+      const content = {
+        charged: {
+          tone: "steady",
+          token: "충전",
+          title: "오늘은 조금 더 넓게 봐도 좋겠습니다",
+          note: "질문 4개, 기사와 생각 질문까지 조금 더 봅니다.",
+          assistant: "오늘은 사고를 조금 넓혀볼 수 있습니다",
+          question: "오늘 넓게 봐야 할 주제 하나를 잡아볼까요?",
+          hint: "업무, 일정, 뉴스 관점을 함께 연결합니다.",
+          choiceA: "생각 질문까지 보기",
+          choiceB: "기사 먼저 보기"
+        },
+        steady: {
+          tone: "steady",
+          token: "보통",
+          title: "오늘을 너무 크게 만들지 않겠습니다",
+          note: "기본 질문 3개로 오늘 기준을 잡습니다.",
+          assistant: "필요한 것만 차분히 챙깁니다",
+          question: "지금 머릿속에 가장 먼저 걸리는 일 하나만 잡아볼까요?",
+          hint: "상태를 바꾸면 질문 수, 말투, 배경 톤이 같이 바뀝니다.",
+          choiceA: "미룬 일에서 고르기",
+          choiceB: "일정에서 고르기"
+        },
+        light: {
+          tone: "light",
+          token: "가볍게",
+          title: "짧게 잡고 바로 넘어가겠습니다",
+          note: "질문 1개, 핵심 브리핑만 보여줍니다.",
+          assistant: "오늘은 또렷하게 줄여서 보겠습니다",
+          question: "오늘 끝났다고 말할 기준 하나만 정할까요?",
+          hint: "긴 입력 대신 첫 10분 행동으로 바꿉니다.",
+          choiceA: "첫 10분 행동",
+          choiceB: "오늘 꼭 할 일"
+        },
+        recover: {
+          tone: "recover",
+          token: "회복",
+          title: "오늘은 천천히 시작해도 됩니다",
+          note: "질문을 줄이고, 부담을 낮춘 브리핑으로 바꿉니다.",
+          assistant: "힘을 아끼는 쪽으로 정리하겠습니다",
+          question: "지금 가능한 가장 작은 시작은 무엇일까요?",
+          hint: "해야 할 일을 늘리지 않고, 하나만 남깁니다.",
+          choiceA: "가장 작은 일",
+          choiceB: "급한 일정만"
+        },
+        off: {
+          tone: "off",
+          token: "오프",
+          title: "오늘은 최소 모드로 둡니다",
+          note: "쉬는 날을 실패로 기록하지 않고 급한 것만 남깁니다.",
+          assistant: "오늘은 밀어붙이지 않겠습니다",
+          question: "급하게 확인해야 할 것만 남길까요?",
+          hint: "뉴스와 할 일은 줄이고, 내일 이어갈 수 있게 저장합니다.",
+          choiceA: "급한 일정만",
+          choiceB: "내일로 넘기기"
+        }
+      };
+
+      function applyState(name) {
+        const data = content[name] || content.steady;
+        hybrid.dataset.tone = data.tone;
+        document.querySelector("#hybridToken").textContent = data.token;
+        document.querySelector("#hybridTitle").textContent = data.title;
+        document.querySelector("#hybridNote").textContent = data.note;
+        document.querySelector("#hybridTone").textContent = data.assistant;
+        document.querySelector("#hybridQuestion").textContent = data.question;
+        document.querySelector("#hybridHint").textContent = data.hint;
+        document.querySelector("#hybridChoiceA").textContent = data.choiceA;
+        document.querySelector("#hybridChoiceB").textContent = data.choiceB;
+        stateButtons.forEach((button) => {
+          button.classList.toggle("is-active", button.dataset.state === name);
+        });
+      }
+
+      stateButtons.forEach((button) => {
+        button.addEventListener("click", () => applyState(button.dataset.state));
+      });
+    </script>
+  </body>
+</html>
