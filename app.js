@@ -8,6 +8,11 @@ const fallbackData = {
       { name: "기술/과학", weight: 15 },
       { name: "국제 뉴스", weight: 15 },
       { name: "시야 확장", weight: 10 }
+    ],
+    newsSources: [
+      { name: "Google News", url: "https://news.google.com/topstories?hl=ko&gl=KR&ceid=KR:ko" },
+      { name: "BBC", url: "https://www.bbc.com/news" },
+      { name: "MIT Technology Review", url: "https://www.technologyreview.com/" }
     ]
   },
   articles: [
@@ -23,7 +28,7 @@ const fallbackData = {
       implication: "핵심 업무 하나, 주의할 점 하나, 읽을 정보 몇 개로 시작 화면을 제한할 수 있다.",
       question: "오늘 가장 먼저 확인해야 할 정보는 무엇인가?",
       opportunity: "반복해서 보는 항목을 아침 체크리스트로 만들 수 있다.",
-      url: "#"
+      url: "https://news.google.com/topstories?hl=ko&gl=KR&ceid=KR:ko"
     },
     {
       category: "경제/사회",
@@ -37,7 +42,7 @@ const fallbackData = {
       implication: "오늘 꼭 확인할 일정과 나중에 봐도 되는 정보를 나눠 보여줄 수 있다.",
       question: "오늘 놓치면 안 되는 일정이나 알림은 무엇인가?",
       opportunity: "일정과 할 일을 아침 브리핑에 함께 넣으면 시작 부담을 줄일 수 있다.",
-      url: "#"
+      url: "https://www.korea.kr/news/policyNewsList.do"
     },
     {
       category: "기술/과학",
@@ -51,7 +56,7 @@ const fallbackData = {
       implication: "매일 반복해서 적는 일, 확인하는 정보, 미루는 일을 먼저 자동화 후보로 볼 수 있다.",
       question: "오늘 10분이라도 줄이고 싶은 반복 작업은 무엇인가?",
       opportunity: "작은 체크리스트와 기본값만으로도 시작 부담을 줄일 수 있다.",
-      url: "#"
+      url: "https://www.technologyreview.com/"
     }
   ],
   schedule: [{ time: "09:30", title: "오늘 일정 입력", type: "확인" }],
@@ -62,6 +67,7 @@ const state = {
   data: fallbackData,
   schedule: [],
   tasks: [],
+  customArticles: [],
   reflections: [],
   feedback: {},
   checkin: {
@@ -87,6 +93,14 @@ const state = {
     longitude: null,
     updatedAt: ""
   },
+  notifications: {
+    popup: true,
+    sound: false,
+    openOnClick: true,
+    leadMinutes: 5,
+    enabled: false,
+    permission: "default"
+  },
   meta: {
     schemaVersion: 1,
     updatedAt: "",
@@ -102,6 +116,7 @@ let speechRecognizer = null;
 let voiceAdvanceEnabled = false;
 let voiceAdvancePaused = false;
 let voiceAdvanceRestartTimer = 0;
+const sentNotifications = new Set();
 
 const qs = (selector) => document.querySelector(selector);
 const VOICE_ADVANCE_KEY = "morningdesk.voiceAdvance.enabled";
@@ -231,12 +246,14 @@ function applySavedState(parsed) {
   if (!parsed) return;
   state.schedule = parsed.schedule || state.schedule;
   state.tasks = parsed.tasks || state.tasks;
+  state.customArticles = Array.isArray(parsed.customArticles) ? parsed.customArticles : state.customArticles;
   state.reflections = parsed.reflections || state.reflections;
   state.feedback = parsed.feedback || state.feedback;
   state.checkin = normalizeCheckin(parsed.checkin || state.checkin);
   state.voice = normalizeVoice(parsed.voice || state.voice);
+  state.notifications = normalizeNotifications(parsed.notifications || state.notifications);
   state.meta = normalizeMeta(parsed.meta || parsed.__meta || state.meta);
-  state.settings = parsed.settings || state.settings;
+  state.settings = normalizeSettings(parsed.settings || state.settings);
 }
 
 function snapshotState() {
@@ -244,10 +261,12 @@ function snapshotState() {
     meta: state.meta,
     schedule: state.schedule,
     tasks: state.tasks,
+    customArticles: state.customArticles,
     reflections: state.reflections,
     feedback: state.feedback,
     checkin: state.checkin,
     voice: state.voice,
+    notifications: state.notifications,
     settings: state.settings
   };
 }
@@ -325,11 +344,13 @@ function applyImportedData(imported) {
   state.meta = normalizeMeta(imported.meta || imported.__meta || state.meta);
   state.schedule = Array.isArray(imported.schedule) ? imported.schedule : state.schedule;
   state.tasks = Array.isArray(imported.tasks) ? imported.tasks : state.tasks;
+  state.customArticles = Array.isArray(imported.customArticles) ? imported.customArticles : state.customArticles;
   state.reflections = Array.isArray(imported.reflections) ? imported.reflections : state.reflections;
   state.feedback = imported.feedback && typeof imported.feedback === "object" ? imported.feedback : state.feedback;
   state.checkin = imported.checkin && typeof imported.checkin === "object" ? normalizeCheckin(imported.checkin) : state.checkin;
   state.voice = imported.voice && typeof imported.voice === "object" ? normalizeVoice(imported.voice) : state.voice;
-  state.settings = imported.settings && typeof imported.settings === "object" ? imported.settings : state.settings;
+  state.notifications = imported.notifications && typeof imported.notifications === "object" ? normalizeNotifications(imported.notifications) : state.notifications;
+  state.settings = imported.settings && typeof imported.settings === "object" ? normalizeSettings(imported.settings) : state.settings;
   state.data.settings = state.settings || state.data.settings;
   saveState();
   renderAll();
@@ -354,6 +375,27 @@ function normalizeVoice(voice = {}) {
     rate: Number(voice.rate || 1),
     scriptVisible: Boolean(voice.scriptVisible),
     endpoint: voice.endpoint || defaultVoiceEndpoint(voice.engine || "browser")
+  };
+}
+
+function normalizeNotifications(notifications = {}) {
+  return {
+    popup: notifications.popup !== false,
+    sound: Boolean(notifications.sound),
+    openOnClick: notifications.openOnClick !== false,
+    leadMinutes: Number(notifications.leadMinutes || 5),
+    enabled: Boolean(notifications.enabled),
+    permission: notifications.permission || notificationPermission()
+  };
+}
+
+function normalizeSettings(settings = {}) {
+  const base = fallbackData.settings;
+  return {
+    dailyNewsCount: Number(settings.dailyNewsCount || base.dailyNewsCount),
+    excludedCategories: Array.isArray(settings.excludedCategories) ? settings.excludedCategories : [...base.excludedCategories],
+    categoryWeights: Array.isArray(settings.categoryWeights) ? settings.categoryWeights : [...base.categoryWeights],
+    newsSources: Array.isArray(settings.newsSources) && settings.newsSources.length ? settings.newsSources : [...base.newsSources]
   };
 }
 
@@ -426,6 +468,20 @@ function readCheckinFromForm() {
     dayMode,
     createdAt: new Date().toISOString()
   };
+}
+
+function activeTasks() {
+  return state.tasks.filter((task) => !["deferred", "hold", "done"].includes(task.status));
+}
+
+function nextScheduleItem() {
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  return state.schedule
+    .filter((item) => item.time)
+    .map((item) => ({ ...item, dateTime: new Date(`${today}T${item.time}`) }))
+    .filter((item) => item.dateTime >= now)
+    .sort((a, b) => a.dateTime - b.dateTime)[0];
 }
 
 function setChoice(selector, value, inputSelector) {
@@ -507,7 +563,9 @@ function setVoiceAdvanceButtons() {
   ["#introVoiceAdvance", "#checkinVoiceAdvance"].forEach((selector) => {
     const button = qs(selector);
     if (!button) return;
-    button.textContent = voiceAdvanceEnabled ? "핸즈프리 끄기" : "핸즈프리 켜기";
+    const label = button.querySelector(".toggle-label");
+    if (label) label.textContent = voiceAdvanceEnabled ? "음성 넘김 켜짐" : "음성 넘김";
+    button.setAttribute("aria-pressed", String(voiceAdvanceEnabled));
     button.classList.toggle("is-listening", voiceAdvanceEnabled);
   });
   qs("#voiceAdvanceStatus")?.classList.toggle("is-listening", voiceAdvanceEnabled);
@@ -550,12 +608,12 @@ function setCheckinStage(stage) {
 
   if (stage === "intro") {
     setVoiceAdvanceStatus(voiceAdvanceEnabled
-      ? "핸즈프리 대기 중입니다. 다음, 넘어가, 확인이라고 말해보세요."
-      : "핸즈프리를 한 번 켜면 체크인 동안 말로 넘길 수 있습니다.");
+      ? "음성 넘김 대기 중입니다. 다음, 넘어가, 확인이라고 말해보세요."
+      : "음성 넘김을 한 번 켜면 체크인 동안 말로 넘길 수 있습니다.");
   } else if (stage === "state") {
     setVoiceAdvanceStatus(voiceAdvanceEnabled
       ? "컨디션을 고른 뒤 다음이라고 말하면 질문 카드로 넘어갑니다."
-      : "컨디션을 고른 뒤 확인하거나, 핸즈프리를 켤 수 있습니다.");
+      : "컨디션을 고른 뒤 확인하거나, 음성 넘김을 켤 수 있습니다.");
   } else {
     setVoiceAdvanceStatus(voiceAdvanceEnabled
       ? "답을 적고 다음이라고 말하면 필요한 질문으로 넘어갑니다."
@@ -641,7 +699,7 @@ function startVoiceAdvanceListening() {
   recognizer.maxAlternatives = 1;
   recognizer.addEventListener("start", () => {
     setVoiceAdvanceButtons();
-    setVoiceAdvanceStatus("핸즈프리 대기 중입니다. 다음, 넘어가, 확인이라고 말해보세요.");
+    setVoiceAdvanceStatus("음성 넘김 대기 중입니다. 다음, 넘어가, 확인이라고 말해보세요.");
   });
   recognizer.addEventListener("result", (event) => {
     const lastResult = event.results?.[event.results.length - 1];
@@ -658,10 +716,10 @@ function startVoiceAdvanceListening() {
   recognizer.addEventListener("error", (event) => {
     if (event.error === "not-allowed" || event.error === "service-not-allowed") {
       stopVoiceAdvanceListening();
-      setVoiceAdvanceStatus("마이크 권한이 막혀 있습니다. 브라우저 권한을 허용하면 핸즈프리를 쓸 수 있습니다.");
+      setVoiceAdvanceStatus("마이크 권한이 막혀 있습니다. 브라우저 권한을 허용하면 음성 넘김을 쓸 수 있습니다.");
       return;
     }
-    setVoiceAdvanceStatus("잠깐 듣지 못했습니다. 핸즈프리를 다시 대기 상태로 돌립니다.");
+    setVoiceAdvanceStatus("잠깐 듣지 못했습니다. 음성 넘김을 다시 대기 상태로 돌립니다.");
   });
   recognizer.addEventListener("end", () => {
     if (speechRecognizer === recognizer) speechRecognizer = null;
@@ -686,7 +744,7 @@ function enableVoiceAdvance({ persist = true } = {}) {
 function toggleVoiceAdvance() {
   if (voiceAdvanceEnabled) {
     stopVoiceAdvanceListening();
-    setVoiceAdvanceStatus("핸즈프리를 껐습니다. 버튼으로 넘길 수 있습니다.");
+    setVoiceAdvanceStatus("음성 넘김을 껐습니다. 버튼으로 넘길 수 있습니다.");
     return;
   }
   enableVoiceAdvance();
@@ -763,7 +821,7 @@ async function loadBriefing() {
     state.data = fallbackData;
     state.schedule = state.schedule.length ? state.schedule : [...state.data.schedule];
     state.tasks = state.tasks.length ? state.tasks : [...state.data.tasks];
-    state.settings = state.settings || JSON.parse(JSON.stringify(state.data.settings));
+    state.settings = normalizeSettings(state.settings || state.data.settings);
     state.data.settings = state.settings;
     return;
   }
@@ -778,7 +836,7 @@ async function loadBriefing() {
 
   state.schedule = state.schedule.length ? state.schedule : [...state.data.schedule];
   state.tasks = state.tasks.length ? state.tasks : [...state.data.tasks];
-  state.settings = state.settings || JSON.parse(JSON.stringify(state.data.settings));
+  state.settings = normalizeSettings(state.settings || state.data.settings);
   state.data.settings = state.settings;
 }
 
@@ -817,7 +875,7 @@ function visibleArticles() {
     ? Math.min(1, state.data.settings.dailyNewsCount)
     : state.data.settings.dailyNewsCount;
 
-  return state.data.articles
+  return allArticles()
     .filter((article) => !state.data.settings.excludedCategories.includes(article.category))
     .slice(0, limit);
 }
@@ -838,17 +896,66 @@ function detail(label, text) {
   `;
 }
 
+function allArticles() {
+  return [...state.customArticles, ...state.data.articles];
+}
+
+function articleHost(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "원문";
+  }
+}
+
+function renderPlan() {
+  const checkin = normalizeCheckin(state.checkin);
+  const defaults = assistantDefaults(checkin.mode, checkin.energy, checkin.dayMode);
+  const tasks = activeTasks();
+  const nextSchedule = nextScheduleItem();
+  const firstTask = tasks[0];
+  const loadMessage = tasks.length > 3
+    ? "오늘 목록이 많습니다. 하나는 미루거나 10분짜리로 줄이는 게 좋습니다."
+    : tasks.length === 0
+      ? "아직 오늘 할 일이 없습니다. 핵심 업무를 할 일로 옮기면 시작점이 생깁니다."
+      : "오늘 목록은 감당 가능한 범위입니다.";
+
+  qs("#planBoard").innerHTML = [
+    {
+      label: "지금 시작",
+      value: firstTask?.title || checkin.mainTask || defaults.mainTask,
+      note: firstTask?.firstAction || "첫 10분 행동을 정하면 바로 움직일 수 있습니다."
+    },
+    {
+      label: "다음 일정",
+      value: nextSchedule ? `${nextSchedule.time} · ${nextSchedule.title}` : "등록된 다음 일정 없음",
+      note: nextSchedule ? `${nextSchedule.type || "일정"} · ${nextSchedule.reminderBefore || state.notifications.leadMinutes || 5}분 전 알림 후보` : "시간이 있는 일만 일정에 넣습니다."
+    },
+    {
+      label: "오늘 부하",
+      value: tasks.length > 3 ? `${tasks.length}개 · 과적` : `${tasks.length}개`,
+      note: loadMessage
+    }
+  ].map((item) => `
+    <article class="plan-card">
+      <span>${escapeHtml(item.label)}</span>
+      <strong>${escapeHtml(item.value)}</strong>
+      <small>${escapeHtml(item.note)}</small>
+    </article>
+  `).join("");
+}
+
 function renderSchedule() {
   qs("#scheduleList").innerHTML = state.schedule.map((item) => `
     <li>
       <strong>${escapeHtml(item.time || "시간 미정")} · ${escapeHtml(item.title)}</strong>
-      <small>${escapeHtml(item.type || "일정")}</small>
+      <small>${escapeHtml(item.type || "일정")} · ${escapeHtml(item.reminderBefore || state.notifications.leadMinutes || 5)}분 전 알림</small>
     </li>
   `).join("");
 }
 
 function renderTasks() {
-  const todayTasks = state.tasks.filter((task) => !["deferred", "hold", "done"].includes(task.status));
+  const todayTasks = activeTasks();
   const deferredTasks = state.tasks.filter((task) => task.status === "deferred");
   qs("#taskLoad").textContent = state.checkin.dayMode === "off"
     ? "오프"
@@ -876,6 +983,7 @@ function renderTasks() {
         <div class="deferred-actions">
           <button class="small-button" type="button" data-action="today" data-title="${escapeHtml(task.title)}">오늘 처리</button>
           <button class="small-button" type="button" data-action="split" data-title="${escapeHtml(task.title)}">10분으로 쪼개기</button>
+          <button class="small-button" type="button" data-action="date" data-title="${escapeHtml(task.title)}">내일 다시</button>
           <button class="small-button" type="button" data-action="hold" data-title="${escapeHtml(task.title)}">보류</button>
           <button class="small-button" type="button" data-action="delete" data-title="${escapeHtml(task.title)}">삭제</button>
         </div>
@@ -905,6 +1013,16 @@ function renderWeights() {
         <div class="bar"><span style="width: ${escapeHtml(item.weight)}%"></span></div>
       </div>
       <span>${escapeHtml(item.weight)}%</span>
+    </div>
+  `).join("");
+  qs("#sourceList").innerHTML = (state.data.settings.newsSources || []).map((source, index) => `
+    <div class="source-row">
+      <div>
+        <strong>${escapeHtml(source.name)}</strong>
+        <small>${escapeHtml(source.url)}</small>
+      </div>
+      <a class="small-link" href="${escapeHtml(source.url)}" target="_blank" rel="noopener noreferrer">열기</a>
+      <button class="small-button" type="button" data-source-delete="${index}">삭제</button>
     </div>
   `).join("");
 }
@@ -943,6 +1061,106 @@ function renderVoiceSettings() {
   voiceRate.value = state.voice.rate || 1;
   qs("#briefingScriptPreview").classList.toggle("is-hidden", !state.voice.scriptVisible);
   updateScriptPreview();
+}
+
+function notificationPermission() {
+  return typeof Notification === "undefined" ? "unsupported" : Notification.permission;
+}
+
+function renderNotificationSettings() {
+  state.notifications = normalizeNotifications(state.notifications);
+  qs("#notificationLead").value = String(state.notifications.leadMinutes || 5);
+  qs("#notifyPopup").checked = state.notifications.popup;
+  qs("#notifySound").checked = state.notifications.sound;
+  qs("#notifyOpenOnClick").checked = state.notifications.openOnClick;
+  const permission = notificationPermission();
+  const label = permission === "granted" && state.notifications.enabled
+    ? "알림 켜짐"
+    : permission === "denied"
+      ? "권한 차단"
+      : permission === "unsupported"
+        ? "미지원"
+        : "권한 필요";
+  qs("#notificationState").textContent = label;
+}
+
+function playNotificationSound() {
+  if (!state.notifications.sound) return;
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const context = new AudioContext();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.frequency.value = 660;
+    gain.gain.value = 0.04;
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    window.setTimeout(() => {
+      oscillator.stop();
+      context.close();
+    }, 180);
+  } catch {
+    // Sound is optional and can be blocked until the user interacts with the page.
+  }
+}
+
+async function showMorningNotification(title, body, tag) {
+  if (!state.notifications.enabled || !state.notifications.popup || notificationPermission() !== "granted") return;
+  playNotificationSound();
+  const options = {
+    body,
+    tag,
+    badge: "./icons/morningdesk-icon.svg",
+    icon: "./icons/morningdesk-icon.svg",
+    data: { url: location.href }
+  };
+
+  if (navigator.serviceWorker?.ready) {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      registration.showNotification(title, options);
+      return;
+    } catch {
+      // Fall back to direct notification below.
+    }
+  }
+
+  const notification = new Notification(title, options);
+  notification.onclick = () => {
+    if (state.notifications.openOnClick) window.focus();
+  };
+}
+
+function scheduleDateTime(item) {
+  if (!item.time) return null;
+  const today = new Date().toISOString().slice(0, 10);
+  const date = new Date(`${today}T${item.time}`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function checkScheduleNotifications() {
+  if (!state.notifications.enabled || notificationPermission() !== "granted") return;
+  const now = new Date();
+  state.schedule.forEach((item, index) => {
+    const date = scheduleDateTime(item);
+    if (!date) return;
+    const diffMinutes = Math.round((date - now) / 60000);
+    const lead = Number(item.reminderBefore || state.notifications.leadMinutes || 5);
+    [
+      { at: lead, label: `${lead}분 전` },
+      { at: 1, label: "1분 전" },
+      { at: 0, label: "지금" }
+    ].forEach((reminder) => {
+      const key = `${todayText()}-${index}-${item.time}-${reminder.at}`;
+      if (sentNotifications.has(key)) return;
+      if (diffMinutes <= reminder.at && diffMinutes > reminder.at - 1) {
+        sentNotifications.add(key);
+        showMorningNotification("모닝데스크 일정 알림", `${reminder.label} · ${item.title}`, key);
+      }
+    });
+  });
 }
 
 function loadVoiceOptions() {
@@ -1061,12 +1279,14 @@ function readBriefing() {
 function renderAll() {
   renderSummary();
   renderDateWeather();
+  renderPlan();
   renderArticles();
   renderSchedule();
   renderTasks();
   renderWeights();
   renderReflections();
   renderVoiceSettings();
+  renderNotificationSettings();
 }
 
 function weatherText(code) {
@@ -1251,6 +1471,22 @@ function bindEvents() {
   qs("#readBriefing").addEventListener("click", readBriefing);
   qs("#stopReading").addEventListener("click", stopReading);
   qs("#refreshWeather").addEventListener("click", requestWeather);
+  qs("#addCheckinTask").addEventListener("click", () => {
+    const checkin = normalizeCheckin(state.checkin);
+    const defaults = assistantDefaults(checkin.mode, checkin.energy, checkin.dayMode);
+    const title = checkin.mainTask || defaults.mainTask;
+    if (state.tasks.some((task) => task.title === title && !["done", "hold"].includes(task.status))) return;
+    state.tasks.unshift({
+      title,
+      priority: "핵심",
+      status: "today",
+      firstAction: "첫 10분 행동 정하기",
+      createdAt: new Date().toISOString()
+    });
+    saveState();
+    renderTasks();
+    renderPlan();
+  });
   qs("#voiceEngine").addEventListener("change", () => {
     state.voice.engine = qs("#voiceEngine").value;
     state.voice.endpoint = state.voice.endpoint || defaultVoiceEndpoint(state.voice.engine);
@@ -1289,9 +1525,11 @@ function bindEvents() {
       meta: state.meta,
       checkin: state.checkin,
       voice: state.voice,
+      notifications: state.notifications,
       settings: state.data.settings,
       schedule: state.schedule,
       tasks: state.tasks,
+      customArticles: state.customArticles,
       reflections: state.reflections,
       feedback: state.feedback
     };
@@ -1329,11 +1567,40 @@ function bindEvents() {
     event.preventDefault();
     const time = qs("#scheduleTime").value;
     const title = qs("#scheduleTitle").value.trim();
+    const reminderBefore = Number(qs("#scheduleReminder").value || state.notifications.leadMinutes || 5);
     if (!title) return;
-    state.schedule.push({ time, title, type: "직접 입력" });
+    state.schedule.push({ time, title, type: "직접 입력", reminderBefore });
     qs("#scheduleTitle").value = "";
     saveState();
     renderSchedule();
+    renderPlan();
+  });
+
+  qs("#articleCaptureForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const url = qs("#articleUrl").value.trim();
+    const title = qs("#articleTitle").value.trim();
+    if (!url) return;
+    state.customArticles.unshift({
+      category: "직접 추가",
+      source: articleHost(url),
+      publishedAt: "직접 추가",
+      cleanTitle: title || articleHost(url),
+      originalTitle: title || "원문 링크 직접 추가",
+      facts: "사용자가 원문 확인을 위해 직접 추가한 기사입니다.",
+      interpretation: "요약이 필요하면 나중에 AI 요약 단계에서 보강합니다.",
+      otherView: "원문을 직접 열어 세부 맥락과 수치를 확인합니다.",
+      implication: "오늘 브리핑에서 다시 확인할 정보 후보로 둡니다.",
+      question: "이 원문에서 오늘 내가 확인해야 할 핵심은 무엇인가?",
+      opportunity: "중요한 링크를 브리핑 안에 보관할 수 있습니다.",
+      url,
+      addedAt: new Date().toISOString()
+    });
+    qs("#articleUrl").value = "";
+    qs("#articleTitle").value = "";
+    saveState();
+    renderArticles();
+    updateScriptPreview();
   });
 
   qs("#articleList").addEventListener("click", (event) => {
@@ -1347,11 +1614,15 @@ function bindEvents() {
   qs("#taskForm").addEventListener("submit", (event) => {
     event.preventDefault();
     const title = qs("#taskTitle").value.trim();
+    const firstAction = qs("#taskFirstAction").value.trim() || "첫 10분 행동 정하기";
+    const priority = qs("#taskPriority").value || "보통";
     if (!title) return;
-    state.tasks.push({ title, priority: "보통", status: "today", firstAction: "첫 10분 행동 정하기" });
+    state.tasks.push({ title, priority, status: "today", firstAction, createdAt: new Date().toISOString() });
     qs("#taskTitle").value = "";
+    qs("#taskFirstAction").value = "";
     saveState();
     renderTasks();
+    renderPlan();
   });
 
   qs("#settingsForm").addEventListener("submit", (event) => {
@@ -1365,6 +1636,62 @@ function bindEvents() {
     saveState();
     renderArticles();
     renderWeights();
+  });
+
+  qs("#sourceForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const name = qs("#sourceName").value.trim();
+    const url = qs("#sourceUrl").value.trim();
+    if (!name || !url) return;
+    state.data.settings.newsSources = [...(state.data.settings.newsSources || []), { name, url }];
+    state.settings = state.data.settings;
+    qs("#sourceName").value = "";
+    qs("#sourceUrl").value = "";
+    saveState();
+    renderWeights();
+  });
+
+  qs("#sourceList").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-source-delete]");
+    if (!button) return;
+    const index = Number(button.dataset.sourceDelete);
+    state.data.settings.newsSources = (state.data.settings.newsSources || []).filter((_, itemIndex) => itemIndex !== index);
+    state.settings = state.data.settings;
+    saveState();
+    renderWeights();
+  });
+
+  qs("#enableNotifications").addEventListener("click", async () => {
+    if (typeof Notification === "undefined") {
+      state.notifications.enabled = false;
+      state.notifications.permission = "unsupported";
+      renderNotificationSettings();
+      return;
+    }
+    const permission = await Notification.requestPermission();
+    state.notifications.permission = permission;
+    state.notifications.enabled = permission === "granted";
+    saveState();
+    renderNotificationSettings();
+    if (permission === "granted") {
+      showMorningNotification("모닝데스크 알림", "알림이 켜졌습니다. 일정 시간에 맞춰 알려드릴게요.", "notification-test");
+    }
+  });
+
+  qs("#notificationForm").addEventListener("submit", (event) => {
+    event.preventDefault();
+    state.notifications = normalizeNotifications({
+      ...state.notifications,
+      leadMinutes: Number(qs("#notificationLead").value || 5),
+      popup: qs("#notifyPopup").checked,
+      sound: qs("#notifySound").checked,
+      openOnClick: qs("#notifyOpenOnClick").checked,
+      permission: notificationPermission()
+    });
+    saveState();
+    renderNotificationSettings();
+    renderSchedule();
+    renderPlan();
   });
 
   qs("#syncForm").addEventListener("submit", async (event) => {
@@ -1428,13 +1755,20 @@ function bindEvents() {
     if (action === "today") task.status = "today";
     if (action === "split") {
       task.status = "today";
-      task.title = `${task.title} - 첫 10분 행동 정하기`;
+      task.firstAction = "첫 10분 행동만 정하기";
+      task.priority = "쪼개기";
+    }
+    if (action === "date") {
+      task.status = "deferred";
+      task.deferUntil = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      task.deferReason = "내일 다시 보기";
     }
     if (action === "hold") task.status = "hold";
     if (action === "delete") state.tasks = state.tasks.filter((item) => item !== task);
 
     saveState();
     renderTasks();
+    renderPlan();
   });
 
   qs("#taskList").addEventListener("click", (event) => {
@@ -1451,7 +1785,7 @@ function bindEvents() {
     if (taskAction === "defer") {
       task.status = "deferred";
       task.daysDeferred = Number(task.daysDeferred || 0) + 1;
-      task.deferReason = task.deferReason || "오늘 목록에서 덜어냄";
+      task.deferReason = qs("#deferReason").value || task.deferReason || "오늘 목록에서 덜어냄";
     }
     if (taskAction === "split") {
       task.firstAction = "첫 10분 행동만 정하기";
@@ -1463,6 +1797,7 @@ function bindEvents() {
 
     saveState();
     renderTasks();
+    renderPlan();
     updateScriptPreview();
   });
 }
@@ -1486,7 +1821,10 @@ async function init() {
   resumeVoiceAdvanceIfAllowed();
   renderVoiceSettings();
   renderSyncSettings();
+  renderNotificationSettings();
   loadVoiceOptions();
+  window.setInterval(checkScheduleNotifications, 30000);
+  checkScheduleNotifications();
   if ("speechSynthesis" in window) {
     window.speechSynthesis.addEventListener("voiceschanged", loadVoiceOptions);
   }

@@ -33,10 +33,13 @@
             <div class="ambient-actions">
               <button class="secondary" id="refreshWeather" type="button">날씨 확인</button>
               <button class="primary" id="introNext" type="button">확인</button>
-              <button class="secondary" id="introVoiceAdvance" type="button">핸즈프리 켜기</button>
+              <button class="voice-toggle" id="introVoiceAdvance" type="button" aria-pressed="false">
+                <span class="toggle-track" aria-hidden="true"><span class="toggle-knob"></span></span>
+                <span class="toggle-label">음성 넘김</span>
+              </button>
             </div>
           </div>
-          <p id="voiceAdvanceStatus" class="voice-command-status">핸즈프리를 한 번 켜면 체크인 동안 "다음", "넘어가", "확인"으로 넘길 수 있습니다.</p>
+          <p id="voiceAdvanceStatus" class="voice-command-status">음성 넘김을 한 번 켜면 체크인 동안 "다음", "넘어가", "확인"으로 넘길 수 있습니다.</p>
         </div>
         <form id="checkinForm" class="checkin" autocomplete="off">
           <div class="assistant-card">
@@ -89,7 +92,10 @@
             <button class="primary" type="submit">브리핑 시작</button>
             <button class="secondary" id="quickStart" type="button">짧게 시작</button>
             <button class="secondary" id="offDay" type="button">오늘은 오프</button>
-            <button class="secondary" id="checkinVoiceAdvance" type="button">핸즈프리 켜기</button>
+            <button class="voice-toggle" id="checkinVoiceAdvance" type="button" aria-pressed="false">
+              <span class="toggle-track" aria-hidden="true"><span class="toggle-knob"></span></span>
+              <span class="toggle-label">음성 넘김</span>
+            </button>
           </div>
         </form>
       </section>
@@ -165,6 +171,17 @@
           <textarea id="briefingScriptPreview" class="script-preview is-hidden" rows="5" readonly aria-label="읽어줄 브리핑 대본"></textarea>
         </section>
 
+        <section class="plan-panel" aria-label="오늘 운영 플랜">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Plan</p>
+              <h3>오늘 운영판</h3>
+            </div>
+            <button class="secondary" id="addCheckinTask" type="button">핵심 업무를 할 일로</button>
+          </div>
+          <div id="planBoard" class="plan-board"></div>
+        </section>
+
         <section class="content-grid">
           <div class="main-column">
             <section class="section-header">
@@ -174,6 +191,11 @@
               </div>
               <span id="newsCount" class="count-pill"></span>
             </section>
+            <form id="articleCaptureForm" class="article-capture">
+              <input id="articleUrl" type="url" placeholder="원문 URL 붙여넣기" aria-label="기사 원문 URL">
+              <input id="articleTitle" type="text" placeholder="제목 메모" aria-label="기사 제목 메모">
+              <button class="secondary" type="submit">기사 추가</button>
+            </form>
             <div id="articleList" class="article-list"></div>
           </div>
 
@@ -189,6 +211,12 @@
               <form id="scheduleForm" class="inline-form">
                 <input id="scheduleTime" type="time" aria-label="일정 시간">
                 <input id="scheduleTitle" type="text" placeholder="일정 추가" aria-label="일정 제목">
+                <select id="scheduleReminder" aria-label="일정 알림">
+                  <option value="5">5분 전</option>
+                  <option value="10">10분 전</option>
+                  <option value="15">15분 전</option>
+                  <option value="30">30분 전</option>
+                </select>
                 <button type="submit" class="icon-button" title="일정 추가">+</button>
               </form>
               <ul id="scheduleList" class="list"></ul>
@@ -236,14 +264,56 @@
             <section class="panel">
               <div class="section-header compact">
                 <div>
+                  <p class="eyebrow">Alert</p>
+                  <h3>알림</h3>
+                </div>
+                <span id="notificationState" class="count-pill">확인 중</span>
+              </div>
+              <p class="panel-help">일정 몇 분 전, 1분 전, 정시에 알려줍니다. 모바일은 PWA 알림 권한이 필요합니다.</p>
+              <form id="notificationForm" class="settings-form">
+                <label>
+                  기본 몇 분 전
+                  <select id="notificationLead">
+                    <option value="5">5분 전</option>
+                    <option value="10">10분 전</option>
+                    <option value="15">15분 전</option>
+                    <option value="30">30분 전</option>
+                  </select>
+                </label>
+                <label class="check-row">
+                  <input id="notifyPopup" type="checkbox">
+                  팝업 알림
+                </label>
+                <label class="check-row">
+                  <input id="notifySound" type="checkbox">
+                  소리
+                </label>
+                <label class="check-row">
+                  <input id="notifyOpenOnClick" type="checkbox">
+                  알림을 누르면 앱 열기
+                </label>
+                <button class="primary full-width" id="enableNotifications" type="button">알림 권한 켜기</button>
+                <button class="secondary full-width" type="submit">알림 설정 저장</button>
+              </form>
+            </section>
+
+            <section class="panel">
+              <div class="section-header compact">
+                <div>
                   <p class="eyebrow">Focus</p>
                   <h3>오늘 할 일</h3>
                 </div>
                 <span id="taskLoad" class="count-pill"></span>
               </div>
               <p class="panel-help">오늘 실제로 움직일 행동만 둡니다. 3개를 넘으면 줄이는 게 좋습니다.</p>
-              <form id="taskForm" class="inline-form">
+              <form id="taskForm" class="task-form">
                 <input id="taskTitle" type="text" placeholder="할 일 추가" aria-label="할 일 제목">
+                <input id="taskFirstAction" type="text" placeholder="첫 10분 행동" aria-label="첫 행동">
+                <select id="taskPriority" aria-label="중요도">
+                  <option value="핵심">핵심</option>
+                  <option value="보통" selected>보통</option>
+                  <option value="가볍게">가볍게</option>
+                </select>
                 <button type="submit" class="icon-button" title="할 일 추가">+</button>
               </form>
               <ul id="taskList" class="list"></ul>
@@ -257,6 +327,16 @@
                 </div>
               </div>
               <p class="panel-help">다시 보여주기만 하지 않고, 오늘 처리·쪼개기·보류·삭제 중 하나로 정리합니다.</p>
+              <label class="defer-reason">
+                미루는 이유 기본값
+                <select id="deferReason">
+                  <option value="일이 너무 큼">일이 너무 큼</option>
+                  <option value="시작 방법을 모름">시작 방법을 모름</option>
+                  <option value="자료가 없음">자료가 없음</option>
+                  <option value="다른 사람 답변 대기">다른 사람 답변 대기</option>
+                  <option value="오늘 목록에서 덜어냄">오늘 목록에서 덜어냄</option>
+                </select>
+              </label>
               <div id="deferredList" class="deferred-list"></div>
             </section>
 
@@ -281,6 +361,18 @@
                 <button class="primary full-width" type="submit">설정 저장</button>
               </form>
               <div id="weightList" class="weight-list"></div>
+              <form id="sourceForm" class="settings-form source-form">
+                <label>
+                  뉴스 출처 이름
+                  <input id="sourceName" type="text" placeholder="예: 기술 뉴스">
+                </label>
+                <label>
+                  RSS 또는 뉴스 URL
+                  <input id="sourceUrl" type="url" placeholder="https://...">
+                </label>
+                <button class="secondary full-width" type="submit">출처 추가</button>
+              </form>
+              <div id="sourceList" class="source-list"></div>
             </section>
 
             <section class="panel">

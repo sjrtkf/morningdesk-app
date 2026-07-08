@@ -1,4 +1,4 @@
-const CACHE_NAME = "morningdesk-v5";
+const CACHE_NAME = "morningdesk-v7";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -52,6 +52,18 @@ self.addEventListener("fetch", (event) => {
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
         return response;
       });
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || "./";
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      const existing = clientList.find((client) => client.url.includes(self.location.origin));
+      if (existing) return existing.focus();
+      return clients.openWindow(targetUrl);
     })
   );
 });

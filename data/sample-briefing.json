@@ -9,6 +9,11 @@
       { "name": "기술/과학", "weight": 15 },
       { "name": "국제 뉴스", "weight": 15 },
       { "name": "시야 확장", "weight": 10 }
+    ],
+    "newsSources": [
+      { "name": "Google News", "url": "https://news.google.com/topstories?hl=ko&gl=KR&ceid=KR:ko" },
+      { "name": "정책브리핑", "url": "https://www.korea.kr/news/policyNewsList.do" },
+      { "name": "MIT Technology Review", "url": "https://www.technologyreview.com/" }
     ]
   },
   "articles": [
@@ -24,7 +29,7 @@
       "implication": "반복 지출, 장비 사용 시간, 자동화로 줄일 수 있는 낭비를 점검할 계기가 될 수 있다.",
       "question": "오늘 내가 줄일 수 있는 반복 낭비나 확인해야 할 비용 항목은 무엇인가?",
       "opportunity": "작은 사용 기록부터 남기면 나중에 자동화나 비용 절감 아이디어로 연결할 수 있다.",
-      "url": "#"
+      "url": "https://news.google.com/topstories?hl=ko&gl=KR&ceid=KR:ko"
     },
     {
       "category": "경제/사회",
@@ -38,7 +43,7 @@
       "implication": "자주 반복하는 신청, 확인, 문서 정리 업무를 자동화 후보로 볼 수 있다.",
       "question": "내가 자주 반복해서 확인하는 사이트나 문서는 무엇인가?",
       "opportunity": "반복 확인 목록을 만들면 모닝데스크가 아침 체크리스트로 보여줄 수 있다.",
-      "url": "#"
+      "url": "https://www.korea.kr/news/policyNewsList.do"
     },
     {
       "category": "기술/과학",
@@ -52,7 +57,7 @@
       "implication": "아침에는 오늘의 핵심 하나, 주의할 점 하나, 읽을 기사 몇 개만 보여주는 방식이 적합할 수 있다.",
       "question": "오늘 아침에 꼭 보고 넘어가야 할 정보는 무엇인가?",
       "opportunity": "사용자가 입력하지 않아도 기본값으로 하루를 정리하는 비서형 흐름을 강화할 수 있다.",
-      "url": "#"
+      "url": "https://www.technologyreview.com/"
     }
   ],
   "schedule": [
