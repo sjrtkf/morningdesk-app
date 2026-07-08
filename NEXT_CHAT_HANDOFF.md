@@ -7,7 +7,8 @@ Last updated: 2026-07-08
 - Repository: `https://github.com/sjrtkf/morningdesk-app`
 - Branch: `main`
 - GitHub Pages: `https://sjrtkf.github.io/morningdesk-app/`
-- Latest app commit before this handoff: `b7d655f Add voice toggle plan articles and alerts`
+- Latest feature commit: `b7d655f Add voice toggle plan articles and alerts`
+- Latest handoff commit: this file's current Git commit
 
 ## Current Product Direction
 
