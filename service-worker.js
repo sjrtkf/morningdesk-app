@@ -1,4 +1,4 @@
-const CACHE_NAME = "morningdesk-v4";
+const CACHE_NAME = "morningdesk-v5";
 const APP_SHELL = [
   "./",
   "./index.html",

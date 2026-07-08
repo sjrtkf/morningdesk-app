@@ -99,8 +99,13 @@ let storageWriteVersion = 0;
 let checkinStateChosen = false;
 let checkinStage = "intro";
 let speechRecognizer = null;
+let voiceAdvanceEnabled = false;
+let voiceAdvancePaused = false;
+let voiceAdvanceRestartTimer = 0;
 
 const qs = (selector) => document.querySelector(selector);
+const VOICE_ADVANCE_KEY = "morningdesk.voiceAdvance.enabled";
+const voiceAdvanceCommands = ["다음", "넘어", "넘겨", "확인", "시작", "계속"];
 
 const assistantPrompts = {
   conversation: "지금 대화할 힘이 어느 정도인지 먼저 알려주세요.",
@@ -498,6 +503,36 @@ function setVoiceAdvanceStatus(message) {
   if (status) status.textContent = message;
 }
 
+function setVoiceAdvanceButtons() {
+  ["#introVoiceAdvance", "#checkinVoiceAdvance"].forEach((selector) => {
+    const button = qs(selector);
+    if (!button) return;
+    button.textContent = voiceAdvanceEnabled ? "핸즈프리 끄기" : "핸즈프리 켜기";
+    button.classList.toggle("is-listening", voiceAdvanceEnabled);
+  });
+  qs("#voiceAdvanceStatus")?.classList.toggle("is-listening", voiceAdvanceEnabled);
+}
+
+function voiceAdvanceSupported() {
+  return Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
+}
+
+function saveVoiceAdvancePreference(enabled) {
+  try {
+    localStorage.setItem(VOICE_ADVANCE_KEY, enabled ? "1" : "0");
+  } catch {
+    // localStorage can be unavailable in private or restricted browser modes.
+  }
+}
+
+function savedVoiceAdvancePreference() {
+  try {
+    return localStorage.getItem(VOICE_ADVANCE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 function setCheckinStage(stage) {
   checkinStage = stage;
   document.body.dataset.checkinStage = stage;
@@ -514,11 +549,17 @@ function setCheckinStage(stage) {
   }
 
   if (stage === "intro") {
-    setVoiceAdvanceStatus('"다음", "넘어가", "확인"이라고 말하면 다음 카드로 넘어갑니다.');
+    setVoiceAdvanceStatus(voiceAdvanceEnabled
+      ? "핸즈프리 대기 중입니다. 다음, 넘어가, 확인이라고 말해보세요."
+      : "핸즈프리를 한 번 켜면 체크인 동안 말로 넘길 수 있습니다.");
   } else if (stage === "state") {
-    setVoiceAdvanceStatus("컨디션을 고른 뒤 확인하거나, 다시 말로 넘길 수 있습니다.");
+    setVoiceAdvanceStatus(voiceAdvanceEnabled
+      ? "컨디션을 고른 뒤 다음이라고 말하면 질문 카드로 넘어갑니다."
+      : "컨디션을 고른 뒤 확인하거나, 핸즈프리를 켤 수 있습니다.");
   } else {
-    setVoiceAdvanceStatus("답을 적고 다음이라고 말하면 필요한 질문으로 넘어갑니다.");
+    setVoiceAdvanceStatus(voiceAdvanceEnabled
+      ? "답을 적고 다음이라고 말하면 필요한 질문으로 넘어갑니다."
+      : "답을 적고 브리핑 시작을 누르면 됩니다.");
   }
 }
 
@@ -563,44 +604,105 @@ function advanceCheckin() {
   advanceQuestionCard();
 }
 
-function startVoiceAdvance() {
+function stopVoiceAdvanceListening({ keepEnabled = false } = {}) {
+  window.clearTimeout(voiceAdvanceRestartTimer);
+  voiceAdvanceRestartTimer = 0;
+  voiceAdvancePaused = keepEnabled;
+  if (!keepEnabled) {
+    voiceAdvanceEnabled = false;
+    saveVoiceAdvancePreference(false);
+    setVoiceAdvanceButtons();
+  }
+  if (speechRecognizer) {
+    const recognizer = speechRecognizer;
+    speechRecognizer = null;
+    recognizer.stop();
+  }
+}
+
+function startVoiceAdvanceListening() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
+    voiceAdvanceEnabled = false;
+    setVoiceAdvanceButtons();
     setVoiceAdvanceStatus("이 브라우저에서는 음성 넘김을 지원하지 않습니다. 버튼으로 넘겨주세요.");
     return;
   }
 
   if (speechRecognizer) {
-    speechRecognizer.stop();
-    speechRecognizer = null;
+    return;
   }
 
   const recognizer = new SpeechRecognition();
   speechRecognizer = recognizer;
   recognizer.lang = "ko-KR";
+  recognizer.continuous = true;
   recognizer.interimResults = false;
   recognizer.maxAlternatives = 1;
   recognizer.addEventListener("start", () => {
-    setVoiceAdvanceStatus('"다음", "넘어가", "확인" 중 하나를 말해주세요.');
+    setVoiceAdvanceButtons();
+    setVoiceAdvanceStatus("핸즈프리 대기 중입니다. 다음, 넘어가, 확인이라고 말해보세요.");
   });
   recognizer.addEventListener("result", (event) => {
-    const transcript = String(event.results?.[0]?.[0]?.transcript || "").trim();
+    const lastResult = event.results?.[event.results.length - 1];
+    const transcript = String(lastResult?.[0]?.transcript || "").trim();
     const command = transcript.replace(/\s+/g, "");
-    const canAdvance = ["다음", "넘어", "넘겨", "확인", "시작", "계속"].some((word) => command.includes(word));
+    const canAdvance = voiceAdvanceCommands.some((word) => command.includes(word));
     if (canAdvance) {
       setVoiceAdvanceStatus(`${transcript}이라고 들었어요. 다음 카드로 넘어갑니다.`);
       advanceCheckin();
       return;
     }
-    setVoiceAdvanceStatus(`${transcript || "잘 들리지 않았어요"}. "다음"이라고 말하면 넘어갑니다.`);
+    setVoiceAdvanceStatus(`${transcript || "잘 들리지 않았어요"}. 다음, 넘어가, 확인 중 하나로 말하면 넘어갑니다.`);
   });
-  recognizer.addEventListener("error", () => {
-    setVoiceAdvanceStatus("음성을 듣지 못했습니다. 마이크 권한을 확인하거나 버튼으로 넘겨주세요.");
+  recognizer.addEventListener("error", (event) => {
+    if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+      stopVoiceAdvanceListening();
+      setVoiceAdvanceStatus("마이크 권한이 막혀 있습니다. 브라우저 권한을 허용하면 핸즈프리를 쓸 수 있습니다.");
+      return;
+    }
+    setVoiceAdvanceStatus("잠깐 듣지 못했습니다. 핸즈프리를 다시 대기 상태로 돌립니다.");
   });
   recognizer.addEventListener("end", () => {
     if (speechRecognizer === recognizer) speechRecognizer = null;
+    if (!voiceAdvanceEnabled || voiceAdvancePaused) return;
+    voiceAdvanceRestartTimer = window.setTimeout(startVoiceAdvanceListening, 350);
   });
   recognizer.start();
+}
+
+function enableVoiceAdvance({ persist = true } = {}) {
+  if (!voiceAdvanceSupported()) {
+    setVoiceAdvanceStatus("이 브라우저에서는 음성 넘김을 지원하지 않습니다. 버튼으로 넘겨주세요.");
+    return;
+  }
+  voiceAdvanceEnabled = true;
+  voiceAdvancePaused = false;
+  if (persist) saveVoiceAdvancePreference(true);
+  setVoiceAdvanceButtons();
+  startVoiceAdvanceListening();
+}
+
+function toggleVoiceAdvance() {
+  if (voiceAdvanceEnabled) {
+    stopVoiceAdvanceListening();
+    setVoiceAdvanceStatus("핸즈프리를 껐습니다. 버튼으로 넘길 수 있습니다.");
+    return;
+  }
+  enableVoiceAdvance();
+}
+
+async function resumeVoiceAdvanceIfAllowed() {
+  if (!savedVoiceAdvancePreference() || !voiceAdvanceSupported()) return;
+  if (!navigator.permissions?.query) return;
+  try {
+    const permission = await navigator.permissions.query({ name: "microphone" });
+    if (permission.state === "granted") {
+      enableVoiceAdvance({ persist: false });
+    }
+  } catch {
+    // Some browsers do not expose microphone permission state to pages.
+  }
 }
 
 function updateCheckinInterface() {
@@ -1082,6 +1184,7 @@ function requestWeather() {
 }
 
 function showDashboard() {
+  stopVoiceAdvanceListening({ keepEnabled: true });
   qs("#threshold").classList.add("is-hidden");
   qs("#dashboard").classList.remove("is-hidden");
   renderAll();
@@ -1091,6 +1194,10 @@ function showThreshold() {
   qs("#threshold").classList.remove("is-hidden");
   qs("#dashboard").classList.add("is-hidden");
   setCheckinStage("intro");
+  if (voiceAdvanceEnabled) {
+    voiceAdvancePaused = false;
+    startVoiceAdvanceListening();
+  }
 }
 
 function bindEvents() {
@@ -1123,8 +1230,8 @@ function bindEvents() {
 
   qs("#introNext").addEventListener("click", advanceCheckin);
   qs("#cardNext").addEventListener("click", advanceCheckin);
-  qs("#introVoiceAdvance").addEventListener("click", startVoiceAdvance);
-  qs("#checkinVoiceAdvance").addEventListener("click", startVoiceAdvance);
+  qs("#introVoiceAdvance").addEventListener("click", toggleVoiceAdvance);
+  qs("#checkinVoiceAdvance").addEventListener("click", toggleVoiceAdvance);
 
   qs("#quickStart").addEventListener("click", () => {
     setCheckinState("light");
@@ -1375,6 +1482,8 @@ async function init() {
   setDayMode(state.checkin.dayMode || "normal");
   setCheckinState(currentCheckinState(), Boolean(state.checkin.createdAt));
   setCheckinStage("intro");
+  setVoiceAdvanceButtons();
+  resumeVoiceAdvanceIfAllowed();
   renderVoiceSettings();
   renderSyncSettings();
   loadVoiceOptions();

@@ -114,6 +114,17 @@ button {
   font-size: 14px;
   font-weight: 700;
   word-break: keep-all;
+  transition: color 260ms ease;
+}
+
+.voice-command-status.is-listening {
+  color: var(--accent-strong);
+}
+
+.secondary.is-listening {
+  background: #dcebe6;
+  color: var(--accent-strong);
+  box-shadow: inset 0 0 0 1px rgba(23, 107, 87, 0.22);
 }
 
 .ambient-panel strong {
