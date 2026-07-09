@@ -1,4 +1,4 @@
-const CACHE_NAME = "morningdesk-v7";
+const CACHE_NAME = "morningdesk-v12";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -6,8 +6,13 @@ const APP_SHELL = [
   "./app-config.js",
   "./storage.js",
   "./app.js",
+  "./mood-layout-samples.html",
+  "./mobile-preview.html",
   "./manifest.webmanifest",
   "./icons/morningdesk-icon.svg",
+  "./icons/morningdesk-icon-192.png",
+  "./icons/morningdesk-icon-512.png",
+  "./supabase-morningdesk.sql",
   "./data/sample-briefing.json"
 ];
 
@@ -32,7 +37,10 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
-  const refreshFirst = ["document", "script", "style"].includes(event.request.destination);
+  const requestUrl = new URL(event.request.url);
+  const refreshFirst = ["document", "script", "style"].includes(event.request.destination)
+    || requestUrl.pathname.endsWith("/data/sample-briefing.json")
+    || requestUrl.pathname.endsWith("/manifest.webmanifest");
   if (refreshFirst) {
     event.respondWith(
       fetch(event.request).then((response) => {

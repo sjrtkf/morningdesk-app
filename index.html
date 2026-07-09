@@ -10,7 +10,7 @@
     <title>모닝데스크</title>
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" href="./icons/morningdesk-icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="./icons/morningdesk-icon.svg">
+    <link rel="apple-touch-icon" href="./icons/morningdesk-icon-192.png">
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
@@ -29,6 +29,9 @@
               <span class="panel-label">날씨</span>
               <strong id="weatherSummary">위치 기반 날씨 대기 중</strong>
               <small id="weatherDetail">위치 권한을 허용하면 현재 지역 날씨를 보여드립니다.</small>
+              <small id="weatherLocation" class="weather-location">현재 위치 확인 전</small>
+              <small id="weatherDay" class="weather-day">오늘 하루 예보와 특보 후보를 함께 봅니다.</small>
+              <small id="weatherRisk" class="weather-risk">특보: 위치 확인 후 표시</small>
             </div>
             <div class="ambient-actions">
               <button class="secondary" id="refreshWeather" type="button">날씨 확인</button>
@@ -51,6 +54,7 @@
               </div>
             </div>
             <div class="checkin-progress" aria-label="체크인 진행 단계">
+              <span class="is-active"></span>
               <span class="is-active"></span>
               <span></span>
               <span></span>
@@ -88,15 +92,17 @@
             </label>
           </div>
           <div class="threshold__actions">
+            <button class="secondary" id="checkinBack" type="button">이전</button>
             <button class="primary" id="cardNext" type="button">다음</button>
             <button class="primary" type="submit">브리핑 시작</button>
-            <button class="secondary" id="quickStart" type="button">짧게 시작</button>
-            <button class="secondary" id="offDay" type="button">오늘은 오프</button>
+            <button class="secondary" id="quickStart" type="button" title="남은 질문을 기본값으로 채우고 핵심 업무만 보며 시작합니다.">핵심만 시작</button>
+            <button class="secondary" id="offDay" type="button" title="쉬는 날로 기록하고 급한 일정과 최소 기사만 봅니다.">쉬는 날로 시작</button>
             <button class="voice-toggle" id="checkinVoiceAdvance" type="button" aria-pressed="false">
               <span class="toggle-track" aria-hidden="true"><span class="toggle-knob"></span></span>
               <span class="toggle-label">음성 넘김</span>
             </button>
           </div>
+          <p class="quick-actions-note">단축 버튼은 컨디션 선택 뒤에도 답변을 줄이고 바로 시작하고 싶을 때 씁니다.</p>
         </form>
       </section>
 
@@ -108,12 +114,55 @@
           </div>
           <div class="topbar__actions">
             <span id="storageStatus" class="storage-status">저장소 확인 중</span>
-            <button class="secondary" id="exportData" type="button">백업</button>
-            <button class="secondary" id="importData" type="button">불러오기</button>
+            <button class="secondary" id="openSettings" type="button">설정</button>
             <button class="secondary" id="resetCheckin" type="button">체크인 수정</button>
+            <button class="secondary hidden-control" id="exportData" type="button">백업</button>
+            <button class="secondary hidden-control" id="importData" type="button">불러오기</button>
             <input id="importFile" type="file" accept="application/json,.json" class="visually-hidden" aria-label="백업 파일 불러오기">
           </div>
         </header>
+
+        <section class="today-hero" aria-label="오늘 상태별 운영판">
+          <div class="today-hero__copy">
+            <span id="modeBadge" class="mode-badge">상태 확인 중</span>
+            <h2 id="dashboardMoodTitle">오늘은 작게 시작합니다</h2>
+            <p id="dashboardMoodGuide">체크인 결과에 맞춰 메인 화면의 정보량과 말투를 조정합니다.</p>
+            <div class="focus-console" aria-label="첫 10분 실행 콘솔">
+              <div class="focus-orbit" id="focusOrbit" aria-live="polite">
+                <strong id="focusTimerClock">10:00</strong>
+                <small>첫 행동</small>
+              </div>
+              <div class="focus-copy">
+                <strong id="focusReward">오늘 집중 0회</strong>
+                <p id="focusTimerStatus" class="focus-timer-status">시작하면 화면이 첫 행동 중심으로 바뀝니다. 못 해도 벌점은 없고, 대신 더 작게 줄입니다.</p>
+                <div class="hero-actions">
+                  <button class="primary" id="startFocusTimer" type="button">10분 시작</button>
+                  <button class="secondary" id="completeFocus" type="button">완료 기록</button>
+                  <button class="secondary" id="shrinkFocus" type="button">더 작게 줄이기</button>
+                  <button class="secondary" id="addCheckinTask" type="button">핵심을 할 일로</button>
+                  <button class="secondary" id="readBriefingHero" type="button">브리핑 듣기</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hero-stack">
+            <article class="hero-card hero-card--primary">
+              <span>지금 할 일</span>
+              <strong id="heroNow">확인 중</strong>
+              <small id="heroFirstAction">첫 행동을 정리하는 중입니다.</small>
+            </article>
+            <article class="hero-card">
+              <span>다음 일정</span>
+              <strong id="heroSchedule">일정 확인 중</strong>
+              <small id="heroScheduleNote">알림 후보를 확인합니다.</small>
+            </article>
+            <article class="hero-card">
+              <span>오늘 볼 기사</span>
+              <strong id="heroArticle">기사 확인 중</strong>
+              <small id="heroArticleNote">업무와 이어지는 신호만 남깁니다.</small>
+            </article>
+          </div>
+        </section>
 
         <section class="summary-grid">
           <article class="summary-panel assistant-summary">
@@ -134,83 +183,46 @@
           </article>
         </section>
 
-        <section class="voice-panel" aria-label="브리핑 읽어주기">
-          <div>
-            <p class="eyebrow">Voice</p>
-            <h3>브리핑 읽어주기</h3>
-            <p id="voiceStatus" class="voice-status">요약, 일정, 할 일, 주요 기사를 짧게 읽어드립니다.</p>
-          </div>
-          <div class="voice-controls">
-            <label class="voice-select">
-              엔진
-              <select id="voiceEngine" aria-label="읽어주기 엔진 선택">
-                <option value="browser">브라우저 기본 음성</option>
-                <option value="kokoro">Kokoro 로컬</option>
-                <option value="melo">MeloTTS 로컬</option>
-                <option value="sherpa">sherpa-onnx 로컬</option>
-              </select>
-            </label>
-            <label class="voice-select">
-              목소리
-              <select id="voiceSelect" aria-label="읽어주기 목소리 선택">
-                <option value="">기본 음성</option>
-              </select>
-            </label>
-            <label class="voice-endpoint">
-              로컬 주소
-              <input id="voiceEndpoint" type="url" placeholder="http://127.0.0.1:7860/speak">
-            </label>
-            <label class="voice-rate">
-              속도
-              <input id="voiceRate" type="range" min="0.8" max="1.2" step="0.1" value="1">
-            </label>
-            <button class="primary" id="readBriefing" type="button">읽기</button>
-            <button class="secondary" id="stopReading" type="button">정지</button>
-            <button class="secondary" id="toggleScript" type="button">대본</button>
-          </div>
-          <textarea id="briefingScriptPreview" class="script-preview is-hidden" rows="5" readonly aria-label="읽어줄 브리핑 대본"></textarea>
-        </section>
-
-        <section class="plan-panel" aria-label="오늘 운영 플랜">
+        <section class="day-map" aria-label="오늘 5단계 흐름">
           <div class="section-header">
             <div>
-              <p class="eyebrow">Plan</p>
-              <h3>오늘 운영판</h3>
+              <p class="eyebrow">Today Map</p>
+              <h3>오늘 5단계</h3>
             </div>
-            <button class="secondary" id="addCheckinTask" type="button">핵심 업무를 할 일로</button>
+            <span id="dayMapStatus" class="count-pill">체크인 완료</span>
           </div>
-          <div id="planBoard" class="plan-board"></div>
+          <div id="daySteps" class="day-steps"></div>
         </section>
 
-        <section class="content-grid">
-          <div class="main-column">
-            <section class="section-header">
-              <div>
-                <p class="eyebrow">News</p>
-                <h3>선별 기사</h3>
-              </div>
-              <span id="newsCount" class="count-pill"></span>
-            </section>
-            <form id="articleCaptureForm" class="article-capture">
-              <input id="articleUrl" type="url" placeholder="원문 URL 붙여넣기" aria-label="기사 원문 URL">
-              <input id="articleTitle" type="text" placeholder="제목 메모" aria-label="기사 제목 메모">
-              <button class="secondary" type="submit">기사 추가</button>
-            </form>
-            <div id="articleList" class="article-list"></div>
+        <section class="execution-board" aria-label="오늘 실행 보드">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">Action Board</p>
+              <h3>오늘 실행 보드</h3>
+            </div>
+            <span id="taskLoad" class="count-pill"></span>
           </div>
-
-          <aside class="side-column">
-            <section class="panel">
-              <div class="section-header compact">
-                <div>
-                  <p class="eyebrow">Flow</p>
-                  <h3>오늘 흐름</h3>
-                </div>
-              </div>
-              <p class="panel-help">시간이 정해진 일만 둡니다. 오늘의 리듬을 보는 곳입니다.</p>
+          <p class="board-help">오늘 할 일은 내가 실제로 움직일 행동입니다. 오늘 시간표는 회의·외출·확인 시간처럼 시각이 정해진 일만 넣고, 미룬 일은 다시 할지 줄일지 보류할지만 고릅니다.</p>
+          <div id="planBoard" class="plan-board"></div>
+          <div class="board-forms">
+            <details class="quick-add-panel" open>
+              <summary>할 일 추가</summary>
+              <form id="taskForm" class="task-form">
+                <input id="taskTitle" type="text" placeholder="예: 견적서 초안 확인" aria-label="할 일 제목">
+                <input id="taskFirstAction" type="text" placeholder="첫 행동: 파일 열기, 첫 줄 보기처럼 작게" aria-label="첫 행동">
+                <select id="taskPriority" aria-label="중요도">
+                  <option value="핵심">핵심</option>
+                  <option value="보통" selected>보통</option>
+                  <option value="가볍게">가볍게</option>
+                </select>
+                <button type="submit" class="icon-button" title="할 일 추가">+</button>
+              </form>
+            </details>
+            <details class="quick-add-panel">
+              <summary>시간표 추가</summary>
               <form id="scheduleForm" class="inline-form">
                 <input id="scheduleTime" type="time" aria-label="일정 시간">
-                <input id="scheduleTitle" type="text" placeholder="일정 추가" aria-label="일정 제목">
+                <input id="scheduleTitle" type="text" placeholder="예: 10:30 거래처 확인 전화" aria-label="일정 제목">
                 <select id="scheduleReminder" aria-label="일정 알림">
                   <option value="5">5분 전</option>
                   <option value="10">10분 전</option>
@@ -219,16 +231,98 @@
                 </select>
                 <button type="submit" class="icon-button" title="일정 추가">+</button>
               </form>
+            </details>
+          </div>
+          <div class="action-lanes">
+            <section class="action-lane">
+              <div class="lane-title"><span>오늘 할 일</span><small>핵심·보통·가볍게 중요도 표시</small></div>
+              <ul id="taskList" class="list"></ul>
+            </section>
+            <section class="action-lane">
+              <div class="lane-title"><span>오늘 시간표</span><small>시간이 지나면 자동으로 흐리게 표시</small></div>
               <ul id="scheduleList" class="list"></ul>
             </section>
+            <section class="action-lane">
+              <div class="lane-title"><span>미룬 일 정리</span><small>다시 보여주기보다 처리 방향 선택</small></div>
+              <div id="deferredList" class="deferred-list"></div>
+            </section>
+          </div>
+        </section>
 
-            <section class="panel">
+        <section class="article-workbench" aria-label="뉴스 읽기 작업대">
+          <div class="section-header">
+            <div>
+              <p class="eyebrow">News Lab</p>
+              <h3>선별 기사</h3>
+              <p id="selectionRule" class="section-subcopy">업무 연결성, 시야 확장, 출처 다양성을 기준으로 먼저 보여줍니다.</p>
+            </div>
+            <span id="newsCount" class="count-pill"></span>
+          </div>
+          <div id="articleCoach" class="article-coach">각 기사는 점수 대신 선정 이유를 보여줍니다. 궁금한 기사는 "이 기사 왜?"를 눌러 업무 연결점과 확인 질문만 짧게 보세요.</div>
+          <div id="articleList" class="article-list"></div>
+        </section>
+
+        <aside id="settingsDrawer" class="settings-drawer" aria-label="설정 패널" aria-hidden="true">
+          <div class="drawer-panel">
+            <div class="section-header">
+              <div>
+                <p class="eyebrow">Settings</p>
+                <h3>설정과 고급 기능</h3>
+              </div>
+              <button class="secondary" id="closeSettings" type="button">닫기</button>
+            </div>
+
+            <section class="voice-panel optional-panel" aria-label="브리핑 읽어주기">
+              <div>
+                <p class="eyebrow">Voice</p>
+                <h3>브리핑 읽어주기</h3>
+                <p id="voiceStatus" class="voice-status">요약, 일정, 할 일, 주요 기사를 짧게 읽어드립니다.</p>
+              </div>
+              <div class="voice-controls">
+                <button class="primary" id="readBriefing" type="button">읽기</button>
+                <button class="secondary" id="stopReading" type="button">정지</button>
+                <button class="secondary" id="toggleScript" type="button">대본</button>
+                <details class="voice-options">
+                  <summary>음성 세부 설정</summary>
+                  <p class="panel-help">엔진은 읽어주는 방식이고, 목소리는 그 엔진 안에서 고르는 음성입니다. 로컬 주소는 PC에서 별도 TTS 서버를 켰을 때만 씁니다.</p>
+                  <div class="voice-options__grid">
+                    <label class="voice-select">
+                      엔진
+                      <select id="voiceEngine" aria-label="읽어주기 엔진 선택">
+                        <option value="browser">브라우저 기본 음성</option>
+                        <option value="kokoro">Kokoro 로컬</option>
+                        <option value="melo">MeloTTS 로컬</option>
+                        <option value="sherpa">sherpa-onnx 로컬</option>
+                      </select>
+                    </label>
+                    <label class="voice-select">
+                      목소리
+                      <select id="voiceSelect" aria-label="읽어주기 목소리 선택">
+                        <option value="">기본 음성</option>
+                      </select>
+                    </label>
+                    <label class="voice-endpoint">
+                      로컬 주소
+                      <input id="voiceEndpoint" type="url" placeholder="http://127.0.0.1:7860/speak">
+                    </label>
+                    <label class="voice-rate">
+                      속도
+                      <input id="voiceRate" type="range" min="0.8" max="1.2" step="0.1" value="1">
+                    </label>
+                  </div>
+                </details>
+              </div>
+              <textarea id="briefingScriptPreview" class="script-preview is-hidden" rows="5" readonly aria-label="읽어줄 브리핑 대본"></textarea>
+            </section>
+
+            <section class="panel utility-panel">
               <div class="section-header compact">
                 <div>
                   <p class="eyebrow">Sync</p>
                   <h3>PC·휴대폰 동기화</h3>
                 </div>
               </div>
+              <p class="panel-help">지금은 이 브라우저에만 저장됩니다. 나중에 휴대폰과 PC가 같은 체크인·할 일·피드백을 쓰려면 이 설정이 필요해서 메인 화면 대신 여기 숨겨둡니다.</p>
               <form id="syncForm" class="settings-form">
                 <label>
                   저장 방식
@@ -247,7 +341,7 @@
                 </label>
                 <div class="inline-form two-column">
                   <label>
-                    프로필
+                    프로필 키
                     <input id="syncProfileId" type="text" placeholder="default">
                   </label>
                   <label>
@@ -255,13 +349,14 @@
                     <input id="syncDeviceLabel" type="text" placeholder="phone">
                   </label>
                 </div>
+                <button class="secondary full-width" id="generateProfileId" type="button">안전한 프로필 키 만들기</button>
                 <button class="primary full-width" type="submit">동기화 설정 저장</button>
                 <button class="secondary full-width" id="syncNow" type="button">지금 동기화</button>
               </form>
               <p id="syncConfigStatus" class="empty-state">동기화 설정을 확인 중입니다.</p>
             </section>
 
-            <section class="panel">
+            <section class="panel utility-panel">
               <div class="section-header compact">
                 <div>
                   <p class="eyebrow">Alert</p>
@@ -270,6 +365,7 @@
                 <span id="notificationState" class="count-pill">확인 중</span>
               </div>
               <p class="panel-help">일정 몇 분 전, 1분 전, 정시에 알려줍니다. 모바일은 PWA 알림 권한이 필요합니다.</p>
+              <div id="notificationDiagnostics" class="diagnostic-grid" aria-label="알림 진단 상태"></div>
               <form id="notificationForm" class="settings-form">
                 <label>
                   기본 몇 분 전
@@ -293,89 +389,63 @@
                   알림을 누르면 앱 열기
                 </label>
                 <button class="primary full-width" id="enableNotifications" type="button">알림 권한 켜기</button>
+                <button class="secondary full-width" id="testNotification" type="button">테스트 알림 보내기</button>
                 <button class="secondary full-width" type="submit">알림 설정 저장</button>
               </form>
             </section>
 
-            <section class="panel">
+            <section class="panel utility-panel">
               <div class="section-header compact">
                 <div>
-                  <p class="eyebrow">Focus</p>
-                  <h3>오늘 할 일</h3>
-                </div>
-                <span id="taskLoad" class="count-pill"></span>
-              </div>
-              <p class="panel-help">오늘 실제로 움직일 행동만 둡니다. 3개를 넘으면 줄이는 게 좋습니다.</p>
-              <form id="taskForm" class="task-form">
-                <input id="taskTitle" type="text" placeholder="할 일 추가" aria-label="할 일 제목">
-                <input id="taskFirstAction" type="text" placeholder="첫 10분 행동" aria-label="첫 행동">
-                <select id="taskPriority" aria-label="중요도">
-                  <option value="핵심">핵심</option>
-                  <option value="보통" selected>보통</option>
-                  <option value="가볍게">가볍게</option>
-                </select>
-                <button type="submit" class="icon-button" title="할 일 추가">+</button>
-              </form>
-              <ul id="taskList" class="list"></ul>
-            </section>
-
-            <section class="panel">
-              <div class="section-header compact">
-                <div>
-                  <p class="eyebrow">Deferred</p>
-                  <h3>미룬 일 정리</h3>
-                </div>
-              </div>
-              <p class="panel-help">다시 보여주기만 하지 않고, 오늘 처리·쪼개기·보류·삭제 중 하나로 정리합니다.</p>
-              <label class="defer-reason">
-                미루는 이유 기본값
-                <select id="deferReason">
-                  <option value="일이 너무 큼">일이 너무 큼</option>
-                  <option value="시작 방법을 모름">시작 방법을 모름</option>
-                  <option value="자료가 없음">자료가 없음</option>
-                  <option value="다른 사람 답변 대기">다른 사람 답변 대기</option>
-                  <option value="오늘 목록에서 덜어냄">오늘 목록에서 덜어냄</option>
-                </select>
-              </label>
-              <div id="deferredList" class="deferred-list"></div>
-            </section>
-
-            <section class="panel">
-              <div class="section-header compact">
-                <div>
-                  <p class="eyebrow">Settings</p>
-                  <h3>설정</h3>
+                  <p class="eyebrow">News Setting</p>
+                  <h3>뉴스 선정 기준</h3>
                 </div>
                 <span id="weightTotal" class="count-pill"></span>
               </div>
+              <p class="panel-help">추천 기준은 조회수보다 업무 연결성, 오늘 판단에 필요한 맥락, 출처 다양성, 사용자의 피드백을 우선합니다. 비중 합계는 100%를 넘기지 않게 자동 조정합니다.</p>
+              <button class="secondary full-width" id="applyRecommendedSettings" type="button">추천 기준 적용</button>
               <form id="settingsForm" class="settings-form">
                 <label>
                   하루 뉴스 개수
                   <input id="dailyNewsCount" type="number" min="1" max="12" step="1">
                 </label>
-                <label>
-                  제외 항목
-                  <input id="excludedCategories" type="text" placeholder="스포츠, 연예, 가십">
-                </label>
+                <div class="topic-entry">
+                  <span>보고 싶지 않은 주제</span>
+                  <div class="topic-input-row">
+                    <input id="excludedTopicInput" type="text" placeholder="예: 스포츠, 연예, 가십, 사건사고" aria-label="제외 주제 추가">
+                    <button class="secondary" id="addExcludedTopic" type="button">추가</button>
+                  </div>
+                  <small>카테고리나 해시태그처럼 추가하면 해당 단어가 들어간 기사는 뒤로 보냅니다.</small>
+                </div>
+                <input id="excludedCategories" type="hidden">
+                <div id="excludedChipList" class="topic-chip-list" aria-label="제외 주제 목록"></div>
                 <div id="weightEditor" class="weight-editor"></div>
                 <button class="primary full-width" type="submit">설정 저장</button>
               </form>
               <div id="weightList" class="weight-list"></div>
-              <form id="sourceForm" class="settings-form source-form">
-                <label>
-                  뉴스 출처 이름
-                  <input id="sourceName" type="text" placeholder="예: 기술 뉴스">
-                </label>
-                <label>
-                  RSS 또는 뉴스 URL
-                  <input id="sourceUrl" type="url" placeholder="https://...">
-                </label>
-                <button class="secondary full-width" type="submit">출처 추가</button>
-              </form>
-              <div id="sourceList" class="source-list"></div>
+              <details class="advanced-settings">
+                <summary>고급: 출처와 URL 직접 관리</summary>
+                <form id="sourceForm" class="settings-form source-form">
+                  <label>
+                    뉴스 출처 이름
+                    <input id="sourceName" type="text" placeholder="예: 기술 뉴스">
+                  </label>
+                  <label>
+                    RSS 또는 뉴스 URL
+                    <input id="sourceUrl" type="url" placeholder="https://...">
+                  </label>
+                  <button class="secondary full-width" type="submit">출처 추가</button>
+                </form>
+                <div id="sourceList" class="source-list"></div>
+                <form id="articleCaptureForm" class="article-capture optional-control">
+                  <input id="articleUrl" type="url" placeholder="원문 URL 붙여넣기" aria-label="기사 원문 URL">
+                  <input id="articleTitle" type="text" placeholder="제목 메모" aria-label="기사 제목 메모">
+                  <button class="secondary" type="submit">기사 추가</button>
+                </form>
+              </details>
             </section>
 
-            <section class="panel">
+            <section class="panel support-panel">
               <div class="section-header compact">
                 <div>
                   <p class="eyebrow">Review</p>
@@ -388,8 +458,8 @@
               </form>
               <ul id="reflectionList" class="list"></ul>
             </section>
-          </aside>
-        </section>
+          </div>
+        </aside>
       </section>
     </main>
     <script src="./app-config.js"></script>

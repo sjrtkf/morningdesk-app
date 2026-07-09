@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>모닝데스크 모바일 샘플</title>
+    <link rel="stylesheet" href="./styles.css">
+    <style>
+      body { background: #eef3ef; }
+      .phone-wrap { width: min(430px, calc(100% - 22px)); margin: 0 auto; padding: 18px 0 28px; }
+      .phone-frame { min-height: 820px; padding: 16px; border: 1px solid #d6e1dc; border-radius: 28px; background: #fbfcfb; box-shadow: 0 24px 70px rgba(20, 31, 26, 0.16); overflow: hidden; }
+      .phone-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+      .phone-title { margin: 0; font-size: 30px; line-height: 1.08; letter-spacing: 0; }
+      .phone-card { margin-top: 12px; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+      .phone-action { display: grid; grid-template-columns: 112px 1fr; gap: 12px; align-items: center; }
+      .phone-steps { display: grid; gap: 8px; margin-top: 12px; }
+      .phone-step { display: grid; grid-template-columns: 30px 1fr auto; gap: 8px; align-items: center; padding: 10px; border-radius: 8px; background: #f4f8f5; }
+      .phone-step span:first-child { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #dfece7; color: var(--accent-strong); font-weight: 900; }
+      .phone-news p, .phone-card p { margin-bottom: 0; color: var(--body); line-height: 1.55; }
+      .phone-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+      .phone-actions button { min-height: 42px; }
+      @media (max-width: 420px) {
+        .phone-action { grid-template-columns: 1fr; }
+        .focus-orbit { width: 120px; margin-inline: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="phone-wrap">
+      <section class="phone-frame">
+        <div class="phone-top">
+          <span class="mode-badge">피곤함 · 최소</span>
+          <button class="secondary" type="button">설정</button>
+        </div>
+        <h1 class="phone-title">오늘은 한 가지만 합니다</h1>
+        <section class="phone-card phone-action">
+          <div class="focus-orbit is-running"><strong>10:00</strong><small>첫 행동</small></div>
+          <div>
+            <strong>모닝데스크 메인 점검</strong>
+            <p>첫 10분 행동: 모바일에서 첫 카드만 확인하기</p>
+            <div class="phone-actions">
+              <button class="primary" type="button">시작</button>
+              <button class="secondary" type="button">더 작게</button>
+            </div>
+          </div>
+        </section>
+        <section class="phone-card">
+          <strong>오늘 5단계</strong>
+          <div class="phone-steps">
+            <div class="phone-step"><span>1</span><span>체크인</span><b>완료</b></div>
+            <div class="phone-step"><span>2</span><span>날씨·일정</span><b>확인</b></div>
+            <div class="phone-step"><span>3</span><span>첫 10분</span><b>진행</b></div>
+            <div class="phone-step"><span>4</span><span>기사 판단</span><b>1개</b></div>
+            <div class="phone-step"><span>5</span><span>마무리</span><b>대기</b></div>
+          </div>
+        </section>
+        <section class="phone-card phone-news">
+          <span class="tag">영어 기사 · 번역 제공</span>
+          <h2>데이터센터 전력 비용 논쟁</h2>
+          <p>먼저 한국어 번역으로 의미를 잡고, 원문 제목과 어려운 단어는 아래에서 같이 확인합니다.</p>
+          <div class="phone-actions">
+            <button class="secondary" type="button">번역 듣기</button>
+            <button class="secondary" type="button">원문·번역</button>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

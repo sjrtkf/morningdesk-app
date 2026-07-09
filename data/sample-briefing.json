@@ -1,5 +1,5 @@
 {
-  "date": "2026-07-06",
+  "date": "2026-07-08",
   "settings": {
     "dailyNewsCount": 5,
     "excludedCategories": ["스포츠", "연예", "가십", "단순 사건사고"],
@@ -13,60 +13,176 @@
     "newsSources": [
       { "name": "Google News", "url": "https://news.google.com/topstories?hl=ko&gl=KR&ceid=KR:ko" },
       { "name": "정책브리핑", "url": "https://www.korea.kr/news/policyNewsList.do" },
-      { "name": "MIT Technology Review", "url": "https://www.technologyreview.com/" }
+      { "name": "AP News", "url": "https://apnews.com/" },
+      { "name": "The Guardian", "url": "https://www.theguardian.com/international" },
+      { "name": "arXiv", "url": "https://arxiv.org/" }
     ]
   },
   "articles": [
     {
       "category": "업무/관심 분야",
-      "source": "샘플 경제지",
-      "publishedAt": "오늘 07:20",
-      "cleanTitle": "에너지 수요 변화가 일상 업무와 비용 계획에 주는 신호",
-      "originalTitle": "에너지 수요 변화에 관심 증가",
-      "facts": "전력 사용량과 에너지 비용에 대한 관심이 커지면서 기업과 개인 모두 효율 관리의 중요성을 다시 보고 있다.",
-      "interpretation": "기사는 에너지 비용이 단순한 고정비가 아니라 운영 방식과 투자 판단에 영향을 줄 수 있다고 해석한다.",
-      "otherView": "단기 가격 변동만 보고 판단하면 장기적인 설비 개선이나 생활 습관 변화의 효과를 놓칠 수 있다.",
-      "implication": "반복 지출, 장비 사용 시간, 자동화로 줄일 수 있는 낭비를 점검할 계기가 될 수 있다.",
-      "question": "오늘 내가 줄일 수 있는 반복 낭비나 확인해야 할 비용 항목은 무엇인가?",
-      "opportunity": "작은 사용 기록부터 남기면 나중에 자동화나 비용 절감 아이디어로 연결할 수 있다.",
-      "url": "https://news.google.com/topstories?hl=ko&gl=KR&ceid=KR:ko"
+      "source": "AP News",
+      "publishedAt": "2026-06-29",
+      "country": "미국/국제",
+      "language": "영어",
+      "topic": "AI 인프라와 전력",
+      "selectionReason": "AI 인프라 투자가 전력·용수·공사 일정으로 이어져 업무 판단에 직접 연결됩니다.",
+      "originalExcerpt": "The article reports a large chipmaking hub plan by South Korean tech companies, framed around surging demand for AI-related semiconductors.",
+      "translation": "삼성전자와 SK하이닉스의 대규모 반도체 허브 계획을 AI 수요 증가와 연결해 다룬 기사입니다. 반도체 공장만의 문제가 아니라 전력, 용수, 인력, 지역 인허가와 함께 봐야 합니다.",
+      "cleanTitle": "삼성·SK하이닉스의 대규모 AI 반도체 허브 계획",
+      "originalTitle": "South Korean tech giants to build a $518 billion chipmaking hub to serve soaring AI demand",
+      "plainSummary": "AI 수요가 커지면서 한국 반도체 기업의 제조 인프라 투자가 전력, 용수, 지역 인허가 문제까지 함께 키우는 흐름이다.",
+      "context": "AI 반도체 경쟁은 공장 하나의 문제가 아니라 전력망, 공업용수, 인력, 지역 공사 일정이 한꺼번에 맞물리는 인프라 이슈다.",
+      "facts": "삼성전자와 SK하이닉스가 AI 수요에 대응하기 위해 한국 남서부에 대규모 반도체 제조 허브 투자를 발표했다.",
+      "interpretation": "AI 데이터센터와 산업용 AI 확산이 반도체, 전력, 용수, 인력, 지역 인프라 계획을 함께 움직이는 흐름으로 읽힌다.",
+      "otherView": "투자 규모가 크더라도 부지, 전력, 물, 숙련 인력 확보가 늦어지면 실제 생산 능력 확대로 이어지는 시점은 밀릴 수 있다.",
+      "implication": "전기·건설·설비·공공 인허가 업무에는 반도체 인프라 주변 수요와 일정 리스크를 함께 봐야 한다.",
+      "question": "이런 대규모 인프라 투자가 내 업무의 견적, 자재, 일정 판단에 영향을 줄 지점은 어디인가?",
+      "opportunity": "AI 인프라 관련 전력·설비·건설 이슈를 별도 뉴스 묶음으로 추적할 가치가 있다.",
+      "terms": [
+        { "term": "chipmaking hub", "meaning": "반도체 생산 시설이 모인 거점. 공장뿐 아니라 전력, 용수, 물류 인프라까지 포함해 봅니다." },
+        { "term": "AI demand", "meaning": "AI 서비스와 데이터센터가 늘면서 생기는 반도체 수요입니다." }
+      ],
+      "sentenceStudy": [
+        {
+          "original": "South Korean tech giants to build a $518 billion chipmaking hub to serve soaring AI demand",
+          "translated": "한국의 대형 기술 기업들이 급증하는 AI 수요에 대응하기 위해 5,180억 달러 규모의 반도체 생산 허브를 만든다는 뜻입니다.",
+          "note": "soaring은 빠르게 치솟는다는 뜻이라, 단순 증가보다 강한 표현입니다."
+        }
+      ],
+      "url": "https://apnews.com/article/22352d95c7a821c5f4548b2d1a4ebde8"
     },
     {
       "category": "경제/사회",
-      "source": "샘플 정책뉴스",
-      "publishedAt": "오늘 08:05",
-      "cleanTitle": "공공 서비스 디지털화가 개인 업무 방식에 미치는 영향",
-      "originalTitle": "디지털 행정 서비스 확대",
-      "facts": "여러 공공 서비스가 온라인 신청, 전자문서, 자동 알림 중심으로 바뀌는 흐름이 이어지고 있다.",
-      "interpretation": "기사는 디지털 도구를 잘 쓰는 사람과 그렇지 못한 사람 사이의 업무 효율 차이가 커질 수 있다고 본다.",
-      "otherView": "모든 절차가 바로 편해지는 것은 아니며, 초기에는 사용법을 익히는 부담이 생길 수 있다.",
-      "implication": "자주 반복하는 신청, 확인, 문서 정리 업무를 자동화 후보로 볼 수 있다.",
-      "question": "내가 자주 반복해서 확인하는 사이트나 문서는 무엇인가?",
-      "opportunity": "반복 확인 목록을 만들면 모닝데스크가 아침 체크리스트로 보여줄 수 있다.",
-      "url": "https://www.korea.kr/news/policyNewsList.do"
+      "source": "The Guardian",
+      "publishedAt": "2026-07-05",
+      "country": "영국",
+      "language": "영어",
+      "topic": "AI 인프라와 전력",
+      "selectionReason": "AI 데이터센터가 전기요금과 전력망 비용을 누가 부담할지로 번지는 흐름을 보여줍니다.",
+      "originalExcerpt": "The article describes criticism that a proposed US bill may not fully shield electricity consumers from the grid and cost pressures created by datacenters.",
+      "translation": "AI 데이터센터 확산으로 전력망 비용과 요금 부담이 커질 수 있고, 소비자 보호 법안이 충분한지 논쟁이 있다는 내용입니다. 현장 업무에서는 대형 부하, 전력 인입, 송전망 공사, 민원 리스크와 연결됩니다.",
+      "cleanTitle": "데이터센터 전기요금 부담을 둘러싼 미국 소비자 보호 논쟁",
+      "originalTitle": "Bipartisan bill fails to protect US consumers from datacenters' true costs, critics warn",
+      "plainSummary": "AI 데이터센터가 늘면서 전력망 비용을 누가 부담할지 논쟁이 커지고, 소비자 보호 법안의 한계도 지적되고 있다.",
+      "context": "데이터센터는 IT 이슈처럼 보이지만 실제 현장에서는 대형 전력 수요, 전기요금, 송전망 공사, 지역 민원으로 이어진다.",
+      "facts": "AI 데이터센터 확산으로 전력망·요금·환경 부담이 커진다는 비판과, 소비자 보호 법안의 실효성 논쟁이 이어지고 있다.",
+      "interpretation": "데이터센터는 단순 IT 시설이 아니라 지역 전력망과 공공 비용을 바꾸는 대형 부하로 봐야 한다.",
+      "otherView": "데이터센터 투자는 일자리와 세수, 디지털 인프라 효과도 만들 수 있어 비용과 편익을 나눠 봐야 한다.",
+      "implication": "대형 부하가 생기는 지역에서는 전력 인입, 수전 설비, 공사 일정, 민원 리스크가 함께 커질 수 있다.",
+      "question": "내가 보는 현장이나 거래처 중 전력 증설 이슈가 생길 가능성이 있는 곳은 어디인가?",
+      "opportunity": "전력 사용량이 큰 시설 뉴스는 설비·자재·공사 수요의 선행 신호로 볼 수 있다.",
+      "terms": [
+        { "term": "ratepayer", "meaning": "전기요금을 내는 소비자나 사용자입니다." },
+        { "term": "datacenter's true costs", "meaning": "시설 건설비뿐 아니라 전력망 증설, 환경 부담, 요금 부담까지 포함한 실제 비용입니다." }
+      ],
+      "url": "https://www.theguardian.com/us-news/2026/jul/05/ratepayer-protection-act-datacenters"
     },
     {
       "category": "기술/과학",
-      "source": "샘플 기술매체",
-      "publishedAt": "어제 18:40",
-      "cleanTitle": "개인 업무 도구가 하루 시작 루틴을 바꾸는 방식",
-      "originalTitle": "개인 생산성 도구 관심 증가",
-      "facts": "일정, 할 일, 메모, 뉴스 요약을 한 화면에서 보려는 개인 생산성 도구 수요가 늘고 있다.",
-      "interpretation": "기사는 사용자가 직접 관리해야 하는 도구보다, 필요한 순간에 먼저 정리해주는 도구가 더 오래 쓰일 수 있다고 해석한다.",
-      "otherView": "도구가 너무 많은 정보를 보여주면 오히려 부담이 될 수 있어 작은 시작점이 중요하다.",
-      "implication": "아침에는 오늘의 핵심 하나, 주의할 점 하나, 읽을 기사 몇 개만 보여주는 방식이 적합할 수 있다.",
-      "question": "오늘 아침에 꼭 보고 넘어가야 할 정보는 무엇인가?",
-      "opportunity": "사용자가 입력하지 않아도 기본값으로 하루를 정리하는 비서형 흐름을 강화할 수 있다.",
-      "url": "https://www.technologyreview.com/"
+      "source": "AP News",
+      "publishedAt": "2025-11-04",
+      "country": "미국/한국",
+      "language": "영어",
+      "topic": "한국 AI 정책",
+      "selectionReason": "한국 정부의 AI 투자 방향이 공공 발주, 제조 자동화, 데이터센터 수요로 이어질 수 있습니다.",
+      "originalExcerpt": "The article covers a South Korean budget speech calling for aggressive artificial intelligence spending and stronger AI-related industrial capacity.",
+      "translation": "한국 정부가 AI 예산 확대와 산업 역량 강화를 강조했다는 내용입니다. 바로 일감이 되는 것은 아니지만 지원사업, 장비 투자, 교육 수요, 공공 발주로 이어질 가능성을 볼 수 있습니다.",
+      "cleanTitle": "한국의 AI 예산 확대가 산업 현장에 던지는 신호",
+      "originalTitle": "South Korean president calls for aggressive AI spending in budget speech",
+      "plainSummary": "한국 정부의 AI 예산 확대 방향은 제조, 반도체, 자동화, 공공 발주 흐름과 연결될 수 있다.",
+      "context": "정책 발표는 바로 일감이 되지는 않지만, 몇 달 뒤 지원사업, 장비 투자, 교육 수요로 이어질 수 있어 추적 가치가 있다.",
+      "facts": "한국 정부가 AI 인프라와 제조 역량 강화를 위해 AI 관련 예산 확대 방향을 제시했다.",
+      "interpretation": "반도체, 자동차, 조선, 로봇 같은 제조 기반 산업에 AI 투자가 연결될 가능성이 크다.",
+      "otherView": "예산 발표가 바로 현장 수요로 바뀌지는 않으며, 국회 심의와 실제 사업 공고를 확인해야 한다.",
+      "implication": "공공 발주, 설비 투자, 데이터센터, 자동화 장비 관련 뉴스를 꾸준히 확인할 필요가 있다.",
+      "question": "AI 예산 확대가 내 업무 자동화 아이디어나 고객 문제와 연결되는 지점은 무엇인가?",
+      "opportunity": "정책 발표를 실제 발주·지원사업·교육 수요로 이어지는 체크리스트로 바꿀 수 있다.",
+      "url": "https://apnews.com/article/80db48ff3d6cdaabd10b79518d56dc0f"
+    },
+    {
+      "category": "경제/사회",
+      "source": "정책브리핑",
+      "publishedAt": "2026-07-08",
+      "country": "한국",
+      "language": "한국어",
+      "topic": "에너지 안보와 조달",
+      "selectionReason": "국내 정책 기사 샘플입니다. 에너지 안보, 원전 공급망, 공공 조달 흐름을 업무 관점에서 볼 수 있습니다.",
+      "cleanTitle": "한·미·일 SMR 협력각서가 에너지·조달 업무에 주는 신호",
+      "originalTitle": "한·미·일, 인태지역 소형모듈원자로 배치 협력각서 체결",
+      "originalExcerpt": "정책브리핑은 한국·미국·일본이 인도·태평양 지역을 시작으로 소형모듈원자로 배치를 위한 협력각서를 체결했다고 전했다.",
+      "translation": "한국어 기사입니다. 핵심은 세 나라가 SMR 배치 협력의 틀을 만들고, 에너지 안보 수요와 민간 원자력 업계 협력 기회를 함께 보겠다는 점입니다.",
+      "plainSummary": "SMR 협력은 에너지 안보, 원전 공급망, 인허가, 조달 시장과 이어질 수 있어 전력·설비·공공 발주 흐름을 볼 때 참고할 만하다.",
+      "context": "AI 데이터센터와 제조 대형 부하가 커질수록 안정적인 전력 공급과 소형 원전 같은 에너지 대안 논의가 함께 커진다.",
+      "facts": "한국·미국·일본이 인도·태평양 지역의 SMR 배치 협력을 위한 협력각서를 체결했다.",
+      "interpretation": "에너지 안보와 원전 기술 협력은 장기적으로 전력 인프라, 기자재, 안전 기준, 조달 기회를 함께 움직일 수 있다.",
+      "otherView": "협력각서는 바로 사업 발주를 뜻하지 않으며, 실제 사업 개발과 인허가, 민간 투자 과정은 별도 확인이 필요하다.",
+      "implication": "전력·설비·공공조달 업무에서는 SMR, 원전 공급망, 안전 기준, 해외 협력 사업을 추적할 가치가 있다.",
+      "question": "에너지 안보 이슈가 내 업무의 전력 설비, 공공 입찰, 안전 서류 판단과 연결되는 지점은 무엇인가?",
+      "opportunity": "해외 원전·SMR 협력 기사를 전력 인프라와 조달 기회 신호로 묶어 볼 수 있다.",
+      "sentenceStudy": [
+        {
+          "original": "한·미·일, 인태지역 소형모듈원자로 배치 협력각서 체결",
+          "translated": "한국·미국·일본이 소형모듈원자로 협력을 위한 틀을 만들었다는 뜻입니다.",
+          "note": "한국어 기사일 때는 번역보다 쉬운 정리와 업무 연결점을 먼저 보여줍니다."
+        }
+      ],
+      "url": "https://www.korea.kr/news/policyNewsList.do"
+    },
+    {
+      "category": "시야 확장",
+      "source": "arXiv",
+      "publishedAt": "2026-05-27",
+      "country": "국제 연구",
+      "language": "영어",
+      "topic": "AI 인프라와 전력",
+      "selectionReason": "전력망 확장 연구라서 데이터센터·제조 대형 부하가 공사 일정과 설비 조달에 주는 압력을 볼 수 있습니다.",
+      "originalExcerpt": "The paper models how datacenters and electrified manufacturing loads can change capacity expansion needs across generation, storage, and transmission systems.",
+      "translation": "데이터센터와 전기화 제조 시설이 커질수록 발전, 저장장치, 송전망 확장 계획이 복잡해진다는 연구입니다. 현장에서는 전력 인입 가능 시점과 설비 조달 기간을 먼저 봐야 한다는 신호로 읽을 수 있습니다.",
+      "cleanTitle": "데이터센터와 제조 대형 부하가 전력망 확장에 주는 압력",
+      "originalTitle": "Grid Capacity Expansion under Data Centers and Electrified Manufacturing Large Loads",
+      "plainSummary": "데이터센터와 전기화 제조 시설이 커질수록 발전량뿐 아니라 송전, 저장장치, 공사 시점까지 전력망 계획이 복잡해진다.",
+      "context": "전력망 확장 연구는 현장 업무에서 전력 인입 가능 시점과 설비 조달 기간을 먼저 따져야 한다는 신호로 볼 수 있다.",
+      "facts": "데이터센터와 전기화 제조 시설이 전력 수요를 키우며 발전·저장·송전 투자 시점에 영향을 준다는 연구가 나왔다.",
+      "interpretation": "전력망 확장은 단순 발전량 문제가 아니라 입지, 공사 기간, 저장장치, 송전망 병목이 함께 작동하는 문제다.",
+      "otherView": "연구 모델은 특정 전력망 조건을 기반으로 하므로 한국 현장에는 별도 검증이 필요하다.",
+      "implication": "대형 전력 수요 시설 주변 공사는 전력 인입 가능 시점과 설비 조달 기간을 먼저 확인해야 한다.",
+      "question": "내 업무에서 전력 인입이나 설비 조달이 일정 병목이 되는 일은 무엇인가?",
+      "opportunity": "모닝데스크가 전력망·대형 부하 뉴스를 별도 관심 분야로 묶어 보여줄 수 있다.",
+      "url": "https://arxiv.org/abs/2605.29053"
+    },
+    {
+      "category": "업무/관심 분야",
+      "source": "arXiv",
+      "publishedAt": "2026-05-10",
+      "country": "국제 연구/한국",
+      "language": "영어",
+      "topic": "AI 인프라와 전력",
+      "selectionReason": "한국 전력시장 연구라서 에너지 가격, 송전 제약, 설비 투자 판단의 배경 변수로 볼 수 있습니다.",
+      "originalExcerpt": "The paper discusses price distortions in Korea's electricity market and how they can affect renewable integration and reform pathways.",
+      "translation": "한국 전력시장의 가격 신호와 송전 제약이 재생에너지 통합과 장기 투자에 영향을 줄 수 있다는 연구입니다. 전력 비용과 공급 조건은 설비 투자와 운영 계획의 배경 변수로 이어집니다.",
+      "cleanTitle": "한국 전력시장 가격 왜곡과 재생에너지 통합 이슈",
+      "originalTitle": "Price Distortions in Korea's Electricity Market: Barriers to Renewable Integration and Reform Pathways",
+      "plainSummary": "한국 전력시장의 가격 신호와 송전 제약은 재생에너지뿐 아니라 설비 투자와 장기 운영 계획의 배경 변수다.",
+      "context": "전력 가격과 공급 조건은 현장 견적, 장비 운영비, 데이터센터 같은 대형 부하 시설의 경제성에 영향을 준다.",
+      "facts": "한국 전력시장의 가격 신호와 송전 제약이 재생에너지 통합과 장기 투자에 영향을 준다는 연구가 제시됐다.",
+      "interpretation": "전력 가격과 송전 제약은 현장 설비 투자, 에너지 비용, 장기 운영 계획에 간접적으로 영향을 준다.",
+      "otherView": "학술 연구는 정책 결정 자체가 아니므로 실제 제도 변화는 정부 발표와 법령을 함께 확인해야 한다.",
+      "implication": "전력 비용과 에너지 정책 변화는 자동화·설비·현장 운영의 배경 변수로 계속 추적할 만하다.",
+      "question": "전력 단가나 공급 조건이 바뀌면 가장 먼저 영향을 받을 내 업무 비용은 무엇인가?",
+      "opportunity": "전기·설비 업무용 관심 키워드에 전력시장, 송전, 재생에너지를 추가할 수 있다.",
+      "url": "https://arxiv.org/abs/2605.09318"
     }
   ],
   "schedule": [
-    { "time": "09:30", "title": "오늘 일정 확인", "type": "확인" },
-    { "time": "14:00", "title": "중요한 일 30분 집중", "type": "작업" }
+    { "time": "09:20", "title": "오늘 핵심 업무와 일정 1개 확정", "type": "확인", "reminderBefore": 5 },
+    { "time": "10:30", "title": "전력·AI 인프라 기사 1개 원문 확인", "type": "리서치", "reminderBefore": 10 },
+    { "time": "14:00", "title": "중요한 일 30분 집중", "type": "작업", "reminderBefore": 15 }
   ],
   "tasks": [
-    { "title": "오늘 가장 중요한 일 하나 정하기", "priority": "핵심", "status": "today" },
-    { "title": "미룬 일 하나를 10분짜리로 쪼개기", "priority": "보통", "status": "deferred", "daysDeferred": 3 },
-    { "title": "내일 아침에 볼 체크리스트 적기", "priority": "보통", "status": "today" }
+    { "title": "오늘 가장 중요한 일 하나 정하기", "priority": "핵심", "status": "today", "firstAction": "해야 할 결과물을 한 문장으로 쓰기" },
+    { "title": "전력·AI 인프라 기사에서 업무 신호 1개 찾기", "priority": "보통", "status": "today", "firstAction": "원문 제목과 핵심 수치만 확인" },
+    { "title": "미룬 일 하나를 10분짜리로 쪼개기", "priority": "보통", "status": "deferred", "daysDeferred": 3, "deferReason": "일이 너무 큼" },
+    { "title": "내일 아침에 볼 체크리스트 적기", "priority": "가볍게", "status": "today", "firstAction": "확인할 사이트 2개만 적기" }
   ]
 }

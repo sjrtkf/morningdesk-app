@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>모닝데스크 웹 샘플</title>
+    <link rel="stylesheet" href="./styles.css">
+    <style>
+      body { background: #f5f7f4; }
+      .sample-shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0; }
+      .sample-hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr); gap: 18px; margin-bottom: 18px; padding: 28px; border: 1px solid var(--line); border-radius: 8px; background: #fff; box-shadow: var(--shadow); }
+      .sample-hero h1 { margin: 0; font-size: clamp(34px, 5vw, 62px); line-height: 1.04; letter-spacing: 0; }
+      .sample-flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 18px 0; }
+      .sample-card { padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+      .sample-card strong, .sample-card small { display: block; }
+      .sample-card small { color: var(--muted); line-height: 1.45; }
+      .sample-grid { display: grid; grid-template-columns: 1fr 0.9fr; gap: 18px; }
+      .sample-news { display: grid; gap: 12px; }
+      .sample-news article { padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+      .sample-news h3 { margin: 8px 0; }
+      .sample-phone-link { display: inline-flex; margin-top: 14px; }
+      @media (max-width: 840px) {
+        .sample-hero, .sample-flow, .sample-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="sample-shell">
+      <section class="sample-hero">
+        <div>
+          <span class="mode-badge">웹 메인 샘플</span>
+          <h1>오늘은 실행과 판단만 먼저 봅니다</h1>
+          <p class="lead">메인은 5단계로 나뉘지만, 사용자가 보는 첫 화면은 핵심 업무, 첫 10분, 다음 일정, 대표 기사로 압축됩니다.</p>
+          <a class="small-link sample-phone-link" href="./mobile-preview.html">모바일 앱 샘플 보기</a>
+        </div>
+        <div class="focus-console">
+          <div class="focus-orbit is-running"><strong>08:42</strong><small>첫 행동</small></div>
+          <div class="focus-copy">
+            <strong>오늘 집중 1회 · 시도 2회</strong>
+            <p>완료하면 기록이 남고, 못 하면 벌점 대신 더 작은 행동으로 줄입니다.</p>
+          </div>
+        </div>
+      </section>
+      <section class="sample-flow">
+        <article class="sample-card"><strong>1 체크인</strong><small>오늘 핵심 업무와 컨디션</small></article>
+        <article class="sample-card"><strong>2 날씨·일정</strong><small>외출과 시간표 확인</small></article>
+        <article class="sample-card"><strong>3 첫 10분</strong><small>지금 움직일 행동</small></article>
+        <article class="sample-card"><strong>4 기사 판단</strong><small>원문·번역·질문</small></article>
+        <article class="sample-card"><strong>5 마무리</strong><small>회고 또는 내일로 넘김</small></article>
+      </section>
+      <section class="sample-grid">
+        <div class="sample-news">
+          <article>
+            <span class="tag">AI 인프라와 전력</span>
+            <h3>데이터센터 전력 비용을 누가 부담할까</h3>
+            <p>핵심 사실, 맥락, 오늘 볼 이유, 생각 질문을 먼저 보고 원문·번역은 접어서 확인합니다.</p>
+          </article>
+          <article>
+            <span class="tag">한국 AI 정책</span>
+            <h3>AI 예산 확대가 현장 업무에 주는 신호</h3>
+            <p>영어 원문은 번역본을 먼저 듣고, 원문 제목과 어려운 단어를 이어서 확인합니다.</p>
+          </article>
+        </div>
+        <div class="sample-card">
+          <h3>설정은 뒤로</h3>
+          <p>Sync, 알림, 뉴스 출처 추가, 백업은 톱니바퀴 설정 안으로 들어갑니다. 메인은 아침에 실제로 보는 것만 남깁니다.</p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
