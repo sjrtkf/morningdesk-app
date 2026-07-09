@@ -200,12 +200,20 @@
               <p class="eyebrow">Action Board</p>
               <h3>오늘 실행 보드</h3>
             </div>
-            <span id="taskLoad" class="count-pill"></span>
+            <div class="board-header-actions">
+              <button class="small-button" id="jumpToArticles" type="button">기사 먼저 보기</button>
+              <span id="taskLoad" class="count-pill"></span>
+            </div>
           </div>
           <p class="board-help">오늘 할 일은 내가 실제로 움직일 행동입니다. 오늘 시간표는 회의·외출·확인 시간처럼 시각이 정해진 일만 넣고, 미룬 일은 다시 할지 줄일지 보류할지만 고릅니다.</p>
           <div id="planBoard" class="plan-board"></div>
+          <div class="board-tabs" role="tablist" aria-label="오늘 실행 보드 보기">
+            <button class="board-tab is-active" type="button" role="tab" aria-selected="true" data-board-tab="tasks">할 일</button>
+            <button class="board-tab" type="button" role="tab" aria-selected="false" data-board-tab="schedule">시간표</button>
+            <button class="board-tab" type="button" role="tab" aria-selected="false" data-board-tab="deferred">미룬 일</button>
+          </div>
           <div class="board-forms">
-            <details class="quick-add-panel" open>
+            <details class="quick-add-panel">
               <summary>할 일 추가</summary>
               <form id="taskForm" class="task-form">
                 <input id="taskTitle" type="text" placeholder="예: 견적서 초안 확인" aria-label="할 일 제목">
@@ -233,16 +241,16 @@
               </form>
             </details>
           </div>
-          <div class="action-lanes">
-            <section class="action-lane">
+          <div class="action-lanes" data-active-board-tab="tasks">
+            <section class="action-lane" data-board-panel="tasks">
               <div class="lane-title"><span>오늘 할 일</span><small>핵심·보통·가볍게 중요도 표시</small></div>
               <ul id="taskList" class="list"></ul>
             </section>
-            <section class="action-lane">
+            <section class="action-lane" data-board-panel="schedule">
               <div class="lane-title"><span>오늘 시간표</span><small>시간이 지나면 자동으로 흐리게 표시</small></div>
               <ul id="scheduleList" class="list"></ul>
             </section>
-            <section class="action-lane">
+            <section class="action-lane" data-board-panel="deferred">
               <div class="lane-title"><span>미룬 일 정리</span><small>다시 보여주기보다 처리 방향 선택</small></div>
               <div id="deferredList" class="deferred-list"></div>
             </section>

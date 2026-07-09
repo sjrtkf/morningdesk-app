@@ -164,6 +164,7 @@ let focusTimerId = 0;
 let focusTimerEndsAt = 0;
 
 const qs = (selector) => document.querySelector(selector);
+const qsa = (selector) => [...document.querySelectorAll(selector)];
 const VOICE_ADVANCE_KEY = "morningdesk.voiceAdvance.enabled";
 const voiceAdvanceCommands = ["다음", "넘어", "넘겨", "확인", "시작", "계속"];
 
@@ -1522,6 +1523,16 @@ function renderTasks() {
     : `<p class="empty-state">미룬 일이 없습니다.</p>`;
 }
 
+function setBoardTab(tabName) {
+  const nextTab = ["tasks", "schedule", "deferred"].includes(tabName) ? tabName : "tasks";
+  qs(".action-lanes").dataset.activeBoardTab = nextTab;
+  qsa("[data-board-tab]").forEach((button) => {
+    const isActive = button.dataset.boardTab === nextTab;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-selected", isActive ? "true" : "false");
+  });
+}
+
 function totalCategoryWeight() {
   return state.data.settings.categoryWeights.reduce((sum, item) => sum + Number(item.weight || 0), 0);
 }
@@ -2577,6 +2588,14 @@ function bindEvents() {
     renderTasks();
     renderPlan();
     updateScriptPreview();
+  });
+
+  qsa("[data-board-tab]").forEach((button) => {
+    button.addEventListener("click", () => setBoardTab(button.dataset.boardTab));
+  });
+
+  qs("#jumpToArticles").addEventListener("click", () => {
+    qs(".article-workbench").scrollIntoView({ behavior: "smooth", block: "start" });
   });
 }
 
