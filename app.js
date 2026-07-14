@@ -352,18 +352,39 @@ function updateStorageStatus(result) {
 function syncStatusMessage(result) {
   const config = window.MorningDeskStorage.getConfig ? window.MorningDeskStorage.getConfig() : window.MORNINGDESK_CONFIG;
   const profileId = config?.profileId || "default";
+  const profileLabel = profileId === "default" ? "미설정" : `${profileId.slice(0, 8)}…`;
   const deviceLabel = config?.deviceLabel || defaultDeviceLabel();
 
   if (!result) {
     return "아직 저장 상태를 확인하지 못했습니다.";
   }
   if (result.mode === "supabase" && result.online) {
-    return `온라인 동기화 사용 중 · 프로필 ${profileId} · 기기 ${deviceLabel}`;
+    return `온라인 동기화 사용 중 · 프로필 ${profileLabel} · 기기 ${deviceLabel}`;
   }
   if (result.mode === "supabase" && !result.online) {
     return "온라인 연결에 실패했습니다. 입력한 URL, anon key, 테이블 설정을 확인하세요.";
   }
   return "현재는 이 브라우저에만 저장합니다.";
+}
+
+function setSyncStatus(message, tone = "neutral") {
+  const status = qs("#syncConfigStatus");
+  if (!status) return;
+  status.textContent = message;
+  status.dataset.tone = tone;
+}
+
+function syncFormConfig() {
+  return {
+    storageMode: qs("#syncMode").value,
+    profileId: qs("#syncProfileId").value.trim() || "default",
+    deviceLabel: qs("#syncDeviceLabel").value.trim() || defaultDeviceLabel(),
+    supabase: {
+      url: qs("#supabaseUrl").value.trim(),
+      anonKey: qs("#supabaseAnonKey").value.trim(),
+      table: "morningdesk_state"
+    }
+  };
 }
 
 function renderSyncSettings(result) {
@@ -377,7 +398,7 @@ function renderSyncSettings(result) {
   qs("#supabaseAnonKey").value = config.supabase?.anonKey || "";
   qs("#syncProfileId").value = config.profileId || "default";
   qs("#syncDeviceLabel").value = config.deviceLabel || defaultDeviceLabel();
-  qs("#syncConfigStatus").textContent = syncStatusMessage(result);
+  setSyncStatus(syncStatusMessage(result), result?.mode === "supabase" && result.online ? "success" : "neutral");
 }
 
 async function reloadFromStorage() {
@@ -2446,43 +2467,47 @@ function bindEvents() {
 
   qs("#syncForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    const profileId = qs("#syncProfileId").value.trim() || "default";
-    if (qs("#syncMode").value === "supabase" && profileId === "default") {
-      qs("#syncConfigStatus").textContent = "온라인 동기화는 기본값 대신 안전한 프로필 키를 먼저 만들어주세요.";
+    const nextConfig = syncFormConfig();
+    if (nextConfig.storageMode === "supabase" && nextConfig.profileId === "default") {
+      setSyncStatus("온라인 동기화는 기본값 대신 안전한 프로필 키를 먼저 만들어주세요.", "warning");
       return;
     }
-    const nextConfig = {
-      storageMode: qs("#syncMode").value,
-      profileId,
-      deviceLabel: qs("#syncDeviceLabel").value.trim() || defaultDeviceLabel(),
-      supabase: {
-        url: qs("#supabaseUrl").value.trim(),
-        anonKey: qs("#supabaseAnonKey").value.trim(),
-        table: "morningdesk_state"
-      }
-    };
     window.MorningDeskStorage.saveConfig(nextConfig);
     const writeVersion = ++storageWriteVersion;
     qs("#storageStatus").textContent = nextConfig.storageMode === "supabase" ? "온라인 확인 중" : "로컬 저장";
-    qs("#syncConfigStatus").textContent = nextConfig.storageMode === "supabase"
+    setSyncStatus(nextConfig.storageMode === "supabase"
       ? "온라인 저장소에 연결을 시도합니다."
-      : "이 브라우저에만 저장하도록 바꿨습니다.";
+      : "이 브라우저에만 저장하도록 바꿨습니다.", "neutral");
     const result = await window.MorningDeskStorage.save(snapshotState());
     if (writeVersion !== storageWriteVersion) return;
     updateStorageStatus(result);
-    qs("#syncConfigStatus").textContent = result.mode === "supabase" && result.online
+    setSyncStatus(result.mode === "supabase" && result.online
       ? "동기화 설정을 저장하고 현재 데이터를 온라인에 올렸습니다."
-      : syncStatusMessage(result);
+      : syncStatusMessage(result), result.mode === "supabase" && result.online ? "success" : "warning");
+  });
+
+  qs("#syncConnectionTest").addEventListener("click", async () => {
+    const candidate = syncFormConfig();
+    candidate.storageMode = "supabase";
+    setSyncStatus("Supabase 연결과 RLS 정책을 확인하고 있습니다.", "neutral");
+    const result = await window.MorningDeskStorage.testConnection(candidate);
+    if (result.ok) {
+      setSyncStatus(result.rowExists
+        ? "연결 성공 · 이 프로필의 온라인 데이터가 확인됐습니다. 설정 저장 후 동기화할 수 있습니다."
+        : "연결 성공 · 테이블과 RLS가 정상입니다. 아직 이 프로필의 온라인 데이터는 없습니다.", "success");
+      return;
+    }
+    setSyncStatus(result.message || "연결을 확인하지 못했습니다.", result.code === "missing" || result.code === "profile" ? "warning" : "error");
   });
 
   qs("#syncNow").addEventListener("click", async () => {
-    qs("#syncConfigStatus").textContent = "동기화 중입니다.";
+    setSyncStatus("동기화 중입니다.", "neutral");
     await reloadFromStorage();
   });
 
   qs("#generateProfileId").addEventListener("click", () => {
     qs("#syncProfileId").value = generateProfileId();
-    qs("#syncConfigStatus").textContent = "새 프로필 키를 만들었습니다. 휴대폰과 PC에 같은 키를 넣으면 같은 데이터를 봅니다.";
+    setSyncStatus("새 프로필 키를 만들었습니다. 휴대폰과 PC에 같은 키를 넣으면 같은 데이터를 봅니다.", "success");
   });
 
   qs("#weightEditor").addEventListener("input", (event) => {

@@ -75,42 +75,110 @@
     }).finally(() => clearTimeout(timeoutId));
   }
 
-  async function loadSupabaseState() {
-    const { url, anonKey, table } = config.supabase;
-    const profileId = config.profileId || "default";
-    const endpoint = `${url.replace(/\/$/, "")}/rest/v1/${table}?id=eq.${encodeURIComponent(profileId)}&select=state,updated_at`;
-    const response = await fetchWithTimeout(endpoint, {
-      headers: {
-        apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`
+  function normalizeTargetConfig(targetConfig = config) {
+    return mergeConfig(config, targetConfig || {});
+  }
+
+  function validateSupabaseConfig(targetConfig) {
+    const target = normalizeTargetConfig(targetConfig);
+    const url = target.supabase?.url?.trim() || "";
+    const anonKey = target.supabase?.anonKey?.trim() || "";
+    const profileId = target.profileId?.trim() || "";
+
+    if (!url || !anonKey || !profileId) {
+      return { ok: false, code: "missing", message: "URL, anon/public key, 프로필 키를 모두 입력하세요." };
+    }
+    if (profileId === "default" || profileId.length < 20) {
+      return { ok: false, code: "profile", message: "안전한 프로필 키 만들기를 눌러 20자 이상의 키를 사용하세요." };
+    }
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== "https:") {
+        return { ok: false, code: "url", message: "Supabase URL은 https:// 주소여야 합니다." };
       }
+    } catch {
+      return { ok: false, code: "url", message: "Supabase 프로젝트 URL 형식을 확인하세요." };
+    }
+    return { ok: true, target };
+  }
+
+  function supabaseHeaders(target, includeJson = false) {
+    const headers = {
+      apikey: target.supabase.anonKey,
+      Authorization: `Bearer ${target.supabase.anonKey}`
+    };
+    if (includeJson) headers["Content-Type"] = "application/json";
+    return headers;
+  }
+
+  async function supabaseError(response, action) {
+    let detail = "";
+    try {
+      const payload = await response.json();
+      detail = payload?.message || payload?.hint || payload?.code || "";
+    } catch {
+      detail = "";
+    }
+    const error = new Error(detail || `Supabase ${action} failed`);
+    error.status = response.status;
+    return error;
+  }
+
+  async function loadSupabaseStateFor(targetConfig) {
+    const target = normalizeTargetConfig(targetConfig);
+    const { url } = target.supabase;
+    const profileId = target.profileId || "default";
+    const endpoint = `${url.replace(/\/$/, "")}/rest/v1/rpc/morningdesk_load`;
+    const response = await fetchWithTimeout(endpoint, {
+      method: "POST",
+      headers: supabaseHeaders(target, true),
+      body: JSON.stringify({ profile_key: profileId })
     });
 
-    if (!response.ok) throw new Error("Supabase load failed");
+    if (!response.ok) throw await supabaseError(response, "load");
     const rows = await response.json();
     return rows[0] || null;
   }
 
+  async function loadSupabaseState() {
+    return loadSupabaseStateFor(config);
+  }
+
   async function saveSupabaseState(state) {
-    const { url, anonKey, table } = config.supabase;
+    const { url } = config.supabase;
     const profileId = config.profileId || "default";
-    const endpoint = `${url.replace(/\/$/, "")}/rest/v1/${table}`;
+    const endpoint = `${url.replace(/\/$/, "")}/rest/v1/rpc/morningdesk_save`;
     const response = await fetchWithTimeout(endpoint, {
       method: "POST",
-      headers: {
-        apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`,
-        "Content-Type": "application/json",
-        Prefer: "resolution=merge-duplicates"
-      },
+      headers: supabaseHeaders(config, true),
       body: JSON.stringify({
-        id: profileId,
-        state,
-        updated_at: new Date().toISOString()
+        profile_key: profileId,
+        next_state: state
       })
     });
 
-    if (!response.ok) throw new Error("Supabase save failed");
+    if (!response.ok) throw await supabaseError(response, "save");
+  }
+
+  async function testConnection(targetConfig) {
+    const validation = validateSupabaseConfig(targetConfig);
+    if (!validation.ok) return validation;
+
+    try {
+      const row = await loadSupabaseStateFor(validation.target);
+      return {
+        ok: true,
+        code: row ? "connected" : "empty",
+        rowExists: Boolean(row),
+        updatedAt: row?.updated_at || ""
+      };
+    } catch (error) {
+      const status = Number(error?.status || 0);
+      if (status === 401) return { ok: false, code: "key", status, message: "anon/public key가 올바르지 않습니다." };
+      if (status === 403) return { ok: false, code: "policy", status, message: "RLS 정책이 연결을 거부했습니다. 최신 SQL을 다시 적용하세요." };
+      if (status === 404) return { ok: false, code: "table", status, message: "동기화 함수를 찾지 못했습니다. 최신 설정 SQL을 먼저 실행하세요." };
+      return { ok: false, code: "network", status, message: "Supabase에 연결하지 못했습니다. URL과 인터넷 연결을 확인하세요." };
+    }
   }
 
   async function load() {
@@ -219,6 +287,7 @@
     describeDetail,
     getConfig,
     saveConfig,
+    testConnection,
     mode: currentMode
   };
 })();

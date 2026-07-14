@@ -11,7 +11,9 @@
 --    - 프로필 키: use "안전한 프로필 키 만들기" and reuse the same key on each device.
 --
 -- Prototype privacy note:
--- This no-login prototype uses a long unguessable profile key as the row id.
+-- This no-login prototype uses a long unguessable profile key as the row id
+-- through two RPC functions. The table itself has no anon RLS policy, so anon
+-- clients cannot enumerate rows through the REST table endpoint.
 -- Do not store company secrets, passwords, API keys, or sensitive personal data.
 -- For stronger privacy, add Supabase Auth later and replace these anon policies
 -- with auth.uid()-based policies.
@@ -28,24 +30,47 @@ drop policy if exists "morningdesk prototype read" on public.morningdesk_state;
 drop policy if exists "morningdesk prototype insert" on public.morningdesk_state;
 drop policy if exists "morningdesk prototype update" on public.morningdesk_state;
 
-create policy "morningdesk prototype read"
-on public.morningdesk_state
-for select
-to anon
-using (true);
+create or replace function public.morningdesk_load(profile_key text)
+returns table(state jsonb, updated_at timestamptz)
+language sql
+security definer
+set search_path = public
+as $$
+  select saved.state, saved.updated_at
+  from public.morningdesk_state as saved
+  where length(profile_key) >= 20
+    and saved.id = profile_key
+  limit 1;
+$$;
 
-create policy "morningdesk prototype insert"
-on public.morningdesk_state
-for insert
-to anon
-with check (id is not null and length(id) >= 20);
+create or replace function public.morningdesk_save(profile_key text, next_state jsonb)
+returns timestamptz
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  saved_at timestamptz;
+begin
+  if profile_key is null or length(profile_key) < 20 then
+    raise exception 'profile key must be at least 20 characters';
+  end if;
 
-create policy "morningdesk prototype update"
-on public.morningdesk_state
-for update
-to anon
-using (id is not null and length(id) >= 20)
-with check (id is not null and length(id) >= 20);
+  insert into public.morningdesk_state (id, state, updated_at)
+  values (profile_key, next_state, now())
+  on conflict (id) do update
+    set state = excluded.state,
+        updated_at = excluded.updated_at
+  returning morningdesk_state.updated_at into saved_at;
+
+  return saved_at;
+end;
+$$;
+
+revoke all on function public.morningdesk_load(text) from public;
+revoke all on function public.morningdesk_save(text, jsonb) from public;
+grant execute on function public.morningdesk_load(text) to anon;
+grant execute on function public.morningdesk_save(text, jsonb) to anon;
 
 create index if not exists morningdesk_state_updated_at_idx
 on public.morningdesk_state (updated_at desc);

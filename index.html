@@ -331,6 +331,12 @@
                 </div>
               </div>
               <p class="panel-help">지금은 이 브라우저에만 저장됩니다. 나중에 휴대폰과 PC가 같은 체크인·할 일·피드백을 쓰려면 이 설정이 필요해서 메인 화면 대신 여기 숨겨둡니다.</p>
+              <div class="sync-steps" aria-label="온라인 동기화 설정 순서">
+                <div><strong>1</strong><span>Supabase에서 설정 SQL 실행</span></div>
+                <div><strong>2</strong><span>URL·키·프로필 입력 후 연결 확인</span></div>
+                <div><strong>3</strong><span>설정 저장 후 다른 기기에 같은 프로필 입력</span></div>
+              </div>
+              <a class="secondary full-width setup-link" href="./supabase-morningdesk.sql" target="_blank" rel="noopener">Supabase 설정 SQL 보기</a>
               <form id="syncForm" class="settings-form">
                 <label>
                   저장 방식
@@ -344,8 +350,9 @@
                   <input id="supabaseUrl" type="url" placeholder="https://프로젝트.supabase.co">
                 </label>
                 <label>
-                  Supabase anon key
+                  Supabase anon/public key
                   <input id="supabaseAnonKey" type="password" autocomplete="off" placeholder="eyJ...">
+                  <small>브라우저 연결용 공개 키입니다. service_role 키는 입력하지 마세요.</small>
                 </label>
                 <div class="inline-form two-column">
                   <label>
@@ -358,10 +365,11 @@
                   </label>
                 </div>
                 <button class="secondary full-width" id="generateProfileId" type="button">안전한 프로필 키 만들기</button>
+                <button class="secondary full-width" id="syncConnectionTest" type="button">연결만 확인</button>
                 <button class="primary full-width" type="submit">동기화 설정 저장</button>
                 <button class="secondary full-width" id="syncNow" type="button">지금 동기화</button>
               </form>
-              <p id="syncConfigStatus" class="empty-state">동기화 설정을 확인 중입니다.</p>
+              <p id="syncConfigStatus" class="sync-status" aria-live="polite">동기화 설정을 확인 중입니다.</p>
             </section>
 
             <section class="panel utility-panel">

@@ -25,6 +25,7 @@ It helps you start the day with a short check-in, selected articles, schedule it
 - Browser speech reading
 - Optional Supabase sync settings panel
 - Supabase setup SQL for prototype sync
+- Read-only Supabase connection test before saving settings
 - PWA notification diagnostics and test notification button
 - PNG icons for iOS home screen install
 - PWA manifest and service worker
@@ -45,9 +46,9 @@ Local LAN addresses such as `192.168.x.x` only work while the phone and PC are o
 
 ## Supabase Prototype Sync
 
-`supabase-morningdesk.sql` creates the prototype `morningdesk_state` table and row-level security policies.
+`supabase-morningdesk.sql` creates the prototype `morningdesk_state` table and the restricted `morningdesk_load` / `morningdesk_save` RPC functions.
 
-This no-login prototype uses a long random profile key generated in the app settings. It is enough for PC/mobile sync testing, but stronger private use should later move to Supabase Auth and `auth.uid()` based policies.
+This no-login prototype uses a long random profile key generated in the app settings. Anonymous clients cannot query the table directly; they can only call the two profile-key RPC functions. It is enough for PC/mobile sync testing, but stronger private use should later move to Supabase Auth and `auth.uid()` based policies. Never enter a `service_role` key in the browser app.
 
 ## Design Samples
 
