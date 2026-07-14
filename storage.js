@@ -1,6 +1,9 @@
 (function () {
   const storageKey = "morningdesk.v1";
   const configKey = "morningdesk.config.v1";
+  const configDatabase = "morningdesk.settings.v1";
+  const configStore = "settings";
+  const configRecord = "sync-config";
 
   function mergeConfig(base, override) {
     return {
@@ -22,8 +25,95 @@
     }
   }
 
-  const config = mergeConfig(window.MORNINGDESK_CONFIG || { storageMode: "local" }, getStoredConfig());
+  function configSnapshot(source) {
+    return {
+      storageMode: source.storageMode || "local",
+      profileId: source.profileId || "default",
+      deviceLabel: source.deviceLabel || "",
+      supabase: {
+        url: source.supabase?.url || "",
+        anonKey: source.supabase?.anonKey || "",
+        table: source.supabase?.table || "morningdesk_state"
+      }
+    };
+  }
+
+  function hasConnectedConfig(source) {
+    return Boolean(
+      source?.storageMode === "supabase"
+      && source?.profileId
+      && source.profileId !== "default"
+      && source?.supabase?.url
+      && source?.supabase?.anonKey
+    );
+  }
+
+  function openConfigDatabase() {
+    if (!window.indexedDB) return Promise.resolve(null);
+    return new Promise((resolve) => {
+      let request;
+      try {
+        request = window.indexedDB.open(configDatabase, 1);
+      } catch {
+        resolve(null);
+        return;
+      }
+      request.onupgradeneeded = () => {
+        if (!request.result.objectStoreNames.contains(configStore)) {
+          request.result.createObjectStore(configStore);
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => resolve(null);
+      request.onblocked = () => resolve(null);
+    });
+  }
+
+  async function readConfigBackup() {
+    const database = await openConfigDatabase();
+    if (!database) return null;
+    return new Promise((resolve) => {
+      const transaction = database.transaction(configStore, "readonly");
+      const request = transaction.objectStore(configStore).get(configRecord);
+      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = () => resolve(null);
+      transaction.oncomplete = () => database.close();
+      transaction.onerror = () => database.close();
+    });
+  }
+
+  async function writeConfigBackup(snapshot) {
+    const database = await openConfigDatabase();
+    if (!database) return false;
+    return new Promise((resolve) => {
+      const transaction = database.transaction(configStore, "readwrite");
+      transaction.objectStore(configStore).put(snapshot, configRecord);
+      transaction.oncomplete = () => {
+        database.close();
+        resolve(true);
+      };
+      transaction.onerror = () => {
+        database.close();
+        resolve(false);
+      };
+    });
+  }
+
+  const storedConfig = getStoredConfig();
+  const config = mergeConfig(window.MORNINGDESK_CONFIG || { storageMode: "local" }, storedConfig);
   window.MORNINGDESK_CONFIG = config;
+
+  const configReady = (async () => {
+    const backup = await readConfigBackup();
+    if (!hasConnectedConfig(config) && hasConnectedConfig(backup)) {
+      const restored = mergeConfig(config, backup);
+      Object.assign(config, restored);
+      config.supabase = restored.supabase;
+      localStorage.setItem(configKey, JSON.stringify(configSnapshot(config)));
+      return;
+    }
+    if (hasConnectedConfig(config)) await writeConfigBackup(configSnapshot(config));
+  })().catch(() => undefined);
 
   function currentMode() {
     if (
@@ -161,6 +251,7 @@
   }
 
   async function testConnection(targetConfig) {
+    await configReady;
     const validation = validateSupabaseConfig(targetConfig);
     if (!validation.ok) return validation;
 
@@ -182,6 +273,7 @@
   }
 
   async function load(options = {}) {
+    await configReady;
     const mode = currentMode();
     if (mode === "supabase") {
       const local = getLocalState();
@@ -221,6 +313,7 @@
   }
 
   async function save(state) {
+    await configReady;
     setLocalState(state);
 
     if (currentMode() === "supabase") {
@@ -269,16 +362,10 @@
     const merged = mergeConfig(config, nextConfig || {});
     Object.assign(config, merged);
     config.supabase = merged.supabase;
-    localStorage.setItem(configKey, JSON.stringify({
-      storageMode: config.storageMode || "local",
-      profileId: config.profileId || "default",
-      deviceLabel: config.deviceLabel || "",
-      supabase: {
-        url: config.supabase?.url || "",
-        anonKey: config.supabase?.anonKey || "",
-        table: config.supabase?.table || "morningdesk_state"
-      }
-    }));
+    const snapshot = configSnapshot(config);
+    localStorage.setItem(configKey, JSON.stringify(snapshot));
+    writeConfigBackup(snapshot);
+    window.navigator.storage?.persist?.().catch(() => false);
     return getConfig();
   }
 

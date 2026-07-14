@@ -123,6 +123,15 @@ The product philosophy is:
   4. iPhone에서 `앱이 닫혀도 알림 연결` 후 백그라운드 테스트
   5. 성공하면 Supabase Cron 일정 발송기 추가
 
+## 2026-07-14 iPhone 재실행 시 동기화 설정 유지 보강
+
+- 사용자 제보: iPhone 홈 화면 앱을 종료한 뒤 URL, publishable key, 프로필 키를 다시 요구하는 불편이 있었다.
+- `storage.js`가 동기화 연결 정보를 localStorage와 IndexedDB에 이중 저장하도록 변경했다.
+- 재실행 때 localStorage 연결 정보가 비어 있으면 IndexedDB 백업에서 자동 복구한다.
+- 저장 시 지원 브라우저에 `navigator.storage.persist()`도 요청한다.
+- 검증: localStorage만 비운 새 실행에서 URL, 키, 프로필 키와 설정 레코드가 복구되는 단위 테스트 통과.
+- 주의: Safari와 홈 화면 PWA는 저장 공간이 분리될 수 있으므로 홈 화면 앱 안에서 한 번 저장해야 한다.
+
 ## Start Prompt For Next Chat
 
 Read `README.md`, `PROJECTS.md`, `CURRENT.md`, `프로젝트/모닝데스크/README.md`, `프로젝트/모닝데스크/requirements.md`, and this handoff file. Then continue MorningDesk from the current public app state. First verify the deployed page and local `publish/morningdesk-app` repo state, then proceed with mobile/PWA notification and Supabase sync planning unless I redirect you.

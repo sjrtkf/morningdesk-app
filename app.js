@@ -2627,10 +2627,10 @@ function bindEvents() {
     }
     updateStorageStatus(result);
     const connectedMessage = result.source === "remote"
-      ? "기존 온라인 데이터를 이 기기로 가져왔습니다."
+      ? "기존 온라인 데이터를 가져왔고 연결 정보를 이 홈 화면 앱에 기억했습니다."
       : result.source === "local"
-        ? "온라인 공간이 비어 있어 이 기기 데이터를 처음 올렸습니다."
-        : "동기화 설정을 저장했습니다. 아직 저장된 데이터는 없습니다.";
+        ? "온라인 공간이 비어 있어 이 기기 데이터를 처음 올렸고 연결 정보를 기억했습니다."
+        : "동기화 설정과 연결 정보를 이 홈 화면 앱에 기억했습니다.";
     setSyncStatus(result.mode === "supabase" && result.online
       ? connectedMessage
       : syncStatusMessage(result), result.mode === "supabase" && result.online ? "success" : "warning");

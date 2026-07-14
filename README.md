@@ -41,6 +41,8 @@ Private work notes, internal project documents, credentials, and voice data are 
 
 Supabase connection values are entered in the app and stored only in the browser local storage of each device.
 
+The sync connection is stored redundantly in localStorage and IndexedDB inside the installed PWA. If localStorage is unexpectedly empty after relaunch, the app restores it from IndexedDB. Safari and an iPhone Home Screen app can use separate storage, so enter the connection in the Home Screen app itself once.
+
 For mobile testing outside the same Wi-Fi network, use the public HTTPS address:
 
 - https://sjrtkf.github.io/morningdesk-app/
