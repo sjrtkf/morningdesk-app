@@ -30,6 +30,11 @@ project publishable key from the `apikey` header itself. Supabase automatically
 provides `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS`, and
 `SUPABASE_SECRET_KEYS` to the function.
 
+For Dashboard deployment, create a function named `morningdesk-push` via the
+editor and paste the complete `index.ts`. Its npm imports are pinned directly in
+the file, so no additional import map is required. Turn off the legacy Verify
+JWT option because the function performs current publishable-key validation.
+
 ## 4. Connect the iPhone
 
 Open the installed Home Screen PWA, then go to Settings > Notifications:
