@@ -1715,7 +1715,6 @@ async function pushRequest(action, payload = {}, method = "POST") {
     method,
     headers: {
       apikey: config.anonKey,
-      Authorization: `Bearer ${config.anonKey}`,
       "Content-Type": "application/json"
     },
     body: method === "GET" ? undefined : JSON.stringify({

@@ -132,6 +132,14 @@ The product philosophy is:
 - 검증: localStorage만 비운 새 실행에서 URL, 키, 프로필 키와 설정 레코드가 복구되는 단위 테스트 통과.
 - 주의: Safari와 홈 화면 PWA는 저장 공간이 분리될 수 있으므로 홈 화면 앱 안에서 한 번 저장해야 한다.
 
+## 2026-07-14 Supabase 새 publishable key 인증 대응
+
+- 공식 최신 문서 확인 결과 `sb_publishable_...` 키를 `Authorization: Bearer`에 보내면 Invalid JWT가 발생할 수 있다.
+- 프런트엔드는 publishable key를 `apikey` 헤더로만 보내도록 변경했다.
+- Edge Function은 legacy JWT 검증을 끄고 `SUPABASE_PUBLISHABLE_KEYS` 또는 legacy anon key를 직접 검증한다.
+- 서버 DB 접근은 `SUPABASE_SECRET_KEYS`를 우선 사용하고 legacy service-role은 호환용 fallback으로만 둔다.
+- `supabase/config.toml`에 `verify_jwt = false`를 명시했다. 이는 무인증 공개 함수가 아니라 함수 내부 publishable key 검증을 사용하기 위한 설정이다.
+
 ## Start Prompt For Next Chat
 
 Read `README.md`, `PROJECTS.md`, `CURRENT.md`, `프로젝트/모닝데스크/README.md`, `프로젝트/모닝데스크/requirements.md`, and this handoff file. Then continue MorningDesk from the current public app state. First verify the deployed page and local `publish/morningdesk-app` repo state, then proceed with mobile/PWA notification and Supabase sync planning unless I redirect you.

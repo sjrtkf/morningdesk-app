@@ -21,6 +21,27 @@ function json(request: Request, body: unknown, status = 200) {
   return Response.json(body, { status, headers: corsHeaders(request) });
 }
 
+function namedKeys(variable: string) {
+  try {
+    return Object.values(JSON.parse(Deno.env.get(variable) || "{}")) as string[];
+  } catch {
+    return [];
+  }
+}
+
+function validPublishableKey(request: Request) {
+  const supplied = request.headers.get("apikey") || "";
+  const allowed = namedKeys("SUPABASE_PUBLISHABLE_KEYS");
+  const legacyAnon = Deno.env.get("SUPABASE_ANON_KEY") || "";
+  return Boolean(supplied && (allowed.includes(supplied) || supplied === legacyAnon));
+}
+
+function serverSecretKey() {
+  return namedKeys("SUPABASE_SECRET_KEYS")[0]
+    || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+    || "";
+}
+
 async function endpointHash(endpoint: string) {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(endpoint));
   return Array.from(new Uint8Array(digest), (value) => value.toString(16).padStart(2, "0")).join("");
@@ -28,6 +49,7 @@ async function endpointHash(endpoint: string) {
 
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response(null, { headers: corsHeaders(request) });
+  if (!validPublishableKey(request)) return json(request, { error: "Invalid publishable key." }, 401);
 
   const publicKey = Deno.env.get("VAPID_PUBLIC_KEY") || "";
   const privateKey = Deno.env.get("VAPID_PRIVATE_KEY") || "";
@@ -49,8 +71,9 @@ Deno.serve(async (request) => {
   if (profileKey.length < 20) return json(request, { error: "Invalid profile key." }, 400);
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+  const secretKey = serverSecretKey();
+  if (!supabaseUrl || !secretKey) return json(request, { error: "Supabase server keys are unavailable." }, 503);
+  const supabase = createClient(supabaseUrl, secretKey, {
     auth: { persistSession: false, autoRefreshToken: false }
   });
 

@@ -1,0 +1,2 @@
+[functions.morningdesk-push]
+verify_jwt = false

@@ -24,9 +24,11 @@ Copy the three output values directly into Supabase Edge Function secrets:
 
 ## 3. Deploy the Edge Function
 
-Deploy `supabase/functions/morningdesk-push`. Keep JWT verification enabled so
-the browser must supply the project's publishable key. Supabase automatically
-provides `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to the function.
+Deploy `supabase/functions/morningdesk-push` with legacy JWT verification
+disabled, as recorded in `supabase/config.toml`. The function validates the
+project publishable key from the `apikey` header itself. Supabase automatically
+provides `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS`, and
+`SUPABASE_SECRET_KEYS` to the function.
 
 ## 4. Connect the iPhone
 
