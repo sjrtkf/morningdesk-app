@@ -130,6 +130,7 @@ const state = {
   notifications: {
     popup: true,
     sound: false,
+    vibration: false,
     openOnClick: true,
     leadMinutes: 5,
     enabled: false,
@@ -452,6 +453,7 @@ function normalizeNotifications(notifications = {}) {
   return {
     popup: notifications.popup !== false,
     sound: Boolean(notifications.sound),
+    vibration: Boolean(notifications.vibration),
     openOnClick: notifications.openOnClick !== false,
     leadMinutes: Number(notifications.leadMinutes || 5),
     enabled: Boolean(notifications.enabled),
@@ -1679,10 +1681,96 @@ function yesNo(value) {
   return value ? "가능" : "확인 필요";
 }
 
+function setPushStatus(message, tone = "neutral") {
+  const status = qs("#pushConfigStatus");
+  if (!status) return;
+  status.textContent = message;
+  status.dataset.tone = tone;
+}
+
+function pushConfig() {
+  const config = window.MorningDeskStorage?.getConfig?.() || {};
+  const url = config.supabase?.url?.replace(/\/$/, "") || "";
+  const anonKey = config.supabase?.anonKey || "";
+  const profileId = config.profileId || "";
+  if (!url || !anonKey || !profileId || profileId === "default") return null;
+  return {
+    endpoint: `${url}/functions/v1/morningdesk-push`,
+    anonKey,
+    profileId,
+    deviceLabel: config.deviceLabel || "device"
+  };
+}
+
+function base64UrlToUint8Array(value) {
+  const padding = "=".repeat((4 - value.length % 4) % 4);
+  const base64 = (value + padding).replace(/-/g, "+").replace(/_/g, "/");
+  return Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
+}
+
+async function pushRequest(action, payload = {}, method = "POST") {
+  const config = pushConfig();
+  if (!config) throw new Error("먼저 PC·휴대폰 온라인 동기화를 연결해주세요.");
+  const response = await fetch(config.endpoint, {
+    method,
+    headers: {
+      apikey: config.anonKey,
+      Authorization: `Bearer ${config.anonKey}`,
+      "Content-Type": "application/json"
+    },
+    body: method === "GET" ? undefined : JSON.stringify({
+      action,
+      profileKey: config.profileId,
+      deviceLabel: config.deviceLabel,
+      ...payload
+    })
+  });
+  let result = {};
+  try {
+    result = await response.json();
+  } catch {
+    result = {};
+  }
+  if (!response.ok) {
+    if (response.status === 404) throw new Error("Supabase 백그라운드 알림 서버를 먼저 배포해야 합니다.");
+    throw new Error(result.error || "백그라운드 알림 서버에 연결하지 못했습니다.");
+  }
+  return result;
+}
+
+async function enableBackgroundPush() {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    throw new Error("이 기기는 백그라운드 Web Push를 지원하지 않습니다.");
+  }
+  if (!isStandalonePwa()) {
+    throw new Error("아이폰에서는 홈 화면에 추가한 모닝데스크 앱으로 실행해주세요.");
+  }
+  const permission = notificationPermission() === "granted"
+    ? "granted"
+    : await Notification.requestPermission();
+  if (permission !== "granted") throw new Error("알림 권한을 허용해야 연결할 수 있습니다.");
+
+  const config = pushConfig();
+  if (!config) throw new Error("먼저 PC·휴대폰 온라인 동기화를 연결해주세요.");
+  const keyResult = await pushRequest("public-key", {}, "GET");
+  if (!keyResult.publicKey) throw new Error("푸시 공개 키가 준비되지 않았습니다.");
+  const registration = await navigator.serviceWorker.ready;
+  let subscription = await registration.pushManager.getSubscription();
+  if (!subscription) {
+    subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: base64UrlToUint8Array(keyResult.publicKey)
+    });
+  }
+  await pushRequest("subscribe", { subscription: subscription.toJSON() });
+  return subscription;
+}
+
 function notificationDiagnostics() {
   const serviceWorkerSupported = "serviceWorker" in navigator;
   const pushSupported = "PushManager" in window;
   const notificationSupported = typeof Notification !== "undefined";
+  const vibrationSupported = typeof navigator.vibrate === "function";
   const secure = window.isSecureContext || ["https:", "http:"].includes(location.protocol) && ["localhost", "127.0.0.1"].includes(location.hostname);
   return [
     {
@@ -1710,6 +1798,14 @@ function notificationDiagnostics() {
       ok: serviceWorkerSupported
     },
     {
+      label: "진동 요청",
+      value: vibrationSupported ? "직접 지원" : "OS 제어",
+      detail: vibrationSupported
+        ? "알림과 함께 짧은 진동 패턴을 요청할 수 있습니다."
+        : "iPhone은 웹이 진동 패턴을 직접 강제하지 못하며 iOS 알림 설정과 집중 모드가 결정합니다.",
+      ok: vibrationSupported || isStandalonePwa()
+    },
+    {
       label: "백그라운드 Push",
       value: yesNo(pushSupported),
       detail: pushSupported ? "서버 Web Push를 붙이면 앱이 닫혀도 알림을 보낼 수 있습니다." : "현재는 앱이 열려 있을 때의 일정 알림만 안정적으로 검증합니다.",
@@ -1723,6 +1819,7 @@ function renderNotificationSettings() {
   qs("#notificationLead").value = String(state.notifications.leadMinutes || 5);
   qs("#notifyPopup").checked = state.notifications.popup;
   qs("#notifySound").checked = state.notifications.sound;
+  qs("#notifyVibration").checked = state.notifications.vibration;
   qs("#notifyOpenOnClick").checked = state.notifications.openOnClick;
   const permission = notificationPermission();
   const label = permission === "granted" && state.notifications.enabled
@@ -1742,6 +1839,13 @@ function renderNotificationSettings() {
         <small>${escapeHtml(item.detail)}</small>
       </div>
     `).join("");
+  }
+  if (!pushConfig()) {
+    setPushStatus("온라인 동기화를 연결하면 앱이 닫힌 상태의 알림을 설정할 수 있습니다.", "neutral");
+  } else if (!("PushManager" in window)) {
+    setPushStatus("현재 실행 환경은 백그라운드 Web Push를 지원하지 않습니다.", "warning");
+  } else {
+    setPushStatus("Supabase 알림 서버 배포가 끝나면 이 기기를 연결할 수 있습니다.", "neutral");
   }
 }
 
@@ -1767,9 +1871,15 @@ function playNotificationSound() {
   }
 }
 
+function requestNotificationVibration() {
+  if (!state.notifications.vibration || typeof navigator.vibrate !== "function") return;
+  navigator.vibrate([160, 80, 160]);
+}
+
 async function showMorningNotification(title, body, tag) {
   if (!state.notifications.enabled || !state.notifications.popup || notificationPermission() !== "granted") return;
   playNotificationSound();
+  requestNotificationVibration();
   const options = {
     body,
     tag,
@@ -1777,6 +1887,7 @@ async function showMorningNotification(title, body, tag) {
     icon: "./icons/morningdesk-icon.svg",
     data: { url: location.href }
   };
+  if (state.notifications.vibration) options.vibrate = [160, 80, 160];
 
   if (navigator.serviceWorker?.ready) {
     try {
@@ -2442,6 +2553,8 @@ function bindEvents() {
     } else {
       state.notifications.enabled = true;
     }
+    state.notifications.sound = qs("#notifySound").checked;
+    state.notifications.vibration = qs("#notifyVibration").checked;
     saveState();
     renderNotificationSettings();
     if (notificationPermission() === "granted") {
@@ -2456,6 +2569,7 @@ function bindEvents() {
       leadMinutes: Number(qs("#notificationLead").value || 5),
       popup: qs("#notifyPopup").checked,
       sound: qs("#notifySound").checked,
+      vibration: qs("#notifyVibration").checked,
       openOnClick: qs("#notifyOpenOnClick").checked,
       permission: notificationPermission()
     });
@@ -2463,6 +2577,31 @@ function bindEvents() {
     renderNotificationSettings();
     renderSchedule();
     renderPlan();
+  });
+
+  qs("#enableBackgroundPush").addEventListener("click", async () => {
+    setPushStatus("이 기기를 백그라운드 알림에 연결하고 있습니다.", "neutral");
+    try {
+      await enableBackgroundPush();
+      setPushStatus("연결됐습니다. 앱을 닫은 뒤 백그라운드 테스트를 눌러 확인하세요.", "success");
+    } catch (error) {
+      setPushStatus(error.message || "백그라운드 알림 연결에 실패했습니다.", "error");
+    }
+  });
+
+  qs("#testBackgroundPush").addEventListener("click", async () => {
+    setPushStatus("서버에서 이 기기로 테스트 알림을 보내고 있습니다.", "neutral");
+    try {
+      const result = await pushRequest("test", {
+        vibration: qs("#notifyVibration").checked
+      });
+      const sent = Number(result.sent || 0);
+      setPushStatus(sent
+        ? `${sent}개 기기로 테스트 알림을 보냈습니다.`
+        : "연결된 기기가 없습니다. 먼저 이 기기의 백그라운드 알림을 연결해주세요.", sent ? "success" : "warning");
+    } catch (error) {
+      setPushStatus(error.message || "백그라운드 테스트에 실패했습니다.", "error");
+    }
   });
 
   qs("#syncForm").addEventListener("submit", async (event) => {

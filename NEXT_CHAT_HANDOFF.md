@@ -64,7 +64,8 @@ The product philosophy is:
 
 - A web page cannot start the microphone with no user action. The first activation must be user-triggered.
 - A web/PWA notification cannot reliably force-open the app at a scheduled time. The stable first version is: show a notification, then open/focus the app when the notification is clicked.
-- Reliable notifications when the app is fully closed will likely need server-based Web Push later.
+- Closed-app notifications use server Web Push. The source is ready, but the Supabase Edge Function and VAPID secrets must be deployed before the UI can subscribe.
+- Web vibration patterns have limited browser support. On iPhone, alert vibration and haptics are ultimately controlled by iOS notification settings and Focus mode.
 - Actual article collection may need a backend because many news sites block direct browser fetches with CORS or content policies.
 
 ## Verification Already Done
@@ -93,14 +94,34 @@ The product philosophy is:
    - App open in browser.
    - PWA installed but backgrounded.
    - Browser closed.
-3. Decide notification backend:
-   - Keep local in-page reminders only for now, or
-   - Add server/Web Push later for reliable background alerts.
-4. Decide news collection path:
+3. Deploy and verify the included Supabase Web Push Edge Function.
+4. Add a Supabase Cron dispatcher only after closed-app test push succeeds.
+5. Decide news collection path:
    - Browser-only RSS/source list is simpler but limited.
    - Backend news collector is more reliable.
-5. Set up real Supabase sync for PC/mobile continuity.
 6. Test local TTS engines later.
+
+## 2026-07-14 Supabase 양방향 동기화와 Web Push 기반
+
+- 사용자가 PC와 iPhone의 Supabase 양방향 동기화 성공을 확인했다.
+- 사용자가 iPhone 홈 화면 PWA에서 기본 테스트 알림 수신을 확인했다.
+- 알림 설정에 `진동 요청`을 추가했다.
+  - 지원 브라우저에서는 `[160, 80, 160]` 패턴을 요청한다.
+  - iPhone의 실제 진동은 iOS 알림 설정과 집중 모드가 최종 결정한다.
+- 서비스워커에 `push` 이벤트 수신과 알림 표시 처리를 추가했다.
+- `supabase/functions/morningdesk-push` Edge Function을 추가했다.
+  - VAPID 공개 키 제공
+  - 기기 PushSubscription 저장
+  - 프로필 키에 연결된 기기로 테스트 Push 발송
+  - 만료된 404/410 구독 비활성화
+- 최신 SQL에는 anon 정책이 없는 `morningdesk_push_subscriptions` 테이블이 포함된다.
+- 배포 절차는 `PUSH_SETUP.md`에 정리했다.
+- 다음 순서:
+  1. 최신 SQL을 다시 실행해 Push 구독 테이블 추가
+  2. VAPID 키 생성 후 Supabase Function secrets에 저장
+  3. `morningdesk-push` Edge Function 배포
+  4. iPhone에서 `앱이 닫혀도 알림 연결` 후 백그라운드 테스트
+  5. 성공하면 Supabase Cron 일정 발송기 추가
 
 ## Start Prompt For Next Chat
 

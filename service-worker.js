@@ -1,4 +1,4 @@
-const CACHE_NAME = "morningdesk-v16";
+const CACHE_NAME = "morningdesk-v17";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -64,6 +64,25 @@ self.addEventListener("fetch", (event) => {
       });
     })
   );
+});
+
+self.addEventListener("push", (event) => {
+  let payload = {};
+  try {
+    payload = event.data?.json() || {};
+  } catch {
+    payload = { body: event.data?.text() || "새 알림이 있습니다." };
+  }
+
+  const options = {
+    body: payload.body || "확인할 일정이 있습니다.",
+    tag: payload.tag || "morningdesk-push",
+    badge: "./icons/morningdesk-icon.svg",
+    icon: "./icons/morningdesk-icon.svg",
+    data: { url: payload.url || "./" }
+  };
+  if (payload.vibration !== false) options.vibrate = [160, 80, 160];
+  event.waitUntil(self.registration.showNotification(payload.title || "모닝데스크", options));
 });
 
 self.addEventListener("notificationclick", (event) => {

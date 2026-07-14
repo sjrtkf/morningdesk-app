@@ -27,6 +27,9 @@ It helps you start the day with a short check-in, selected articles, schedule it
 - Supabase setup SQL for prototype sync
 - Read-only Supabase connection test before saving settings
 - PWA notification diagnostics and test notification button
+- Optional vibration request with device support diagnostics
+- Web Push subscription UI and service worker push handling
+- Supabase Edge Function source for closed-app test notifications
 - PNG icons for iOS home screen install
 - PWA manifest and service worker
 
@@ -46,9 +49,11 @@ Local LAN addresses such as `192.168.x.x` only work while the phone and PC are o
 
 ## Supabase Prototype Sync
 
-`supabase-morningdesk.sql` creates the prototype `morningdesk_state` table and the restricted `morningdesk_load` / `morningdesk_save` RPC functions.
+`supabase-morningdesk.sql` creates the prototype `morningdesk_state` table, the restricted `morningdesk_load` / `morningdesk_save` RPC functions, and a private Web Push subscription table.
 
 This no-login prototype uses a long random profile key generated in the app settings. Anonymous clients cannot query the table directly; they can only call the two profile-key RPC functions. It is enough for PC/mobile sync testing, but stronger private use should later move to Supabase Auth and `auth.uid()` based policies. Never enter a `service_role` key in the browser app.
+
+Closed-app notification setup is documented in `PUSH_SETUP.md`. VAPID private keys and the Supabase service role key stay in Supabase Edge Function secrets and must never be committed or entered into the browser app.
 
 ## Design Samples
 

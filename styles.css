@@ -1326,6 +1326,18 @@ select {
   line-height: 1.5;
 }
 
+.settings-divider {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--line);
+}
+
+.check-row small {
+  margin-left: auto;
+  color: var(--muted);
+  font-weight: 500;
+}
+
 .sync-status {
   margin: 0;
   padding: 11px 12px;
