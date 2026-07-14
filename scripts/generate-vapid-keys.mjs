@@ -13,4 +13,4 @@ const rawPublicKey = Buffer.concat([
 
 console.log(`VAPID_PUBLIC_KEY=${rawPublicKey.toString("base64url")}`);
 console.log(`VAPID_PRIVATE_KEY=${privateJwk.d}`);
-console.log("VAPID_SUBJECT=mailto:YOUR_EMAIL@example.com");
+console.log("VAPID_SUBJECT=https://sjrtkf.github.io/morningdesk-app/");

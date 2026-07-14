@@ -20,7 +20,7 @@ Copy the three output values directly into Supabase Edge Function secrets:
 
 - `VAPID_PUBLIC_KEY`
 - `VAPID_PRIVATE_KEY`
-- `VAPID_SUBJECT` with an email address you control
+- `VAPID_SUBJECT` with the MorningDesk public HTTPS URL
 
 ## 3. Deploy the Edge Function
 
