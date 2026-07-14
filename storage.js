@@ -181,14 +181,16 @@
     }
   }
 
-  async function load() {
+  async function load(options = {}) {
     const mode = currentMode();
     if (mode === "supabase") {
       const local = getLocalState();
       try {
         const remoteRow = await loadSupabaseState();
         const remote = remoteRow?.state || null;
-        const selected = newerState(local, remote, remoteRow?.updated_at);
+        const selected = options.preferRemote && remote
+          ? remote
+          : newerState(local, remote, remoteRow?.updated_at);
         if (selected) {
           setLocalState(selected);
           if (selected === local) {

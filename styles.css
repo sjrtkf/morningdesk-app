@@ -1319,6 +1319,13 @@ select {
   line-height: 1.4;
 }
 
+.field-hint {
+  margin: -2px 0 2px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
 .sync-status {
   margin: 0;
   padding: 11px 12px;

@@ -2478,11 +2478,22 @@ function bindEvents() {
     setSyncStatus(nextConfig.storageMode === "supabase"
       ? "온라인 저장소에 연결을 시도합니다."
       : "이 브라우저에만 저장하도록 바꿨습니다.", "neutral");
-    const result = await window.MorningDeskStorage.save(snapshotState());
+    const result = nextConfig.storageMode === "supabase"
+      ? await window.MorningDeskStorage.load({ preferRemote: true })
+      : await window.MorningDeskStorage.save(snapshotState());
     if (writeVersion !== storageWriteVersion) return;
+    if (result.state) {
+      applySavedState(result.state);
+      renderAll();
+    }
     updateStorageStatus(result);
+    const connectedMessage = result.source === "remote"
+      ? "기존 온라인 데이터를 이 기기로 가져왔습니다."
+      : result.source === "local"
+        ? "온라인 공간이 비어 있어 이 기기 데이터를 처음 올렸습니다."
+        : "동기화 설정을 저장했습니다. 아직 저장된 데이터는 없습니다.";
     setSyncStatus(result.mode === "supabase" && result.online
-      ? "동기화 설정을 저장하고 현재 데이터를 온라인에 올렸습니다."
+      ? connectedMessage
       : syncStatusMessage(result), result.mode === "supabase" && result.online ? "success" : "warning");
   });
 
@@ -2508,6 +2519,23 @@ function bindEvents() {
   qs("#generateProfileId").addEventListener("click", () => {
     qs("#syncProfileId").value = generateProfileId();
     setSyncStatus("새 프로필 키를 만들었습니다. 휴대폰과 PC에 같은 키를 넣으면 같은 데이터를 봅니다.", "success");
+  });
+
+  qs("#copyProfileId").addEventListener("click", async () => {
+    const input = qs("#syncProfileId");
+    const profileId = input.value.trim();
+    if (!profileId || profileId === "default") {
+      setSyncStatus("먼저 안전한 프로필 키를 만들어주세요.", "warning");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(profileId);
+      setSyncStatus("프로필 키를 복사했습니다. 다른 기기의 같은 입력란에 붙여 넣으세요.", "success");
+    } catch {
+      input.focus();
+      input.select();
+      setSyncStatus("프로필 키를 선택했습니다. 브라우저의 복사 기능을 사용해주세요.", "warning");
+    }
   });
 
   qs("#weightEditor").addEventListener("input", (event) => {

@@ -364,7 +364,11 @@
                     <input id="syncDeviceLabel" type="text" placeholder="phone">
                   </label>
                 </div>
-                <button class="secondary full-width" id="generateProfileId" type="button">안전한 프로필 키 만들기</button>
+                <div class="inline-form two-column">
+                  <button class="secondary full-width" id="generateProfileId" type="button">안전한 프로필 키 만들기</button>
+                  <button class="secondary full-width" id="copyProfileId" type="button">프로필 키 복사</button>
+                </div>
+                <p class="field-hint">프로필 키는 동기화 비밀번호처럼 보관하고, 각 기기에 같은 값을 입력하세요.</p>
                 <button class="secondary full-width" id="syncConnectionTest" type="button">연결만 확인</button>
                 <button class="primary full-width" type="submit">동기화 설정 저장</button>
                 <button class="secondary full-width" id="syncNow" type="button">지금 동기화</button>
