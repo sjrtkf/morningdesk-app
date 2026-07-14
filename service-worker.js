@@ -1,4 +1,4 @@
-const CACHE_NAME = "morningdesk-v19";
+const CACHE_NAME = "morningdesk-v20";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -14,6 +14,7 @@ const APP_SHELL = [
   "./icons/morningdesk-icon-192.png",
   "./icons/morningdesk-icon-512.png",
   "./supabase-morningdesk.sql",
+  "./supabase-cron-dispatch.sql",
   "./data/sample-briefing.json"
 ];
 

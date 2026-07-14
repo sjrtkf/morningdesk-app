@@ -143,3 +143,21 @@ The product philosophy is:
 ## Start Prompt For Next Chat
 
 Read `README.md`, `PROJECTS.md`, `CURRENT.md`, `프로젝트/모닝데스크/README.md`, `프로젝트/모닝데스크/requirements.md`, and this handoff file. Then continue MorningDesk from the current public app state. First verify the deployed page and local `publish/morningdesk-app` repo state, then proceed with mobile/PWA notification and Supabase sync planning unless I redirect you.
+
+## 2026-07-14 예약 Web Push 발송기 준비
+
+- `morningdesk-push` Edge Function에 일정 기반 `dispatch`와 무발송 점검용 `dispatch-preview`를 추가했다.
+- 서울 시간 기준으로 기본 리드 타임, 1분 전, 정시에 해당하는 일정을 계산한다.
+- `morningdesk_push_delivery_log`의 고유 발송 키로 같은 일정·단계·구독의 중복 발송을 막는다.
+- 만료된 404/410 Push 구독은 자동 비활성화하고 오래된 발송 기록은 정리한다.
+- 예약 실행 요청은 앱의 publishable key와 별개인 `MORNINGDESK_DISPATCH_SECRET`으로 인증한다.
+- `supabase-cron-dispatch.sql`을 추가했다. Vault 비밀값을 설정하기 전에는 실행할 수 없고, 실제 Cron 등록문은 기본적으로 주석 처리되어 있다.
+- 앱 설정에 `알림 서버 상태 확인` 버튼을 추가해 함수 배포 및 예약 비밀값 준비 여부를 확인할 수 있다.
+- 서비스워커 캐시는 `morningdesk-v20`이다.
+- 현재 Supabase 대시보드의 Auth client lock 장애 때문에 함수 배포는 완료되지 않았다. 엔드포인트는 아직 `404_NOT_FOUND`다.
+- 다음 순서:
+  1. 대시보드 정상화 후 최신 Edge Function 배포
+  2. `dispatch-preview` 결과 확인
+  3. iPhone 닫힌 앱 테스트 Push 성공 확인
+  4. Vault에 함수 URL과 dispatch secret 저장
+  5. Cron 등록 주석을 해제하고 1분 주기 예약 발송 확인

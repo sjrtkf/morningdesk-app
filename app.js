@@ -1762,7 +1762,13 @@ async function enableBackgroundPush() {
     });
   }
   await pushRequest("subscribe", { subscription: subscription.toJSON() });
-  return subscription;
+  return { subscription, schedulerConfigured: Boolean(keyResult.schedulerConfigured) };
+}
+
+async function checkBackgroundPushServer() {
+  const result = await pushRequest("public-key", {}, "GET");
+  if (!result.publicKey) throw new Error("푸시 공개 키가 준비되지 않았습니다.");
+  return Boolean(result.schedulerConfigured);
 }
 
 function notificationDiagnostics() {
@@ -2581,10 +2587,24 @@ function bindEvents() {
   qs("#enableBackgroundPush").addEventListener("click", async () => {
     setPushStatus("이 기기를 백그라운드 알림에 연결하고 있습니다.", "neutral");
     try {
-      await enableBackgroundPush();
-      setPushStatus("연결됐습니다. 앱을 닫은 뒤 백그라운드 테스트를 눌러 확인하세요.", "success");
+      const result = await enableBackgroundPush();
+      setPushStatus(result.schedulerConfigured
+        ? "연결됐습니다. 서버 일정 발송기도 준비됐습니다. 앱을 닫은 뒤 백그라운드 테스트를 눌러보세요."
+        : "기기는 연결됐습니다. 백그라운드 테스트 후 서버 일정 발송기 비밀값을 설정하세요.", result.schedulerConfigured ? "success" : "warning");
     } catch (error) {
       setPushStatus(error.message || "백그라운드 알림 연결에 실패했습니다.", "error");
+    }
+  });
+
+  qs("#checkPushServer").addEventListener("click", async () => {
+    setPushStatus("Supabase 알림 서버 상태를 확인하고 있습니다.", "neutral");
+    try {
+      const schedulerConfigured = await checkBackgroundPushServer();
+      setPushStatus(schedulerConfigured
+        ? "알림 서버와 일정 발송기 비밀값이 모두 준비됐습니다."
+        : "알림 서버는 준비됐지만 일정 발송기 비밀값은 아직 없습니다.", schedulerConfigured ? "success" : "warning");
+    } catch (error) {
+      setPushStatus(error.message || "알림 서버 상태를 확인하지 못했습니다.", "error");
     }
   });
 

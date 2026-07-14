@@ -30,6 +30,9 @@ It helps you start the day with a short check-in, selected articles, schedule it
 - Optional vibration request with device support diagnostics
 - Web Push subscription UI and service worker push handling
 - Supabase Edge Function source for closed-app test notifications
+- Asia/Seoul scheduled Push dispatcher for lead-time, one-minute, and exact reminders
+- Duplicate-delivery protection and a guarded Supabase Cron setup script
+- In-app Push server readiness check
 - PNG icons for iOS home screen install
 - PWA manifest and service worker
 
@@ -56,6 +59,8 @@ Local LAN addresses such as `192.168.x.x` only work while the phone and PC are o
 This no-login prototype uses a long random profile key generated in the app settings. Anonymous clients cannot query the table directly; they can only call the two profile-key RPC functions. It is enough for PC/mobile sync testing, but stronger private use should later move to Supabase Auth and `auth.uid()` based policies. Never enter a `service_role` key in the browser app.
 
 Closed-app notification setup is documented in `PUSH_SETUP.md`. VAPID private keys and the Supabase service role key stay in Supabase Edge Function secrets and must never be committed or entered into the browser app.
+
+Scheduled closed-app reminders use `supabase-cron-dispatch.sql`. The Cron line is disabled in the file by default and should only be enabled after the iPhone closed-app server test succeeds. Its dispatch secret is stored in Edge Function Secrets and Supabase Vault, never in source code.
 
 ## Design Samples
 
