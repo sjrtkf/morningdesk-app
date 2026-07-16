@@ -33,6 +33,8 @@ It helps you start the day with a short check-in, selected articles, schedule it
 - Asia/Seoul scheduled Push dispatcher for lead-time, one-minute, and exact reminders
 - Duplicate-delivery protection and a guarded Supabase Cron setup script
 - In-app Push server readiness check
+- Daily RSS/Atom briefing generation and publishing through Windows Task Scheduler at 06:15 Asia/Seoul
+- Windows sign-in startup shortcut installer
 - PNG icons for iOS home screen install
 - PWA manifest and service worker
 
@@ -51,6 +53,14 @@ For mobile testing outside the same Wi-Fi network, use the public HTTPS address:
 - https://sjrtkf.github.io/morningdesk-app/
 
 Local LAN addresses such as `192.168.x.x` only work while the phone and PC are on the same network. iPhone PWA notification checks should be done from the installed Home Screen app after opening the GitHub Pages URL.
+
+## Automatic Morning Operation
+
+- `scripts/install-daily-briefing-task.ps1` installs a 06:15 Windows task that refreshes, tests, commits, and publishes `data/live-briefing.json`. If the PC was unavailable at 06:15, Windows starts it when the task can next run.
+- Run `powershell -ExecutionPolicy Bypass -File scripts/uninstall-daily-briefing-task.ps1` to remove the daily update task.
+- Run `powershell -ExecutionPolicy Bypass -File scripts/install-windows-startup.ps1` once to open MorningDesk whenever Windows signs in.
+- Run `powershell -ExecutionPolicy Bypass -File scripts/uninstall-windows-startup.ps1` to remove the startup entry.
+- If live feed collection fails, the app automatically falls back to `data/sample-briefing.json` and the last service-worker cache.
 
 ## Supabase Prototype Sync
 

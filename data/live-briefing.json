@@ -1,0 +1,331 @@
+{
+  "date": "2026-07-16",
+  "settings": {
+    "dailyNewsCount": 5,
+    "excludedCategories": [
+      "스포츠",
+      "연예",
+      "가십",
+      "단순 사건사고"
+    ],
+    "categoryWeights": [
+      {
+        "name": "업무/관심 분야",
+        "weight": 40
+      },
+      {
+        "name": "경제/사회",
+        "weight": 20
+      },
+      {
+        "name": "기술/과학",
+        "weight": 15
+      },
+      {
+        "name": "국제 뉴스",
+        "weight": 15
+      },
+      {
+        "name": "시야 확장",
+        "weight": 10
+      }
+    ],
+    "newsSources": [
+      {
+        "name": "Google News",
+        "url": "https://news.google.com/topstories?hl=ko&gl=KR&ceid=KR:ko"
+      },
+      {
+        "name": "정책브리핑",
+        "url": "https://www.korea.kr/news/policyNewsList.do"
+      },
+      {
+        "name": "AP News",
+        "url": "https://apnews.com/"
+      },
+      {
+        "name": "The Guardian",
+        "url": "https://www.theguardian.com/international"
+      },
+      {
+        "name": "arXiv",
+        "url": "https://arxiv.org/"
+      }
+    ]
+  },
+  "articles": [
+    {
+      "category": "업무/관심 분야",
+      "source": "전기신문",
+      "publishedAt": "2026-07-16",
+      "country": "한국",
+      "language": "한국어",
+      "topic": "업무/관심 분야",
+      "selectionReason": "업무/관심 분야 최신 후보 · 원문 링크 확인 가능 · 스포츠·연예·가십 기본 제외",
+      "originalTitle": "[2026 전력전자학술대회] 산업계 최대 화두 AI 데이터센터, 전기차·우주 기술까지 접목할까…전력변환기술 현재와 미래",
+      "cleanTitle": "[2026 전력전자학술대회] 산업계 최대 화두 AI 데이터센터, 전기차·우주 기술까지 접목할까…전력변환기술 현재와 미래",
+      "originalExcerpt": "[2026 전력전자학술대회] 산업계 최대 화두 AI 데이터센터, 전기차·우주 기술까지 접목할까…전력변환기술 현재와 미래",
+      "translation": "[2026 전력전자학술대회] 산업계 최대 화두 AI 데이터센터, 전기차·우주 기술까지 접목할까…전력변환기술 현재와 미래. 현재 맡은 업무의 발주, 자재 수급, 전력 인입 또는 공사 일정에 영향이 있는지 확인할 후보입니다.",
+      "plainSummary": "전기신문가 이 주제의 최신 소식을 전했습니다. 자동 수집 단계에서는 과장된 결론을 붙이지 않고 원문 확인이 필요한 후보로 제시합니다.",
+      "facts": "전기신문가 “[2026 전력전자학술대회] 산업계 최대 화두 AI 데이터센터, 전기차·우주 기술까지 접목할까…전력변환기술 현재와 미래” 관련 소식을 보도했습니다. 구체 수치와 적용 시점은 원문에서 확인해야 합니다.",
+      "context": "전력·건설·설비·데이터센터 흐름은 견적, 자재, 공사 일정과 연결될 수 있어 원문 확인 가치가 있습니다.",
+      "interpretation": "자동 수집 결과이므로 제목만으로 사실관계나 영향을 확정하지 않습니다. 원문과 다른 출처를 함께 확인해야 합니다.",
+      "otherView": "같은 사건도 출처의 지역, 이해관계, 발표 주체에 따라 강조점이 달라질 수 있습니다.",
+      "implication": "현재 맡은 업무의 발주, 자재 수급, 전력 인입 또는 공사 일정에 영향이 있는지 확인할 후보입니다.",
+      "question": "이 소식이 실제 발주나 현장 일정으로 이어지는지 확인할 다음 자료는 무엇인가?",
+      "opportunity": "원문 확인 후 실제 업무와 연결되는 신호라면 유익함으로 표시해 다음 선별에 반영할 수 있습니다.",
+      "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTFBDTkxyOERZZGNlelNRNHdWcVM5RVZFY3ljQzlIYmxEYzNiNnJqQ1NEZ2pGTmpydS1HNzhFd2lKcEgzdmZTRzRKaFB6MXdyZ0FxSmVTNEdfdElJbGFNc3FkTmItUnFfUmtVNDdaNXdqZnbSAXBBVV95cUxQQ05McjhEWWRjZXpTUTR3VnFTOUVWRWN5Y0M5SGJsRGMzYjZyakNTRGdqRk5qcnUtRzc4RXdpSnBIM3ZmU0c0SmhQejF3cmdBcUplUzRHX3RJSWxhTXNxZE5iLVJxX1JrVTQ3WjV3amZ2?oc=5"
+    },
+    {
+      "category": "업무/관심 분야",
+      "source": "연합인포맥스",
+      "publishedAt": "2026-07-16",
+      "country": "한국",
+      "language": "한국어",
+      "topic": "업무/관심 분야",
+      "selectionReason": "업무/관심 분야 최신 후보 · 원문 링크 확인 가능 · 스포츠·연예·가십 기본 제외",
+      "originalTitle": "美전력 수요, AI 붐 여파 사상 최고치 경신 중",
+      "cleanTitle": "美전력 수요, AI 붐 여파 사상 최고치 경신 중",
+      "originalExcerpt": "美전력 수요, AI 붐 여파 사상 최고치 경신 중",
+      "translation": "美전력 수요, AI 붐 여파 사상 최고치 경신 중. 현재 맡은 업무의 발주, 자재 수급, 전력 인입 또는 공사 일정에 영향이 있는지 확인할 후보입니다.",
+      "plainSummary": "연합인포맥스가 이 주제의 최신 소식을 전했습니다. 자동 수집 단계에서는 과장된 결론을 붙이지 않고 원문 확인이 필요한 후보로 제시합니다.",
+      "facts": "연합인포맥스가 “美전력 수요, AI 붐 여파 사상 최고치 경신 중” 관련 소식을 보도했습니다. 구체 수치와 적용 시점은 원문에서 확인해야 합니다.",
+      "context": "전력·건설·설비·데이터센터 흐름은 견적, 자재, 공사 일정과 연결될 수 있어 원문 확인 가치가 있습니다.",
+      "interpretation": "자동 수집 결과이므로 제목만으로 사실관계나 영향을 확정하지 않습니다. 원문과 다른 출처를 함께 확인해야 합니다.",
+      "otherView": "같은 사건도 출처의 지역, 이해관계, 발표 주체에 따라 강조점이 달라질 수 있습니다.",
+      "implication": "현재 맡은 업무의 발주, 자재 수급, 전력 인입 또는 공사 일정에 영향이 있는지 확인할 후보입니다.",
+      "question": "이 소식이 실제 발주나 현장 일정으로 이어지는지 확인할 다음 자료는 무엇인가?",
+      "opportunity": "원문 확인 후 실제 업무와 연결되는 신호라면 유익함으로 표시해 다음 선별에 반영할 수 있습니다.",
+      "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE1wdVJhV0cwM2c5NUNrTVM0OXl1SVFNSDRtcDdwcDFVNnN4cVZzS2xGa2hBcEpRNTJBY1VsQnREaU9zbHVaNzZ3dHlUbUNrdFNMZ1lHZnRzN0xVZ21QSy1kSlplZ2FYV2FJQXY1bDNPWFo?oc=5"
+    },
+    {
+      "category": "경제/사회",
+      "source": "한겨레",
+      "publishedAt": "2026-07-16",
+      "country": "한국",
+      "language": "한국어",
+      "topic": "경제/사회",
+      "selectionReason": "경제/사회 최신 후보 · 원문 링크 확인 가능 · 스포츠·연예·가십 기본 제외",
+      "originalTitle": "한은, 기준금리 연 2.50%→2.75%…3년6개월 만에 인상",
+      "cleanTitle": "한은, 기준금리 연 2.50%→2.75%…3년6개월 만에 인상",
+      "originalExcerpt": "한은, 기준금리 연 2.50%→2.75%…3년6개월 만에 인상",
+      "translation": "한은, 기준금리 연 2.50%→2.75%…3년6개월 만에 인상. 바로 결론내리기보다 실제 수치와 시행 시점, 국내 영향 범위를 확인할 필요가 있습니다.",
+      "plainSummary": "한겨레가 이 주제의 최신 소식을 전했습니다. 자동 수집 단계에서는 과장된 결론을 붙이지 않고 원문 확인이 필요한 후보로 제시합니다.",
+      "facts": "한겨레가 “한은, 기준금리 연 2.50%→2.75%…3년6개월 만에 인상” 관련 소식을 보도했습니다. 구체 수치와 적용 시점은 원문에서 확인해야 합니다.",
+      "context": "경제·정책 변화는 원가, 금리, 소비, 공공 발주 조건을 통해 현장 업무에 간접 영향을 줄 수 있습니다.",
+      "interpretation": "자동 수집 결과이므로 제목만으로 사실관계나 영향을 확정하지 않습니다. 원문과 다른 출처를 함께 확인해야 합니다.",
+      "otherView": "같은 사건도 출처의 지역, 이해관계, 발표 주체에 따라 강조점이 달라질 수 있습니다.",
+      "implication": "바로 결론내리기보다 실제 수치와 시행 시점, 국내 영향 범위를 확인할 필요가 있습니다.",
+      "question": "이 변화가 비용이나 거래처 의사결정에 영향을 주는 경로는 무엇인가?",
+      "opportunity": "원문 확인 후 실제 업무와 연결되는 신호라면 유익함으로 표시해 다음 선별에 반영할 수 있습니다.",
+      "url": "https://news.google.com/rss/articles/CBMickFVX3lxTFBlRGtybWtyRExpcHFIN2pYWTRBaC1OWDhMUjQtaTZ4TERiSlRsdnlOcWJldGFYaVdzWEUtNHNhNFVVaVNHeVYySDJORTZnek5IOGVWeWFhaGRMVTNSb3ZQR0N5aktEZ2VUNktiVzhMSHZPQQ?oc=5"
+    },
+    {
+      "category": "경제/사회",
+      "source": "연합뉴스TV",
+      "publishedAt": "2026-07-16",
+      "country": "한국",
+      "language": "한국어",
+      "topic": "경제/사회",
+      "selectionReason": "경제/사회 최신 후보 · 원문 링크 확인 가능 · 스포츠·연예·가십 기본 제외",
+      "originalTitle": "[속보] 한은, 기준금리 2.75%로 0.25%p 인상",
+      "cleanTitle": "[속보] 한은, 기준금리 2.75%로 0.25%p 인상",
+      "originalExcerpt": "[속보] 한은, 기준금리 2.75%로 0.25%p 인상",
+      "translation": "[속보] 한은, 기준금리 2.75%로 0.25%p 인상. 바로 결론내리기보다 실제 수치와 시행 시점, 국내 영향 범위를 확인할 필요가 있습니다.",
+      "plainSummary": "연합뉴스TV가 이 주제의 최신 소식을 전했습니다. 자동 수집 단계에서는 과장된 결론을 붙이지 않고 원문 확인이 필요한 후보로 제시합니다.",
+      "facts": "연합뉴스TV가 “[속보] 한은, 기준금리 2.75%로 0.25%p 인상” 관련 소식을 보도했습니다. 구체 수치와 적용 시점은 원문에서 확인해야 합니다.",
+      "context": "경제·정책 변화는 원가, 금리, 소비, 공공 발주 조건을 통해 현장 업무에 간접 영향을 줄 수 있습니다.",
+      "interpretation": "자동 수집 결과이므로 제목만으로 사실관계나 영향을 확정하지 않습니다. 원문과 다른 출처를 함께 확인해야 합니다.",
+      "otherView": "같은 사건도 출처의 지역, 이해관계, 발표 주체에 따라 강조점이 달라질 수 있습니다.",
+      "implication": "바로 결론내리기보다 실제 수치와 시행 시점, 국내 영향 범위를 확인할 필요가 있습니다.",
+      "question": "이 변화가 비용이나 거래처 의사결정에 영향을 주는 경로는 무엇인가?",
+      "opportunity": "원문 확인 후 실제 업무와 연결되는 신호라면 유익함으로 표시해 다음 선별에 반영할 수 있습니다.",
+      "url": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE5rV01VY3dycW5IRHd6U1lRck51YzdpSWt4NWtGQnJ6ZjV5QmI2WUlJaTl2ZUE5MmpFcUExN0NoUXU2cEZSbndhTEhVSGl0Y216ZkRDTV9uejFDZkJGUmI5WDRjclZvYVk?oc=5"
+    },
+    {
+      "category": "기술/과학",
+      "source": "대한민국 정책브리핑",
+      "publishedAt": "2026-07-16",
+      "country": "한국",
+      "language": "한국어",
+      "topic": "기술/과학",
+      "selectionReason": "기술/과학 최신 후보 · 원문 링크 확인 가능 · 스포츠·연예·가십 기본 제외",
+      "originalTitle": "정부, 550조 AI 데이터센터 투자 견인…'1인 1 AI 에이전트' 시대 연다",
+      "cleanTitle": "정부, 550조 AI 데이터센터 투자 견인…'1인 1 AI 에이전트' 시대 연다",
+      "originalExcerpt": "정부, 550조 AI 데이터센터 투자 견인…'1인 1 AI 에이전트' 시대 연다",
+      "translation": "정부, 550조 AI 데이터센터 투자 견인…'1인 1 AI 에이전트' 시대 연다. 업무 자동화나 설비 운영에 적용할 수 있는지 작은 검증 과제로 바꿔볼 만합니다.",
+      "plainSummary": "대한민국 정책브리핑가 이 주제의 최신 소식을 전했습니다. 자동 수집 단계에서는 과장된 결론을 붙이지 않고 원문 확인이 필요한 후보로 제시합니다.",
+      "facts": "대한민국 정책브리핑가 “정부, 550조 AI 데이터센터 투자 견인…'1인 1 AI 에이전트' 시대 연다” 관련 소식을 보도했습니다. 구체 수치와 적용 시점은 원문에서 확인해야 합니다.",
+      "context": "새 기술은 발표 자체보다 비용, 신뢰성, 규제, 현장 적용 시점이 중요합니다.",
+      "interpretation": "자동 수집 결과이므로 제목만으로 사실관계나 영향을 확정하지 않습니다. 원문과 다른 출처를 함께 확인해야 합니다.",
+      "otherView": "같은 사건도 출처의 지역, 이해관계, 발표 주체에 따라 강조점이 달라질 수 있습니다.",
+      "implication": "업무 자동화나 설비 운영에 적용할 수 있는지 작은 검증 과제로 바꿔볼 만합니다.",
+      "question": "이 기술을 실제 업무에 쓰려면 가장 먼저 검증해야 할 조건은 무엇인가?",
+      "opportunity": "원문 확인 후 실제 업무와 연결되는 신호라면 유익함으로 표시해 다음 선별에 반영할 수 있습니다.",
+      "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxONkMwLWc5amF4b1d4Mld5LUdOMXlYSXpFc1Nod2xjVWZfSEpLWnVlTzBZWG9VcjlnRHlDZDJCTWxjZWV0b2h0UDdZTWNNNlZBTk12RGpBQTdTSU5hOEJ3b2V1cnZ5ZkdDeTZUVnNLaUtFeWVmQUlDcjFQNHFvVC1ZSnhzSGZjWTVCUTktTA?oc=5"
+    },
+    {
+      "category": "기술/과학",
+      "source": "연합뉴스",
+      "publishedAt": "2026-07-16",
+      "country": "한국",
+      "language": "한국어",
+      "topic": "기술/과학",
+      "selectionReason": "기술/과학 최신 후보 · 원문 링크 확인 가능 · 스포츠·연예·가십 기본 제외",
+      "originalTitle": "대전 도시철도서 시각장애인 길 안내 로봇 실증",
+      "cleanTitle": "대전 도시철도서 시각장애인 길 안내 로봇 실증",
+      "originalExcerpt": "대전 도시철도서 시각장애인 길 안내 로봇 실증",
+      "translation": "대전 도시철도서 시각장애인 길 안내 로봇 실증. 업무 자동화나 설비 운영에 적용할 수 있는지 작은 검증 과제로 바꿔볼 만합니다.",
+      "plainSummary": "연합뉴스가 이 주제의 최신 소식을 전했습니다. 자동 수집 단계에서는 과장된 결론을 붙이지 않고 원문 확인이 필요한 후보로 제시합니다.",
+      "facts": "연합뉴스가 “대전 도시철도서 시각장애인 길 안내 로봇 실증” 관련 소식을 보도했습니다. 구체 수치와 적용 시점은 원문에서 확인해야 합니다.",
+      "context": "새 기술은 발표 자체보다 비용, 신뢰성, 규제, 현장 적용 시점이 중요합니다.",
+      "interpretation": "자동 수집 결과이므로 제목만으로 사실관계나 영향을 확정하지 않습니다. 원문과 다른 출처를 함께 확인해야 합니다.",
+      "otherView": "같은 사건도 출처의 지역, 이해관계, 발표 주체에 따라 강조점이 달라질 수 있습니다.",
+      "implication": "업무 자동화나 설비 운영에 적용할 수 있는지 작은 검증 과제로 바꿔볼 만합니다.",
+      "question": "이 기술을 실제 업무에 쓰려면 가장 먼저 검증해야 할 조건은 무엇인가?",
+      "opportunity": "원문 확인 후 실제 업무와 연결되는 신호라면 유익함으로 표시해 다음 선별에 반영할 수 있습니다.",
+      "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE1fbWhaVV9YcUp5UDRfUVpEMEk4bUhvNGNsRjN3NFN4N1B0bE0wRTlsVThGTmJvRjNOaHRIV0kySzJYcjJlbVVlSFA5R2VXOFlhc2R3Wl9DNjZVaXhHclpVSdIBYEFVX3lxTE1fbWhaVV9YcUp5UDRfUVpEMEk4bUhvNGNsRjN3NFN4N1B0bE0wRTlsVThGTmJvRjNOaHRIV0kySzJYcjJlbVVlSFA5R2VXOFlhc2R3Wl9DNjZVaXhHclpVSQ?oc=5"
+    },
+    {
+      "category": "국제 뉴스",
+      "source": "The Guardian",
+      "publishedAt": "2026-07-16",
+      "country": "영국/국제",
+      "language": "영어",
+      "topic": "국제 뉴스",
+      "selectionReason": "국제 뉴스 최신 후보 · 원문 링크 확인 가능 · 스포츠·연예·가십 기본 제외",
+      "originalTitle": "Moroccan intelligence insider reveals widespread use of Pegasus hacking software",
+      "cleanTitle": "Moroccan intelligence insider reveals widespread use of Pegasus hacking software",
+      "originalExcerpt": "Moroccan intelligence insider reveals widespread use of Pegasus hacking software",
+      "translation": "영문 원문 후보입니다. 제목과 원문을 함께 보고, 수치·주체·시점을 직접 확인하세요. 국내 상황과 동일하다고 가정하지 말고 관련 국내 보도와 함께 비교해야 합니다.",
+      "plainSummary": "The Guardian가 이 주제의 최신 소식을 전했습니다. 자동 수집 단계에서는 과장된 결론을 붙이지 않고 원문 확인이 필요한 후보로 제시합니다.",
+      "facts": "The Guardian가 “Moroccan intelligence insider reveals widespread use of Pegasus hacking software” 관련 소식을 보도했습니다. 구체 수치와 적용 시점은 원문에서 확인해야 합니다.",
+      "context": "해외 정책과 산업 변화는 공급망, 원자재, 환율, 국내 제도 변화의 선행 신호가 될 수 있습니다.",
+      "interpretation": "자동 수집 결과이므로 제목만으로 사실관계나 영향을 확정하지 않습니다. 원문과 다른 출처를 함께 확인해야 합니다.",
+      "otherView": "같은 사건도 출처의 지역, 이해관계, 발표 주체에 따라 강조점이 달라질 수 있습니다.",
+      "implication": "국내 상황과 동일하다고 가정하지 말고 관련 국내 보도와 함께 비교해야 합니다.",
+      "question": "이 해외 흐름이 한국 시장과 내 업무에 전달되는 경로는 무엇인가?",
+      "opportunity": "원문 확인 후 실제 업무와 연결되는 신호라면 유익함으로 표시해 다음 선별에 반영할 수 있습니다.",
+      "url": "https://www.theguardian.com/news/2026/jul/16/morocco-intelligence-insider-reveals-widespread-use-hacking-software-pegasus"
+    },
+    {
+      "category": "국제 뉴스",
+      "source": "The Guardian",
+      "publishedAt": "2026-07-16",
+      "country": "영국/국제",
+      "language": "영어",
+      "topic": "국제 뉴스",
+      "selectionReason": "국제 뉴스 최신 후보 · 원문 링크 확인 가능 · 스포츠·연예·가십 기본 제외",
+      "originalTitle": "How global heating supercharged floods in West Africa, displacing thousands",
+      "cleanTitle": "How global heating supercharged floods in West Africa, displacing thousands",
+      "originalExcerpt": "How global heating supercharged floods in West Africa, displacing thousands",
+      "translation": "영문 원문 후보입니다. 제목과 원문을 함께 보고, 수치·주체·시점을 직접 확인하세요. 국내 상황과 동일하다고 가정하지 말고 관련 국내 보도와 함께 비교해야 합니다.",
+      "plainSummary": "The Guardian가 이 주제의 최신 소식을 전했습니다. 자동 수집 단계에서는 과장된 결론을 붙이지 않고 원문 확인이 필요한 후보로 제시합니다.",
+      "facts": "The Guardian가 “How global heating supercharged floods in West Africa, displacing thousands” 관련 소식을 보도했습니다. 구체 수치와 적용 시점은 원문에서 확인해야 합니다.",
+      "context": "해외 정책과 산업 변화는 공급망, 원자재, 환율, 국내 제도 변화의 선행 신호가 될 수 있습니다.",
+      "interpretation": "자동 수집 결과이므로 제목만으로 사실관계나 영향을 확정하지 않습니다. 원문과 다른 출처를 함께 확인해야 합니다.",
+      "otherView": "같은 사건도 출처의 지역, 이해관계, 발표 주체에 따라 강조점이 달라질 수 있습니다.",
+      "implication": "국내 상황과 동일하다고 가정하지 말고 관련 국내 보도와 함께 비교해야 합니다.",
+      "question": "이 해외 흐름이 한국 시장과 내 업무에 전달되는 경로는 무엇인가?",
+      "opportunity": "원문 확인 후 실제 업무와 연결되는 신호라면 유익함으로 표시해 다음 선별에 반영할 수 있습니다.",
+      "url": "https://www.theguardian.com/world/2026/jul/16/how-global-heating-supercharged-floods-west-africa-displacing-thousands"
+    },
+    {
+      "category": "시야 확장",
+      "source": "arXiv",
+      "publishedAt": "2026-07-15",
+      "country": "국제 연구",
+      "language": "영어",
+      "topic": "시야 확장",
+      "selectionReason": "시야 확장 최신 후보 · 원문 링크 확인 가능 · 스포츠·연예·가십 기본 제외",
+      "originalTitle": "MxGPS: Multiplex Graph Transformers for a Power Grid Foundation Model",
+      "cleanTitle": "MxGPS: Multiplex Graph Transformers for a Power Grid Foundation Model",
+      "originalExcerpt": "MxGPS: Multiplex Graph Transformers for a Power Grid Foundation Model",
+      "translation": "영문 원문 후보입니다. 제목과 원문을 함께 보고, 수치·주체·시점을 직접 확인하세요. 기존 방식과 다른 가정을 발견하고 후속 자료를 찾는 출발점으로 활용합니다.",
+      "plainSummary": "arXiv가 이 주제의 최신 소식을 전했습니다. 자동 수집 단계에서는 과장된 결론을 붙이지 않고 원문 확인이 필요한 후보로 제시합니다.",
+      "facts": "arXiv가 “MxGPS: Multiplex Graph Transformers for a Power Grid Foundation Model” 관련 소식을 보도했습니다. 구체 수치와 적용 시점은 원문에서 확인해야 합니다.",
+      "context": "연구 결과는 가능성을 보여주지만 실제 현장 조건과 정책에 그대로 적용되지는 않습니다.",
+      "interpretation": "자동 수집 결과이므로 제목만으로 사실관계나 영향을 확정하지 않습니다. 원문과 다른 출처를 함께 확인해야 합니다.",
+      "otherView": "같은 사건도 출처의 지역, 이해관계, 발표 주체에 따라 강조점이 달라질 수 있습니다.",
+      "implication": "기존 방식과 다른 가정을 발견하고 후속 자료를 찾는 출발점으로 활용합니다.",
+      "question": "이 연구의 가정 중 내 현장과 가장 다른 조건은 무엇인가?",
+      "opportunity": "원문 확인 후 실제 업무와 연결되는 신호라면 유익함으로 표시해 다음 선별에 반영할 수 있습니다.",
+      "url": "https://arxiv.org/abs/2607.13763v1"
+    },
+    {
+      "category": "시야 확장",
+      "source": "arXiv",
+      "publishedAt": "2026-07-13",
+      "country": "국제 연구",
+      "language": "영어",
+      "topic": "시야 확장",
+      "selectionReason": "시야 확장 최신 후보 · 원문 링크 확인 가능 · 스포츠·연예·가십 기본 제외",
+      "originalTitle": "A Hierarchical Semi-Markov Load Model for AI Data Centers Coupling Job Scheduling with Bulk-Synchronous-Parallel Power Dynamics",
+      "cleanTitle": "A Hierarchical Semi-Markov Load Model for AI Data Centers Coupling Job Scheduling with Bulk-Synchronous-Parallel Power Dynamics",
+      "originalExcerpt": "A Hierarchical Semi-Markov Load Model for AI Data Centers Coupling Job Scheduling with Bulk-Synchronous-Parallel Power Dynamics",
+      "translation": "영문 원문 후보입니다. 제목과 원문을 함께 보고, 수치·주체·시점을 직접 확인하세요. 기존 방식과 다른 가정을 발견하고 후속 자료를 찾는 출발점으로 활용합니다.",
+      "plainSummary": "arXiv가 이 주제의 최신 소식을 전했습니다. 자동 수집 단계에서는 과장된 결론을 붙이지 않고 원문 확인이 필요한 후보로 제시합니다.",
+      "facts": "arXiv가 “A Hierarchical Semi-Markov Load Model for AI Data Centers Coupling Job Scheduling with Bulk-Synchronous-Parallel Power Dynamics” 관련 소식을 보도했습니다. 구체 수치와 적용 시점은 원문에서 확인해야 합니다.",
+      "context": "연구 결과는 가능성을 보여주지만 실제 현장 조건과 정책에 그대로 적용되지는 않습니다.",
+      "interpretation": "자동 수집 결과이므로 제목만으로 사실관계나 영향을 확정하지 않습니다. 원문과 다른 출처를 함께 확인해야 합니다.",
+      "otherView": "같은 사건도 출처의 지역, 이해관계, 발표 주체에 따라 강조점이 달라질 수 있습니다.",
+      "implication": "기존 방식과 다른 가정을 발견하고 후속 자료를 찾는 출발점으로 활용합니다.",
+      "question": "이 연구의 가정 중 내 현장과 가장 다른 조건은 무엇인가?",
+      "opportunity": "원문 확인 후 실제 업무와 연결되는 신호라면 유익함으로 표시해 다음 선별에 반영할 수 있습니다.",
+      "url": "https://arxiv.org/abs/2607.12222v1"
+    }
+  ],
+  "schedule": [
+    {
+      "time": "09:20",
+      "title": "오늘 핵심 업무와 일정 1개 확정",
+      "type": "확인",
+      "reminderBefore": 5
+    },
+    {
+      "time": "10:30",
+      "title": "전력·AI 인프라 기사 1개 원문 확인",
+      "type": "리서치",
+      "reminderBefore": 10
+    },
+    {
+      "time": "14:00",
+      "title": "중요한 일 30분 집중",
+      "type": "작업",
+      "reminderBefore": 15
+    }
+  ],
+  "tasks": [
+    {
+      "title": "오늘 가장 중요한 일 하나 정하기",
+      "priority": "핵심",
+      "status": "today",
+      "firstAction": "해야 할 결과물을 한 문장으로 쓰기"
+    },
+    {
+      "title": "전력·AI 인프라 기사에서 업무 신호 1개 찾기",
+      "priority": "보통",
+      "status": "today",
+      "firstAction": "원문 제목과 핵심 수치만 확인"
+    },
+    {
+      "title": "미룬 일 하나를 10분짜리로 쪼개기",
+      "priority": "보통",
+      "status": "deferred",
+      "daysDeferred": 3,
+      "deferReason": "일이 너무 큼"
+    },
+    {
+      "title": "내일 아침에 볼 체크리스트 적기",
+      "priority": "가볍게",
+      "status": "today",
+      "firstAction": "확인할 사이트 2개만 적기"
+    }
+  ],
+  "generatedAt": "2026-07-16T08:20:59.836Z",
+  "automation": {
+    "source": "scheduled-rss",
+    "successfulFeeds": 5,
+    "totalFeeds": 5
+  }
+}

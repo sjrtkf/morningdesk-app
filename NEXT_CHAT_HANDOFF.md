@@ -161,3 +161,12 @@ Read `README.md`, `PROJECTS.md`, `CURRENT.md`, `프로젝트/모닝데스크/REA
   3. iPhone 닫힌 앱 테스트 Push 성공 확인
   4. Vault에 함수 URL과 dispatch secret 저장
   5. Cron 등록 주석을 해제하고 1분 주기 예약 발송 확인
+
+## 2026-07-16 자동 브리핑과 Windows 자동 실행
+
+- Windows 작업 스케줄러가 매일 06:15(Asia/Seoul)에 공개 RSS/Atom 5개 묶음을 수집하고 테스트한 뒤 `data/live-briefing.json`을 GitHub에 게시한다.
+- 전력·데이터센터·건설·공공입찰, 경제, 기술, 국제, 전력망 연구를 카테고리별로 고르게 수집한다.
+- 기사 전문은 저장하지 않고 제목, 원문 링크, 출처, 확인 질문과 보수적인 자동 해석만 저장한다.
+- 수집 실패 시 샘플 브리핑과 서비스워커 캐시로 자동 대체한다.
+- Windows 로그인 시 공개 앱을 여는 설치·제거 PowerShell 스크립트를 추가했다.
+- 서비스워커 캐시는 `morningdesk-v21`이다.

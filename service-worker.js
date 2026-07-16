@@ -1,4 +1,4 @@
-const CACHE_NAME = "morningdesk-v20";
+const CACHE_NAME = "morningdesk-v21";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -15,6 +15,7 @@ const APP_SHELL = [
   "./icons/morningdesk-icon-512.png",
   "./supabase-morningdesk.sql",
   "./supabase-cron-dispatch.sql",
+  "./data/live-briefing.json",
   "./data/sample-briefing.json"
 ];
 
@@ -42,6 +43,7 @@ self.addEventListener("fetch", (event) => {
   const requestUrl = new URL(event.request.url);
   const refreshFirst = ["document", "script", "style"].includes(event.request.destination)
     || requestUrl.pathname.endsWith("/data/sample-briefing.json")
+    || requestUrl.pathname.endsWith("/data/live-briefing.json")
     || requestUrl.pathname.endsWith("/manifest.webmanifest")
     || requestUrl.pathname.endsWith("/manifest-v12.webmanifest");
   if (refreshFirst) {

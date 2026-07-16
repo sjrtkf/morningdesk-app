@@ -1146,9 +1146,17 @@ async function loadBriefing() {
   }
 
   try {
-    const response = await fetch("./data/sample-briefing.json");
-    if (!response.ok) throw new Error("sample data unavailable");
-    state.data = await response.json();
+    const sampleResponse = await fetch("./data/sample-briefing.json");
+    if (!sampleResponse.ok) throw new Error("sample data unavailable");
+    const sample = await sampleResponse.json();
+    let live = null;
+    try {
+      const liveResponse = await fetch("./data/live-briefing.json", { cache: "no-store" });
+      if (liveResponse.ok) live = await liveResponse.json();
+    } catch {
+      // Keep the bundled sample when the scheduled briefing is temporarily unavailable.
+    }
+    state.data = live?.articles?.length >= 5 ? live : sample;
   } catch {
     state.data = fallbackData;
   }
@@ -1230,7 +1238,10 @@ function renderArticles() {
 function selectionRuleText() {
   const tone = dashboardTone();
   const config = dashboardToneConfig(tone);
-  return `추천 기준: 조회수보다 업무 연결성, 오늘 판단에 필요한 맥락, 출처 다양성, 사용자의 피드백을 먼저 봅니다. ${config.badge}에서는 최대 ${config.articleLimit}개만 보여줍니다.`;
+  const updated = state.data.generatedAt
+    ? `자동 갱신 ${new Date(state.data.generatedAt).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}. `
+    : "기본 브리핑 사용 중. ";
+  return `${updated}추천 기준: 조회수보다 업무 연결성, 오늘 판단에 필요한 맥락, 출처 다양성, 사용자의 피드백을 먼저 봅니다. ${config.badge}에서는 최대 ${config.articleLimit}개만 보여줍니다.`;
 }
 
 function comparisonBlock(article) {
